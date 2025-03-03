@@ -1,10 +1,12 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/"; // Update with your backend URL
+const API_URL = "http://localhost:5000/api"; //  backend URL
+
+const orders="orders"
 
 export const getOrders = async () => {
   try {
-    const response = await axios.get(API_URL);
+    const response = await axios.get(`${API_URL}/${orders}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -14,7 +16,7 @@ export const getOrders = async () => {
 
 export const createOrder = async (orderData) => {
   try {
-    const response = await axios.post(API_URL, orderData);
+    const response = await axios.post(`${API_URL}/${orders}`, orderData);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error);
@@ -23,7 +25,7 @@ export const createOrder = async (orderData) => {
 
 export const updateOrderStatus = async (orderId, status) => {
   try {
-    const response = await axios.put(`${API_URL}/${orderId}`, { status });
+    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status });
     return response.data;
   } catch (error) {
     console.error("Error updating order:", error);
