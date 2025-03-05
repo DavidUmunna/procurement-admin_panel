@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import { createOrder } from "../services/OrderService";
 
+
 const CreateOrder = () => {
-  const [supplier, setSupplier] = useState("");
-  const [products, setProducts] = useState([{ product: "", quantity: 1 }]);
+  const [supplier, setSupplier] = useState("Company");
+  const [products, setProducts] = useState([{ Name: "", quantity: 1 ,price:`₦${0}`}]);
+  const [orderedBy,setorderedBy]=useState("")
+  //const [price,setPrice]=useState(`₦`)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await createOrder({ supplier, products });
-    setSupplier("");
-    setProducts([{ product: "", quantity: 1 }]);
+    const orderData=await createOrder({ supplier, products, orderedBy });
+  
+    console.log("Submitting order data:", orderData);
+    await createOrder(orderData)
+    setorderedBy("");
+    setSupplier("Company");
+    setProducts([{ Name: "", quantity: 1,price:`₦${0}` }]);
     alert("Order Created!");
   };
 
@@ -20,7 +27,7 @@ const CreateOrder = () => {
   };
 
   const addProduct = () => {
-    setProducts([...products, { product: "", quantity: 1 }]);
+    setProducts([...products, { Name: "", quantity: 1 }]);
   };
 
   const removeProduct = (index) => {
@@ -34,11 +41,22 @@ const CreateOrder = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Create Purchase Order</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2">Supplier ID:</label>
+            <label className="block text-gray-700 font-bold mb-2">Supplier :</label>
             <input
               type="text"
+              placeholder="Optional"
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
+              
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2">ordered By:</label>
+            <input
+              type="text"
+              value={orderedBy}
+              onChange={(e) => setorderedBy(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -46,12 +64,12 @@ const CreateOrder = () => {
 
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Products</h3>
           {products.map((item, index) => (
-            <div key={index} className="flex space-x-4 mb-4">
+            <div key={index} className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
               <input
                 type="text"
-                placeholder="Product ID"
-                value={item.product}
-                onChange={(e) => handleProductChange(index, "product", e.target.value)}
+                placeholder="Product Name"
+                value={item.Name}
+                onChange={(e) => handleProductChange(index, "Name", e.target.value)}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -60,6 +78,14 @@ const CreateOrder = () => {
                 placeholder="Quantity"
                 value={item.quantity}
                 onChange={(e) => handleProductChange(index, "quantity", e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                placeholder="price"
+                value={item.price}
+                onChange={(e) => handleProductChange(index, "price", e.target.value)}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

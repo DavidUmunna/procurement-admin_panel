@@ -7,6 +7,7 @@ const orders="orders"
 export const getOrders = async () => {
   try {
     const response = await axios.get(`${API_URL}/${orders}`);
+    console.log(response)
     return response.data;
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -16,7 +17,9 @@ export const getOrders = async () => {
 
 export const createOrder = async (orderData) => {
   try {
+    console.log(orderData)
     const response = await axios.post(`${API_URL}/${orders}`, orderData);
+    console.log(response)
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error);
