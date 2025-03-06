@@ -110,7 +110,7 @@ const OrderList = () => {
                         className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                         onClick={() => toggleDropdown(order._id)}
                       >
-                        {order.status === "Pending" ? "Complete" : "Pending"}
+                        {order.status === "Pending" ? "Pending" : "Complete"}
                       </button>
                       {dropdownOpen === order._id && (
                         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
