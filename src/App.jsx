@@ -20,7 +20,7 @@ const App = () => {
               <Link to="/create" className="px-4 py-2 bg-white text-yellow-500 rounded-lg hover:bg-gray-200 transition font-bold">
                 Create Order
               </Link>
-              <Link to="/src/pages/User.jsx" className="px-4 py-2 bg-white text-yellow-500 rounded-lg hover:bg-gray-200 transition font-bold">
+              <Link to="/users" className="px-4 py-2 bg-white text-yellow-500 rounded-lg hover:bg-gray-200 transition font-bold">
                 Users
               </Link>
             </div>

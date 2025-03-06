@@ -3,7 +3,7 @@ import { createOrder } from "../services/OrderService";
 
 
 const CreateOrder = () => {
-  const [supplier, setSupplier] = useState("Company");
+  const [supplier, setSupplier] = useState("Halden");
   const [products, setProducts] = useState([{ Name: "", quantity: 1 ,price:`₦${0}`}]);
   const [orderedBy,setorderedBy]=useState("")
   //const [price,setPrice]=useState(`₦`)
