@@ -4,7 +4,7 @@ import OrderList from "./components/OrderList";
 import CreateOrder from "./components/CreateOrder";
 
 import './index.css';
-import Users from "./pages/User";
+import Users from "./pages/User_list";
 
 const App = () => {
   return (
@@ -31,6 +31,7 @@ const App = () => {
             
             <Route path="/" element={<OrderList />} />
             <Route path="/create" element={<CreateOrder />} />
+            <Route path="/users" element={<Users />} />
           </Routes>
         </div>
       </div>
