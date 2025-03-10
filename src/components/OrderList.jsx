@@ -46,18 +46,18 @@ const OrderList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">
-      <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">📦 Order List</h2>
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">📦 Order List</h2>
 
         {orders.length === 0 ? (
           <p className="text-gray-500 text-center">No orders found.</p>
         ) : (
-          <ul className="space-y-6">
+          <ul className="space-y-4 sm:space-y-6">
             {orders.map((order) => (
               <li
                 key={order.orderNumber}
-                className="p-6 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all"
+                className="p-4 sm:p-6 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all"
               >
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                   <div className="flex-1 mb-4 md:mb-0">
@@ -71,17 +71,15 @@ const OrderList = () => {
                       {expandedOrder === order.orderNumber ? (
                         <>
                           <ChevronUpIcon className="h-5 w-5" />
-                          
                         </>
                       ) : (
                         <>
                           <ChevronDownIcon className="h-5 w-5" />
-                          
                         </>
                       )}
                     </button>
                     {expandedOrder === order.orderNumber && (
-                      <div className="mt-2 space-y-4">
+                      <div className="mt-2 space-y-2 sm:space-y-4">
                         {order.products.map((product) => (
                           <div key={product._id} className="flex flex-col md:flex-row text-sm text-gray-500 space-y-2 md:space-y-0 md:space-x-6">
                             <p className="font-medium text-gray-700">Product: {product.Name}</p>
@@ -104,10 +102,10 @@ const OrderList = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex space-x-4">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                     <div className="relative">
                       <button
-                        className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                        className="px-4 py-2 sm:px-5 sm:py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                         onClick={() => toggleDropdown(order._id)}
                       >
                         {order.status === "Pending" ? "Pending" : "Complete"}
@@ -130,7 +128,7 @@ const OrderList = () => {
                       )}
                     </div>
                     <button
-                      className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                      className="px-4 py-2 sm:px-5 sm:py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                       onClick={() => handleDelete(order._id)}
                     >
                       Delete

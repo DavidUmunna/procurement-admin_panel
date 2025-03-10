@@ -1,4 +1,5 @@
 import axios from "axios";
+//import User from "../../../procurement-users-panel/src/components/user-navbar";
 
 const circuitBreaker=require("opossum")
 
@@ -47,3 +48,20 @@ create_users_breaker.fallback(() => ({ message: "Service is down. Please try aga
 
 create_users_breaker.fire().then((response)=>console.log(response))
 .catch(err=>console.error("circuit breaker triggered",err))
+
+export const updateUser= async (userId, status) => {
+    try {
+      const response = await axios.put(`${API_URL}/${route}/${userId}`, { status });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+export const deleteUser = async (userId) => {
+    try {
+      await axios.delete(`${API_URL}/${userId}`);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
