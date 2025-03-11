@@ -1,17 +1,13 @@
 import axios from "axios";
 //import User from "../../../procurement-users-panel/src/components/user-navbar";
 
-const circuitBreaker=require("opossum")
+//const circuitBreaker=require("opossum")
 
 
 const API_URL="http://localhost:5000/api"
 
 const route="users"
-const options={
-    timeout:3000,
-    errorthresholdpercentage:50,
-    resettimeout:5000
-  }
+
 
 
 export const get_users=async ()=>{
@@ -27,11 +23,7 @@ export const get_users=async ()=>{
     
 }
 
-const get_users_breaker=new circuitBreaker(get_users,options)
-get_users_breaker.fallback(() => ({ message: "Service is down. Please try again later." }))
 
-get_users_breaker.fire().then((response)=>console.log(response))
-.catch(err=>console.error("circuit breaker triggered",err))
 
 export const createUser = async (userData) => {
     try {
@@ -43,11 +35,7 @@ export const createUser = async (userData) => {
       console.error("Error creating user:", error);
     }
   };
-const create_users_breaker=new circuitBreaker(createUser,options)
-create_users_breaker.fallback(() => ({ message: "Service is down. Please try again later." }))
 
-create_users_breaker.fire().then((response)=>console.log(response))
-.catch(err=>console.error("circuit breaker triggered",err))
 
 export const updateUser= async (userId, status) => {
     try {
@@ -60,7 +48,7 @@ export const updateUser= async (userId, status) => {
 
 export const deleteUser = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/${userId}`);
+      await axios.delete(`${API_URL}/${route}/${userId}`);
     } catch (error) {
       console.error("Error deleting user:", error);
     }

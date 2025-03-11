@@ -102,7 +102,7 @@ const CreateOrder = () => {
           <button
             type="button"
             onClick={addProduct}
-            className="px-2 y-2 w-7 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"  
+            className="p-2 y-4 w-full bg-green-500 text-white rounded-lg hover:bg-green-600 transition"  
           >
             Add Product
           </button>

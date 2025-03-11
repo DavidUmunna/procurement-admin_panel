@@ -5,11 +5,7 @@ const API_URL = "http://localhost:5000/api"; //  backend URL
 
 const orders="orders"
 
-const options={
-  timeout:3000,
-  errorthresholdpercentage:50,
-  resettimeout:5000
-}
+
 
 export const getOrders = async () => {
   try {
