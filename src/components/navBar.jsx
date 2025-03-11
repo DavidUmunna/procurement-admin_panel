@@ -6,7 +6,7 @@ import React from 'react';
 const user = {
   name: 'Tom Cook',
   email: 'tom@example.com',
-  imageUrl: require("./assets/profile.png");
+  imageUrl: require("./assets/profile.png")
 };
 
 const navigation = [
@@ -14,7 +14,7 @@ const navigation = [
   { name: 'CreateOrder', to: '/createorder', current: false },
   { name: 'OrderHistory', to: '#', current: false },
   { name: 'AddUsers', to: '/addusers', current: false },
-  { name: 'UserList', to: 'users', current: false },
+  { name: 'UserList', to: 'users', current: false }
 ];
 
 const userNavigation = [
