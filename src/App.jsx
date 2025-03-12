@@ -1,6 +1,5 @@
 import React from "react";
-import { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import OrderList from "./components/OrderList";
 import CreateOrder from "./components/CreateOrder";
 import Addusers from "./pages/add_users";
@@ -20,7 +19,7 @@ const App = () => {
           <Routes>
             <Route path="/addusers" element={<Addusers />} />
             <Route path="/" element={<OrderList />} />
-            <Route path="/create" element={<CreateOrder />} />
+            <Route path="/createorder" element={<CreateOrder />} />
             <Route path="/users" element={<Users />} />
           </Routes>
         </div>

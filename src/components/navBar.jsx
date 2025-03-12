@@ -10,7 +10,7 @@ const user = {
 };
 
 const navigation = [
-  { name: 'Dashboard', to: '/dashboard', current: false },
+  { name: 'OrderList', to: '/', current: false },
   { name: 'CreateOrder', to: '/createorder', current: false },
   { name: 'OrderHistory', to: '#', current: false },
   { name: 'AddUsers', to: '/addusers', current: false },

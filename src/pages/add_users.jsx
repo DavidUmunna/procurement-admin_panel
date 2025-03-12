@@ -16,7 +16,7 @@ const   Add_user=()=>{
       
     //const [dropdownOpen, setDropdownOpen] = useState()
     const handleSubmit=async (e)=>{
-        e.preventDefault()
+        e.preventDefault();
         const user_data=await createUser({name,email,password,role});
 
         console.log("Submitting User data:", user_data);
