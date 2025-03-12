@@ -27,8 +27,8 @@ export default function UserList() {
   };
 
   // Function to delete a user
-  const handleDelete = async (orderId) => {
-      await deleteUser(orderId);
+  const handleDelete = async (userId) => {
+      await deleteUser(userId);
       fetch_users();
     };
 
@@ -41,13 +41,13 @@ export default function UserList() {
         {users.length === 0 ? (
           <p className="text-gray-500 text-center">No Users found.</p>
         ) : (
-          <li role="list" className="divide-y divide-gray-100">
+          <ul  className="divide-y divide-gray-100">
             {users.map((person) => (
               <li key={person.email} className="flex justify-between gap-x-6 py-5">
                 <div className="flex min-w-0 gap-x-4">
                   <img
                     alt=""
-                    src={person.imageUrl}
+                    src={person.imageurl}
                     className="size-12 flex-none rounded-full bg-gray-50"
                   />
                   <div className="min-w-0 flex-auto">
@@ -66,7 +66,7 @@ export default function UserList() {
                 </div>
               </li>
             ))}
-          </li>
+          </ul>
         )}
       </div>
     </div>
