@@ -48,7 +48,7 @@ const OrderList = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
       <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">📦 Order List</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">📦 Request List</h2>
 
         {orders.length === 0 ? (
           <p className="text-gray-500 text-center">No orders found.</p>
