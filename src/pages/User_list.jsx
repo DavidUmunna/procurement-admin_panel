@@ -47,7 +47,7 @@ export default function UserList() {
                 <div className="flex min-w-0 gap-x-4">
                   <img
                     alt=""
-                    src={person.imageUrl}
+                    src={person.imageurl}
                     className="size-12 flex-none rounded-full bg-gray-50"
                   />
                   <div className="min-w-0 flex-auto">
