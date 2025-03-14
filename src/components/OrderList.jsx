@@ -64,6 +64,9 @@ const OrderList = () => {
                     <div className="font-serif text-lg text-gray-700 mb-2">
                       Ordered By: {order.orderedBy}
                     </div>
+                    <div className="font-serif text-lg text-gray-700 mb-2">
+                      User email: {order.email}
+                    </div>
                     <button
                       className="text-blue-500 hover:underline flex items-center"
                       onClick={() => toggleOrderDetails(order.orderNumber)}

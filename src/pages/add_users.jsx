@@ -67,7 +67,7 @@ const   Add_user=()=>{
                     />
                     <button
                             type="button"
-                            className=" absolute right-3 top-5/6 transform -translate-y-1/2 text-gray-500"
+                            className=" absolute right-3  top-3/4 transform -translate-y-1/2 text-gray-500"
                             onClick={() => setShowPassword(!showPassword)}
                     >
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
