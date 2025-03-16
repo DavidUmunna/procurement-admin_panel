@@ -10,15 +10,16 @@ const user = {
 };
 
 const navigation = [
-  { name: 'RequestList', to: '/', current: false },
+  { name: 'RequestList', to: '/requestlist', current: false },
   { name: 'CreateRequest', to: '/createorder', current: false },
   { name: 'AddUsers', to: '/addusers', current: false },
-  { name: 'UserList', to: 'users', current: false }
+  { name: 'UserList', to: '/users', current: false },
+  //{ name: 'RequestList', to: '/orderlist', current: false }
 ];
 
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
+  { name: 'Your Profile', to:"/userdetails" },
+  
   { name: 'Sign out', href: '/signout' },
 ];
 

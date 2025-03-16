@@ -1,30 +1,141 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import OrderList from "./components/OrderList";
 import CreateOrder from "./components/CreateOrder";
 import Addusers from "./pages/add_users";
 import Adminav from "./components/navBar";
-import './index.css';
+import { UserProvider } from "./components/usercontext";
+import "./index.css";
 import Users from "./pages/User_list";
+import Adminlogin from "./pages/admin_login";
+import Userdetails from "./pages/user_details";
+import Logout from "./components/logout";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Page transition animation
+const pageVariants = {
+  initial: { opacity: 0, y: 20, scale: 0.95 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -20, scale: 0.95 },
+};
+
+const PageTransition = ({ children }) => (
+  <motion.div
+    variants={pageVariants}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    transition={{ duration: 0.6, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
 
 const App = () => {
-  
-  return (
-    <Router>
-      <div className="min-h-screen bg-gray-100">
-        <div>
-          <Adminav/>
-        </div>
-        <div className="container mx-auto p-6">
-          <Routes>
-            <Route path="/addusers" element={<Addusers />} />
-            <Route path="/" element={<OrderList />} />
-            <Route path="/createorder" element={<CreateOrder />} />
-            <Route path="/users" element={<Users />} />
-          </Routes>
-        </div>
+  const location = useLocation();
+  const [isauthenticated, setisauthenticated] = useState(false);
+
+  useEffect(() => {
+    console.log("isauthenticated", isauthenticated);
+  }, [isauthenticated]);
+
+  if (isauthenticated === null) {
+    return (
+      <div className="flex justify-center items-center h-screen text-lg font-semibold">
+        Loading...
       </div>
-    </Router>
+    );
+  }
+
+  return (
+    <UserProvider>
+      <div className="min-h-screen bg-gray-100">
+        {/* Show Navbar only if user is authenticated */}
+        {isauthenticated && <Adminav />}
+
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/adminlogin"
+              element={
+                !isauthenticated ? (
+                  <PageTransition>
+                    <Adminlogin setAuth={setisauthenticated} />
+                  </PageTransition>
+                ) : (
+                  <Navigate to="/requestlist" />
+                )
+              }
+            />
+            <Route
+              path="/addusers"
+              element={
+                isauthenticated ? (
+                  <PageTransition>
+                    <Addusers />
+                  </PageTransition>
+                ) : (
+                  <Navigate to="/adminlogin" />
+                )
+              }
+            />
+            <Route
+              path="/requestlist"
+              element={
+                isauthenticated ? (
+                  <PageTransition>
+                    <OrderList />
+                  </PageTransition>
+                ) : (
+                  <Navigate to="/adminlogin" />
+                )
+              }
+            />
+            <Route
+              path="/createorder"
+              element={
+                isauthenticated ? (
+                  <PageTransition>
+                    <CreateOrder />
+                  </PageTransition>
+                ) : (
+                  <Navigate to="/adminlogin" />
+                )
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                isauthenticated ? (
+                  <PageTransition>
+                    <Users />
+                  </PageTransition>
+                ) : (
+                  <Navigate to="/adminlogin" />
+                )
+              }
+            />
+            <Route
+              path="/userdetails"
+              element={
+                isauthenticated ? (
+                  <PageTransition>
+                    <Userdetails />
+                  </PageTransition>
+                ) : (
+                  <Navigate to="/adminlogin" />
+                )
+              }
+            />
+            <Route
+              path="/signout"
+              element={<PageTransition><Logout setAuth={setisauthenticated} /></PageTransition>}
+            />
+            <Route path="*" element={<Navigate to={isauthenticated ? "/userdetails" : "/adminlogin"} />} />
+          </Routes>
+        </AnimatePresence>
+      </div>
+    </UserProvider>
   );
 };
 
