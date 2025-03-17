@@ -71,33 +71,9 @@ const OrderList = () => {
                     <div className="flex-1 mb-4 md:mb-0">
                       <p className="font-serif text-lg text-gray-700 mb-2">Ordered By: {order.orderedBy}</p>
                       <p className="font-serif text-lg text-gray-700 mb-2">User email: {order.email}</p>
-                      <button
-                        className="text-blue-500 hover:underline flex items-center"
-                        onClick={() => toggleOrderDetails(order._id)}
-                      >
-                        {expandedOrder === order._id ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
-                      </button>
-                      <AnimatePresence>
-                        {expandedOrder === order._id && (
-                          <motion.div 
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto", transition: { duration: 0.4, ease: "easeOut" } }}
-                            exit={{ opacity: 0, height: 0, transition: { duration: 0.3, ease: "easeIn" } }}
-                            className="mt-2 space-y-2 sm:space-y-4"
-                          >
-                            {order.products.map((product) => (
-                              <div key={product._id} className="flex flex-col md:flex-row text-sm text-gray-500 space-y-2 md:space-y-0 md:space-x-6">
-                                <p className="font-medium text-gray-700">Product: {product.Name}</p>
-                                <p>Quantity: {product.quantity}</p>
-                                <p>Price: {product.price}</p>
-                              </div>
-                            ))}
-                            <p className="text-sm text-gray-500 mt-4">
-                              Status: <span className={`px-3 py-1 rounded-full text-white ${order.status === "Pending" ? "bg-yellow-500" : "bg-green-500"}`}>{order.status}</span>
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      <p className="font-serif text-lg text-gray-700 mb-2">Urgency: {order.urgency}</p>
+                      <p className="font-serif text-lg text-gray-700 mb-2">File Uploaded: {order.file ? <a href={order.file} className="text-blue-500 underline">View File</a> : "No file uploaded"}</p>
+                      <p className="font-serif text-lg text-gray-700 mb-2">Remarks: {order.remarks || "No remarks"}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                       <div className="relative">
@@ -117,6 +93,8 @@ const OrderList = () => {
                             >
                               <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Completed")}>Complete</button>
                               <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Pending")}>Pending</button>
+                              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Approved")}>Approved</button>
+                              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Rejected")}>Rejected</button>
                             </motion.div>
                           )}
                         </AnimatePresence>

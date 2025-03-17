@@ -13,7 +13,7 @@ export default function SignOut({ setAuth }) {
         setUser(null);
         localStorage.removeItem("user");
         const token = localStorage.getItem('token');
-        localStorage.removeItem("auth");
+        
         logoutUser(token);
         localStorage.removeItem("token");
         

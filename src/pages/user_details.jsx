@@ -7,6 +7,8 @@ const UserDetails = () => {
 
   return (
     <div>
+      {user?
+      <>
       <div className="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6 text-center">
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200">
@@ -41,6 +43,7 @@ const UserDetails = () => {
           )}
         </div>
       </div>
+      </>:null}
     </div>
   );
 };

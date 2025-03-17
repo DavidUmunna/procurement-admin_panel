@@ -20,7 +20,7 @@ const navigation = [
 const userNavigation = [
   { name: 'Your Profile', to:"/userdetails" },
   
-  { name: 'Sign out', href: '/signout' },
+  { name: 'Sign out', to: '/signout' },
 ];
 
 function classNames(...classes) {
@@ -84,12 +84,12 @@ export default function User() {
                           {userNavigation.map((item) => (
                             <Menu.Item key={item.name}>
                               {({ active }) => (
-                                <a
-                                  href={item.href}
+                                <Link
+                                  to={item.to}
                                   className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                 >
                                   {item.name}
-                                </a>
+                                </Link>
                               )}
                             </Menu.Item>
                           ))}
@@ -150,7 +150,7 @@ export default function User() {
                       <Disclosure.Button
                         key={item.name}
                         as="a"
-                        href={item.href}
+                        to={item.to}
                         className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                       >
                         {item.name}

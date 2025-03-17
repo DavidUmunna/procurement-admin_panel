@@ -32,7 +32,7 @@ export default function Sign_in({ setAuth }) {
         setUser(response.data.user);
         setUserData(response.data.user);
         navigate("/adminav");
-        navigate("/userdetails")
+        
       } else {
         setError(response.data.message);
       }
@@ -130,7 +130,7 @@ export default function Sign_in({ setAuth }) {
                 type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex w-full justify-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition"
+                className="flex w-full justify-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition"
               >
                 {loading ? "Signing in..." : "Sign in"}
               </motion.button>

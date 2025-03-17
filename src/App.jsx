@@ -11,7 +11,7 @@ import Adminlogin from "./pages/admin_login";
 import Userdetails from "./pages/user_details";
 import Logout from "./components/logout";
 import { AnimatePresence, motion } from "framer-motion";
-
+import axios from "axios"
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -33,11 +33,22 @@ const PageTransition = ({ children }) => (
 
 const App = () => {
   const location = useLocation();
-  const [isauthenticated, setisauthenticated] = useState(false);
+  const [isauthenticated, setisauthenticated] = useState(null);
+
 
   useEffect(() => {
     console.log("isauthenticated", isauthenticated);
-  }, [isauthenticated]);
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/check-auth", { withCredentials: true });
+        setisauthenticated(response.data.authenticated);
+      } catch (error) {
+        setisauthenticated(false);
+        console.error(error);
+      }
+    };
+    checkAuth();
+  }, []);
 
   if (isauthenticated === null) {
     return (
@@ -63,7 +74,7 @@ const App = () => {
                     <Adminlogin setAuth={setisauthenticated} />
                   </PageTransition>
                 ) : (
-                  <Navigate to="/requestlist" />
+                  <Navigate to="/userdetails" />
                 )
               }
             />

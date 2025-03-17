@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createOrder } from "../services/OrderService";
 //import Navbar from "./navBar";
 import { motion, AnimatePresence } from "framer-motion";
+import {useUser} from "./usercontext"
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -18,19 +19,31 @@ const buttonVariants = {
 };
 
 const CreateOrder = () => {
+  const { user } = useUser();
   const [supplier, setSupplier] = useState("Halden");
   const [products, setProducts] = useState([{ Name: "", quantity: 1, price: `₦${0}` }]);
   const [orderedBy, setOrderedBy] = useState("");
+  const [urgency, setUrgency] = useState("");
+  const [file, setFile] = useState(null);
+  const [remarks, setRemarks] = useState("");
+  const [email, setemail]=useState("")
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const orderData = await createOrder({ supplier, products, orderedBy });
+    setemail(user.email)
+    const orderData = await createOrder({ supplier, orderedBy,email, urgency, file, remarks });
 
     console.log("Submitting order data:", orderData);
 
     setOrderedBy("");
     setSupplier("Company");
     setProducts([{ Name: "", quantity: 1, price: `₦${0}` }]);
+    setUrgency("");
+    setFile(null);
+    setRemarks("");
     alert("Order Created!");
   };
 
@@ -51,8 +64,6 @@ const CreateOrder = () => {
 
   return (
     <div>
-      
-
       <motion.div
         className="min-h-screen bg-gray-100 flex justify-center items-center p-6"
         variants={containerVariants}
@@ -88,7 +99,37 @@ const CreateOrder = () => {
               />
             </motion.div>
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Products</h3>
+            {/* Urgency Dropdown */}
+            <label className="block mb-2">Urgency</label>
+            <select
+              value={urgency}
+              onChange={(e) => setUrgency(e.target.value)}
+              className="w-full p-2 border rounded mb-4"
+            >
+              <option value="">Select Urgency</option>
+              <option value="VeryUrgent">Very Urgent</option>
+              <option value="Urgent">Urgent</option>
+              <option value="Not Urgent">Not Urgent</option>
+            </select>
+
+            {/* File Upload */}
+            <label className="block mb-2">Upload Document/Picture</label>
+            <input 
+              type="file" 
+              onChange={handleFileChange} 
+              className="w-full p-2 border rounded mb-4" 
+            />
+
+            {/* Remarks Text Area */}
+            <label className="block mb-2">Remarks/Message</label>
+            <textarea
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              className="w-full p-2 border rounded mb-4"
+              placeholder="Describe your request..."
+            ></textarea>
+
+            {/*<h3 className="text-xl font-semibold text-gray-800 mb-2">Products</h3>
             <AnimatePresence>
               {products.map((item, index) => (
                 <motion.div
@@ -122,34 +163,10 @@ const CreateOrder = () => {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <motion.button
-                    type="button"
-                    onClick={() => removeProduct(index)}
-                    className="px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    Remove
-                  </motion.button>
                 </motion.div>
               ))}
-            </AnimatePresence>
-            <motion.button
-              type="button"
-              onClick={addProduct}
-              className="p-2 y-4 w-full bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-              variants={buttonVariants}
-              whileHover="hover"
-            >
-              Add Product
-            </motion.button>
-            <motion.button
-              type="submit"
-              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-              variants={buttonVariants}
-              whileHover="hover"
-            >
-              Create Order
-            </motion.button>
+            </AnimatePresence>*/}
+            <motion.button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Create Order</motion.button>
           </motion.form>
         </motion.div>
       </motion.div>
