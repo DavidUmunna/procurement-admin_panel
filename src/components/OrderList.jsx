@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getOrders, updateOrderStatus, deleteOrder } from "../services/OrderService";
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
+//import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
 import { motion, AnimatePresence } from "framer-motion";
 
 const OrderList = () => {
@@ -70,6 +70,11 @@ const OrderList = () => {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div className="flex-1 mb-4 md:mb-0">
                       <p className="font-serif text-lg text-gray-700 mb-2">Ordered By: {order.orderedBy}</p>
+                      <p className="font-serif text-lg text-gray-700 mb-2">products: {order.products.map(item=>({
+                        name:item.name,
+                        quantity:item.quntity,
+                        price:item.price
+                      }))}</p>
                       <p className="font-serif text-lg text-gray-700 mb-2">User email: {order.email}</p>
                       <p className="font-serif text-lg text-gray-700 mb-2">Urgency: {order.urgency}</p>
                       <p className="font-serif text-lg text-gray-700 mb-2">File Uploaded: {order.file ? <a href={order.file} className="text-blue-500 underline">View File</a> : "No file uploaded"}</p>

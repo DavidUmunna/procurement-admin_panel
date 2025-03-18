@@ -23,7 +23,20 @@ export const get_users=async ()=>{
     
 }
 
+export const getuserbymail=async(email)=>{
+  try{
+    const response=await axios.get(`${API_URL}/${route}/${email}`)
+    if (response){
+      console.log("user email exists")
+      return response
+    }else{
+      console.log("user doesnt exist")
+    }
 
+  }catch(error){
+      console.error("an error occured:",error)
+  }
+}
 
 export const createUser = async (userData) => {
     try {
@@ -35,7 +48,18 @@ export const createUser = async (userData) => {
       console.error("Error creating user:", error);
     }
   };
+ 
 
+  export const updateUserpassword = async (email, newPassword) => {
+    try {
+      const response = await axios.put(`${API_URL}/${route}/${email}`, { email,newPassword });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating password:", error);
+      throw error; // Rethrow error for proper handling in calling function
+    }
+  };
+  
 
 export const updateUser= async (userId, status) => {
     try {

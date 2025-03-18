@@ -12,6 +12,7 @@ import Userdetails from "./pages/user_details";
 import Logout from "./components/logout";
 import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios"
+import ForgotPassword from "./pages/forgotpassword";
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -138,6 +139,12 @@ const App = () => {
                 )
               }
             />
+            <Route path="/forgotpassword"
+            element={
+              <PageTransition>
+                <ForgotPassword/>
+              </PageTransition>
+            }/>
             <Route
               path="/signout"
               element={<PageTransition><Logout setAuth={setisauthenticated} /></PageTransition>}

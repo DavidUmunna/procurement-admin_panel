@@ -34,7 +34,7 @@ const CreateOrder = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setemail(user.email)
-    const orderData = await createOrder({ supplier, orderedBy,email, urgency, file, remarks });
+    const orderData = await createOrder({ supplier, orderedBy,email,products, urgency, file, remarks });
 
     console.log("Submitting order data:", orderData);
 
@@ -129,7 +129,7 @@ const CreateOrder = () => {
               placeholder="Describe your request..."
             ></textarea>
 
-            {/*<h3 className="text-xl font-semibold text-gray-800 mb-2">Products</h3>
+            *<h3 className="text-xl font-semibold text-gray-800 mb-2">Request</h3>
             <AnimatePresence>
               {products.map((item, index) => (
                 <motion.div
@@ -163,10 +163,31 @@ const CreateOrder = () => {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                
+                  <motion.button
+                    type="button"
+                    onClick={() => removeProduct(index)}
+                    className="px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    Remove
+                  </motion.button>
+
+                 
                 </motion.div>
               ))}
-            </AnimatePresence>*/}
-            <motion.button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Create Order</motion.button>
+
+            </AnimatePresence>
+            <motion.button
+              type="button"
+              onClick={addProduct}
+              className="p-2 y-4 w-full bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+              variants={buttonVariants}
+              whileHover="hover"
+            >
+              Add Product
+            </motion.button>
+            <motion.button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Create Request</motion.button>
           </motion.form>
         </motion.div>
       </motion.div>

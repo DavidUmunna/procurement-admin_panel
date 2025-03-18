@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../components/usercontext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import {Link} from "react-router-dom"
 export default function Sign_in({ setAuth }) {
   const navigate = useNavigate();
   const { setUser } = useUser();
@@ -32,7 +32,7 @@ export default function Sign_in({ setAuth }) {
         setUser(response.data.user);
         setUserData(response.data.user);
         navigate("/adminav");
-        
+        console.log(userData)
       } else {
         setError(response.data.message);
       }
@@ -107,9 +107,9 @@ export default function Sign_in({ setAuth }) {
                   Password
                 </label>
                 <div className="text-sm">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                  <Link to="/forgotpassword" className="font-semibold text-indigo-600 hover:text-indigo-500">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="mt-2">
