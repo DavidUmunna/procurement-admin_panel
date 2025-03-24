@@ -74,7 +74,7 @@ const Add_user = () => {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-3/4 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+                  className="absolute right-3 top-5/6 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

@@ -2,14 +2,22 @@ import axios from 'axios';
 ;
 const API_URL = "http://localhost:5000/api";
 
-const route="signin"
+const route="admin-user/admin-login"
+const route_logout="signin"
 
 
+export const loginUser=async(email,password)=>{
+  try{
+    const response=axios.post(`${API_URL}/${route}`,)
+    return response.data
+  }catch(err){
 
+  }
+}
 
 export const logoutUser = async (token) => {
     try {
-      await axios.post(`${API_URL}/${route}/logout`,{},{headers:{Authorization:`Bearer${token}`}});
+      await axios.post(`${API_URL}/${route_logout}/logout`,{},{headers:{Authorization:`Bearer${token}`}});
     } catch (error) {
       console.error("Error deleting user:", error);
     }

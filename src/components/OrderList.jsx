@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getOrders, updateOrderStatus, deleteOrder } from "../services/OrderService";
-//import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
+import { getOrders, updateOrderStatus, deleteOrder, downloadFile } from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaFilePdf, FaFile } from "react-icons/fa";
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -44,6 +44,24 @@ const OrderList = () => {
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
 
+  const handleFileDownload = async (fileName, event) => {
+    event.preventDefault();
+    try {
+      const fileData = await downloadFile(fileName);
+      console.log(fileData)
+      const url = window.URL.createObjectURL(new Blob([fileData]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
       <motion.div 
@@ -70,14 +88,30 @@ const OrderList = () => {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div className="flex-1 mb-4 md:mb-0">
                       <p className="font-serif text-lg text-gray-700 mb-2">Ordered By: {order.orderedBy}</p>
-                      <p className="font-serif text-lg text-gray-700 mb-2">products: {order.products.map(item=>({
-                        name:item.name,
-                        quantity:item.quntity,
-                        price:item.price
-                      }))}</p>
+                      <p className="font-serif text-lg text-gray-700 mb-2">
+                        Products: {order.products.map((item, index) => (
+                          <span key={index}>
+                            {item.name} (Qty: {item.quantity}, Price: {item.price})
+                          </span>
+                        ))}
+                      </p>
                       <p className="font-serif text-lg text-gray-700 mb-2">User email: {order.email}</p>
-                      <p className="font-serif text-lg text-gray-700 mb-2">Urgency: {order.urgency}</p>
-                      <p className="font-serif text-lg text-gray-700 mb-2">File Uploaded: {order.file ? <a href={order.file} className="text-blue-500 underline">View File</a> : "No file uploaded"}</p>
+                      <p className={`font-serif text-lg mb-2 ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
+                        Urgency: {order.urgency}
+                      </p>
+                      <p className="font-serif text-lg text-gray-700 mb-2">
+                        File Uploaded: {order.filename ? (
+                          <a
+                            href="#"
+                            onClick={(event) => handleFileDownload(order.filename, event)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                          >
+                            View File
+                          </a>
+                        ) : "No file uploaded"}
+                      </p>
                       <p className="font-serif text-lg text-gray-700 mb-2">Remarks: {order.remarks || "No remarks"}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">

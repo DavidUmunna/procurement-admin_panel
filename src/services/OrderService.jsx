@@ -39,7 +39,14 @@ export const updateOrderStatus = async (orderId, status) => {
     console.error("Error updating order:", error);
   }
 };
-
+export const downloadFile = async (fileName) => {
+  try {
+    const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileName}`, { responseType: "blob" });
+    return response_2.data;
+  } catch (err) {
+    console.error({ err });
+  }
+};
 
 export const deleteOrder = async (orderId) => {
   try {
