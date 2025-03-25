@@ -2,8 +2,17 @@ import React, { useEffect, useState } from "react";
 import { getOrders, updateOrderStatus, deleteOrder, downloadFile } from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile } from "react-icons/fa";
+import {connect} from "react-redux"
 
-const OrderList = () => {
+
+const mapstatetoprop=(state)=>{
+  return {
+      SearchResulst:state.searchResults
+  }
+
+}
+
+const OrderList = ({searchResults}) => {
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
@@ -61,7 +70,7 @@ const OrderList = () => {
       console.error("Error downloading file:", error);
     }
   };
-
+  const displayedOrders=searchResults.length>0? searchResults:orders
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
       <motion.div 
@@ -71,12 +80,12 @@ const OrderList = () => {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">📦 Request List</h2>
 
-        {orders.length === 0 ? (
+        {displayedOrders.length === 0 ? (
           <p className="text-gray-500 text-center">No orders found.</p>
         ) : (
           <motion.ul className="space-y-4 sm:space-y-6">
             <AnimatePresence>
-              {orders.map((order) => (
+              {displayedOrders.map((order) => (
                 <motion.li
                   key={order._id}
                   initial={{ opacity: 0, y: 20 }}
@@ -151,4 +160,4 @@ const OrderList = () => {
   );
 };
 
-export default OrderList;
+export default connect(mapstatetoprop)(OrderList);

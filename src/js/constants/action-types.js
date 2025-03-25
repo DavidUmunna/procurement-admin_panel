@@ -1,0 +1,3 @@
+export const SEARCH_BY_DATE="SEARCH_BY_DATE"
+export const SEARCH_BY_NAME="SEARCH_BY_NAME"
+export const SEARCH_BY_ROLE="SEARCH_BY_ROLE"
