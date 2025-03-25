@@ -34,7 +34,7 @@ const PageTransition = ({ children }) => (
 
 const App = () => {
   const location = useLocation();
-  const [isauthenticated, setisauthenticated] = useState(null);
+  const [isauthenticated, setisauthenticated] = useState(false);
 
 
   useEffect(() => {

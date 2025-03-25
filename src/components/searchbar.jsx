@@ -10,7 +10,7 @@ const mapdispatchtoprop=(dispatch)=>{
 
 }
 
-const Search_bar=(props)=>{
+const Searchbar=(props)=>{
     const [search,setsearch]=useState('')
 
 
@@ -47,4 +47,4 @@ const Search_bar=(props)=>{
     )
 }
 
-export default connect(null,mapdispatchtoprop)(Search_bar)
+export default connect(null,mapdispatchtoprop)(Searchbar)

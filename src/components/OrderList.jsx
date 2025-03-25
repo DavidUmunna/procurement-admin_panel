@@ -3,11 +3,12 @@ import { getOrders, updateOrderStatus, deleteOrder, downloadFile } from "../serv
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile } from "react-icons/fa";
 import {connect} from "react-redux"
+import Searchbar from "./searchbar"
 
 
 const mapstatetoprop=(state)=>{
   return {
-      SearchResulst:state.searchResults
+      searchResults:state.searchResults ||[]
   }
 
 }
@@ -72,7 +73,13 @@ const OrderList = ({searchResults}) => {
   };
   const displayedOrders=searchResults.length>0? searchResults:orders
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
+    <div>
+
+      <motion.div>
+        <Searchbar/>
+      </motion.div>
+      <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
+      
       <motion.div 
         className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-8"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -156,6 +163,7 @@ const OrderList = ({searchResults}) => {
           </motion.ul>
         )}
       </motion.div>
+    </div>
     </div>
   );
 };
