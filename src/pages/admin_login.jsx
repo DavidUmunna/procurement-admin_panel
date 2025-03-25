@@ -21,7 +21,7 @@ export default function Sign_in({ setAuth }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/signin",
+        "http://localhost:5000/api/admin-user/admin",
         { username, password },
         { withCredentials: true }
       );
