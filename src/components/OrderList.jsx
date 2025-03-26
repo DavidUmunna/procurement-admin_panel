@@ -115,7 +115,7 @@ const OrderList = ({searchResults}) => {
                       <p className={`font-serif text-lg mb-2 ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
                         Urgency: {order.urgency}
                       </p>
-                      <p className="font-serif text-lg text-gray-700 mb-2">
+                      <p className="font-serif flex text-lg text-gray-700 mb-2">
                         File Uploaded: {order.filename ? (
                           <a
                             href="#"
@@ -124,9 +124,9 @@ const OrderList = ({searchResults}) => {
                             rel="noopener noreferrer"
                             className="text-blue-500 underline"
                           >
-                            View File
+                            <FaFilePdf color="red" size={20} title="View File" />
                           </a>
-                        ) : "No file uploaded"}
+                        ) : <FaFile color="gray" size={20} title="No File Available" />}
                       </p>
                       <p className="font-serif text-lg text-gray-700 mb-2">Remarks: {order.remarks || "No remarks"}</p>
                     </div>

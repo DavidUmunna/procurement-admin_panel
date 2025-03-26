@@ -34,14 +34,17 @@ const PageTransition = ({ children }) => (
 
 const App = () => {
   const location = useLocation();
-  const [isauthenticated, setisauthenticated] = useState(false);
+  const [isauthenticated, setisauthenticated] = useState(null);
 
 
   useEffect(() => {
     console.log("isauthenticated", isauthenticated);
     const checkAuth = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/check-auth", { withCredentials: true });
+        const token=localStorage.getItem("authToken")
+        const response = await axios.get("http://localhost:5000/api/check-auth",
+           {headers: {Authorization:`Bearer ${token}`}, 
+          withCredentials: true });
         setisauthenticated(response.data.authenticated);
       } catch (error) {
         setisauthenticated(false);
@@ -49,7 +52,7 @@ const App = () => {
       }
     };
     checkAuth();
-  }, []);
+  }, [isauthenticated]);
 
   if (isauthenticated === null) {
     return (

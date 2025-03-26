@@ -9,13 +9,14 @@ export default function SignOut({ setAuth }) {
     const { setUser } = useUser();
 
     useEffect(() => {
+        localStorage.removeItem('authToken');
         setAuth(false);
         setUser(null);
         localStorage.removeItem("user");
-        const token = localStorage.getItem('token');
+      
         
-        logoutUser(token);
-        localStorage.removeItem("token");
+        
+        //localStorage.removeItem("token");
         
         setTimeout(() => {
             navigate("/adminlogin");
