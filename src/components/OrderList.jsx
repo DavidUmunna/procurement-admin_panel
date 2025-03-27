@@ -3,7 +3,9 @@ import { getOrders, updateOrderStatus, deleteOrder, downloadFile } from "../serv
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile } from "react-icons/fa";
 import {connect} from "react-redux"
+import {useUser} from "./usercontext"
 import Searchbar from "./searchbar"
+import axios from "axios"
 
 
 const mapstatetoprop=(state)=>{
@@ -14,6 +16,7 @@ const mapstatetoprop=(state)=>{
 }
 
 const OrderList = ({searchResults}) => {
+  const {user} = useUser()
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
@@ -28,6 +31,7 @@ const OrderList = ({searchResults}) => {
       if (Array.isArray(data)) {
         setOrders(data || []);
       } else {
+        console.log(data)
         throw new Error("Invalid data format");
       }
     } catch (err) {
@@ -37,6 +41,16 @@ const OrderList = ({searchResults}) => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     await updateOrderStatus(orderId, newStatus);
+    if(newStatus==="Approved"){
+      console.log(orderId,"this is for ap[proved")
+      const adminName=user.name
+      try {
+        const response = await axios.put(`http://localhost:5000/api/orders/${orderId}/approve`, {adminName,orderId});
+        console.log(response.data.message);
+    } catch (error) {
+        console.error("Error approving order:", error.response?.data?.message || error.message);
+    }
+    }
     fetchOrders();
     setDropdownOpen(null);
   };
@@ -104,6 +118,8 @@ const OrderList = ({searchResults}) => {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div className="flex-1 mb-4 md:mb-0">
                       <p className="font-serif text-lg text-gray-700 mb-2">Ordered By: {order.orderedBy}</p>
+                      <p className="font-serif text-lg text-gray-700 mb-2">Approvals: {order.Approvals}</p>
+
                       <p className="font-serif text-lg text-gray-700 mb-2">
                         Products: {order.products.map((item, index) => (
                           <span key={index}>

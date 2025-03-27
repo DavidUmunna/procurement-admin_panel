@@ -31,8 +31,8 @@ const Searchbar=(props)=>{
     }
 
     return (
-        <div>
-            <div className="flex justify-center">
+        <div className="px-20 ">
+            <div className="flex justify-center shadow-lg border-2 p-2 min-w-max rounded">
                 <input 
                 type="text" 
                 placeholder="enter search"

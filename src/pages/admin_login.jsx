@@ -31,6 +31,7 @@ export default function Sign_in({ setAuth }) {
         localStorage.setItem("authToken",response.data.token)
         //localStorage.setItem("auth", "true");
         setUser(response.data.user);
+        console.log(response.data.user)
         setUserData(response.data.user);
         navigate("/adminav");
         console.log(userData)

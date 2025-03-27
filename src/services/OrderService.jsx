@@ -7,9 +7,11 @@ const orders="orders"
 
 
 
-export const getOrders = async () => {
+export const getOrders = async (role) => {
   try {
-    const response = await axios.get(`${API_URL}/${orders}`);
+    const token=localStorage.getItem("authToken")
+    console.log(token)
+    const response = await axios.get(`${API_URL}/${orders}`,{headers:{Authorization:`Bearer ${token}`},withCredential:true});
     console.log(response)
     return response.data;
   } catch (error) {
