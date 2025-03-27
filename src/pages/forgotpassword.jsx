@@ -41,6 +41,7 @@ export default function ForgotPassword() {
       return;
     }
 
+
     setLoading(true);
     try {
       
@@ -58,6 +59,9 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
+  const handleloginredirect=(e)=>{
+    navigate("/adminlogin")
+  }
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -78,13 +82,25 @@ export default function ForgotPassword() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 border rounded"
             />
-            <button
-              onClick={handleEmailSubmit}
-              disabled={loading}
-              className="mt-4 w-full bg-blue-500 text-white py-2 rounded disabled:bg-gray-400"
-            >
-              {loading ? "Processing..." : "Send Reset Link"}
-            </button>
+            <div className="flex ">
+
+                
+                <button
+                  onClick={handleEmailSubmit}
+                  disabled={loading}
+                  className="mt-4 w-full mx-2 bg-blue-500 text-white py-2  rounded disabled:bg-gray-400"
+                >
+                  {loading ? "Processing..." : "Send Reset Link"}
+                </button>
+                <button
+                onClick={handleloginredirect}
+                disabled={loading}
+                className="mt-4 w-full mx-4 bg-blue-500 text-white py-2 rounded disabled:bg-gray-400"
+                >
+                  LoginPage
+
+                </button>
+            </div>
             {error && <p className="text-red-500 mt-2">{error}</p>}
           </motion.div>
         )}
