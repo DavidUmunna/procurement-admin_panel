@@ -132,17 +132,21 @@ const OrderList = ({searchResults}) => {
                         Urgency: {order.urgency}
                       </p>
                       <p className="font-serif flex text-lg text-gray-700 mb-2">
-                        File Uploaded: {order.filename ? (
-                          <a
+                        File Uploaded: {order.filenames && order.filenames.length>0 ? (
+                          order.filenames.map((filename,index)=>(
+
+                            <a
                             href="#"
                             onClick={(event) => handleFileDownload(order.filename, event)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-500 underline"
-                          >
-                            <FaFilePdf color="red" size={20} title="View File" />
-                          </a>
-                        ) : <FaFile color="gray" size={20} title="No File Available" />}
+                            >
+                              <FaFilePdf color="red" size={20} title="View File" />
+                            </a>
+                          ))
+                          
+                        ) :( <FaFile color="gray" size={20} title="No File Available" />)}
                       </p>
                       <p className="font-serif text-lg text-gray-700 mb-2">Remarks: {order.remarks || "No remarks"}</p>
                     </div>
