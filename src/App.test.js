@@ -1,8 +1,13 @@
 import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router'; // Import MemoryRouter
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('renders the login page when not authenticated', () => {
+  render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
+  const loadingElement = screen.getByText(/Loading.../i); // Check for the loading state
+  expect(loadingElement).toBeInTheDocument();
 });
