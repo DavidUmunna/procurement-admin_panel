@@ -4,7 +4,7 @@ import axios from "axios";
 //const circuitBreaker=require("opossum")
 
 
-const API_URL="http://localhost:5000/api"
+const API_URL="http://vigilant_khayyam:5000/api"
 
 const route="users"
 

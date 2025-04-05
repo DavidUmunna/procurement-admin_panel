@@ -1,6 +1,6 @@
 import axios from 'axios';
 ;
-const API_URL = "http://localhost:5000/api";
+const API_URL = "http://vigilant_khayyam:5000/api";
 
 const route="admin-user/admin-login"
 const route_logout="signin"

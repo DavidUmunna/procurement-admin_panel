@@ -42,7 +42,7 @@ const App = () => {
     const checkAuth = async () => {
       try {
         const token=localStorage.getItem("authToken")
-        const response = await axios.get("http://localhost:5000/api/access",
+        const response = await axios.get("http://vigilant_khayyam:5000/api/access",
            {headers: {Authorization:`Bearer ${token}`}, 
           withCredentials: true });
         setisauthenticated(response.data.authenticated);
