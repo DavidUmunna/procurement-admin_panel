@@ -28,7 +28,7 @@ const CreateOrder = () => {
   const [files, setFiles] = useState([]);
   const [remarks, setRemarks] = useState("");
   const [email, setEmail] = useState("");
-  const [filename,setfilename]=useState("")
+  const [filenames,setfilenames]=useState("")
 
   useEffect(() => {
     if (user) {
@@ -40,14 +40,15 @@ const CreateOrder = () => {
   const handleFileChange = (event) => {
     const uploadedFiles = event.target.files ? Array.from(event.target.files) : [];
     setFiles(uploadedFiles);
+    console.log(files)
     if (uploadedFiles.length>0){
-      setfilename(uploadedFiles[0].name)
+      setfilenames(uploadedFiles.map(file=>file.name))
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(filename)
+    console.log(filenames)
     //const form=e.target
     const formData = new FormData();
     //let formdataobject=Object.fromEntries(formData.entries())
@@ -55,7 +56,7 @@ const CreateOrder = () => {
         supplier,
         orderedBy,
         email,
-        filename,
+        filenames,
         urgency,
         remarks,
         products, // Sending products separately as a JSON object

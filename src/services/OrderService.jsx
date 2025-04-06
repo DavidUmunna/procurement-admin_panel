@@ -1,7 +1,7 @@
 import axios from "axios";
 //const circuitBreaker=require("opossum")
 
-const API_URL = "http://vigilant_khayyam:5000/api"; //  backend URL
+const API_URL = "http://192.168.0.185:5000/api"; //  backend URL
 
 const orders="orders"
 
@@ -21,12 +21,34 @@ export const getOrders = async (role) => {
 };
 
 
-export const createOrder = async (orderData) => {
+export const createOrder = async ({ formData, orderData }) => {
   try {
-    console.log(orderData)
-    const response = await axios.post(`${API_URL}/${orders}`, orderData);
-    console.log(response)
-    return response.data;
+    console.log("Order Data:", orderData);
+
+    const requests = [];
+
+    // Check if formData contains a file before uploading
+    if (formData && formData.has("files")) {
+      requests.push(
+        axios.post(`${API_URL}/fileupload`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+      );
+    }
+
+    // Send the order even if no file is uploaded
+    if (orderData && Object.keys(orderData).length > 0) {
+      requests.push(axios.post(`${API_URL}/orders`, orderData));
+    } else {
+      console.warn("No order data provided.");
+    }
+
+    const results = await Promise.allSettled(requests);
+
+    const fileResponse = results[0]?.status === "fulfilled" ? results[0].value : null;
+    const orderResponse = results[1]?.status === "fulfilled" ? results[1].value : null;
+
+    return { file: fileResponse?.data, order: orderResponse?.data };
   } catch (error) {
     console.error("Error creating order:", error);
   }
