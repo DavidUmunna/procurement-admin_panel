@@ -158,7 +158,7 @@ const OrderList = ({searchResults}) => {
                         >
                           {order.status}
                         </button>
-                        <AnimatePresence>
+                        <AnimatePresence >
                           {dropdownOpen === order._id && (
                             <motion.div 
                               initial={{ opacity: 0, y: -10 }}
@@ -166,10 +166,30 @@ const OrderList = ({searchResults}) => {
                               exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
                               className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
                             >
-                              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Completed")}>Complete</button>
-                              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Pending")}>Pending</button>
-                              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Approved")}>Approved</button>
-                              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => handleStatusChange(order._id, "Rejected")}>Rejected</button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleStatusChange(order._id, "Completed")}
+                              >
+                                Complete
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleStatusChange(order._id, "Pending")}
+                              >
+                                Pending
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleStatusChange(order._id, "Approved")}
+                              >
+                                Approved
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleStatusChange(order._id, "Rejected")}
+                              >
+                                Rejected
+                              </button>
                             </motion.div>
                           )}
                         </AnimatePresence>
