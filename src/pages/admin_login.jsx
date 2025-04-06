@@ -21,9 +21,13 @@ export default function Sign_in({ setAuth }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.185:5000/api/admin-user/login",
+        " https://4a1c-102-90-81-110.ngrok-free.app/api/admin-user/login",
         { username, password },
-        { withCredentials: true }
+        { withCredentials: true
+
+         },{headers:{
+          "ngrok-skip-browser-warning": "true",
+         }}
       );
 
       if (response.data.success) {

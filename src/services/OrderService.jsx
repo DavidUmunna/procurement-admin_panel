@@ -1,7 +1,7 @@
 import axios from "axios";
 //const circuitBreaker=require("opossum")
 
-const API_URL = "http://192.168.0.185:5000/api"; //  backend URL
+const API_URL = " https://4a1c-102-90-81-110.ngrok-free.app/api"; //  backend URL
 
 const orders="orders"
 
@@ -11,7 +11,9 @@ export const getOrders = async (role) => {
   try {
     const token=localStorage.getItem("authToken")
     console.log(token)
-    const response = await axios.get(`${API_URL}/${orders}`,{headers:{Authorization:`Bearer ${token}`},withCredential:true});
+    const response = await axios.get(`${API_URL}/${orders}`,{headers:{Authorization:`Bearer ${token}`, 
+      "ngrok-skip-browser-warning": "true"},
+      withCredential:true});
     console.log(response)
     return response.data;
   } catch (error) {
@@ -31,14 +33,16 @@ export const createOrder = async ({ formData, orderData }) => {
     if (formData && formData.has("files")) {
       requests.push(
         axios.post(`${API_URL}/fileupload`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data" 
+            ,"ngrok-skip-browser-warning": "true",
+          },
         })
       );
     }
 
     // Send the order even if no file is uploaded
     if (orderData && Object.keys(orderData).length > 0) {
-      requests.push(axios.post(`${API_URL}/orders`, orderData));
+      requests.push(axios.post(`${API_URL}/orders`, orderData,{headers:{ "ngrok-skip-browser-warning": "true"}}));
     } else {
       console.warn("No order data provided.");
     }
@@ -57,7 +61,7 @@ export const createOrder = async ({ formData, orderData }) => {
 
 export const updateOrderStatus = async (orderId, status) => {
   try {
-    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status });
+    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status },{headers:{ "ngrok-skip-browser-warning": "true"}});
     return response.data;
   } catch (error) {
     console.error("Error updating order:", error);
@@ -74,7 +78,7 @@ export const downloadFile = async (fileName) => {
 
 export const deleteOrder = async (orderId) => {
   try {
-    await axios.delete(`${API_URL}/${orders}/${orderId}`);
+    await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{ "ngrok-skip-browser-warning": "true"}});
   } catch (error) {
     console.error("Error deleting order:", error);
   }

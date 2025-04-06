@@ -4,7 +4,7 @@ import axios from "axios";
 //const circuitBreaker=require("opossum")
 
 
-const API_URL="http://192.168.0.185:5000/api"
+const API_URL=" https://4a1c-102-90-81-110.ngrok-free.app/api"
 
 const route="users"
 
@@ -12,7 +12,7 @@ const route="users"
 
 export const get_users=async ()=>{
     try{
-        const response = await axios.get(`${API_URL}/${route}`);
+        const response = await axios.get(`${API_URL}/${route}`,{headers:{ "ngrok-skip-browser-warning": "true",}});
         console.log(response)
         return response.data;
 
@@ -25,7 +25,7 @@ export const get_users=async ()=>{
 
 export const getuserbymail=async(email)=>{
   try{
-    const response=await axios.get(`${API_URL}/${route}/${email}`)
+    const response=await axios.get(`${API_URL}/${route}/${email}`,{headers:{ "ngrok-skip-browser-warning": "true"}})
     if (response){
       console.log("user email exists")
       return response
@@ -41,7 +41,7 @@ export const getuserbymail=async(email)=>{
 export const createUser = async (userData) => {
     try {
       console.log(userData)
-      const response = await axios.post(`${API_URL}/${route}`, userData);
+      const response = await axios.post(`${API_URL}/${route}`,{headers:{ "ngrok-skip-browser-warning": "true"}}, userData);
       console.log(response)
       return response.data;
     } catch (error) {
@@ -52,7 +52,7 @@ export const createUser = async (userData) => {
 
   export const updateUserpassword = async (email, newPassword) => {
     try {
-      const response = await axios.put(`${API_URL}/${route}/${email}`, { email,newPassword });
+      const response = await axios.put(`${API_URL}/${route}/${email}`, { email,newPassword },{headers:{ "ngrok-skip-browser-warning": "true"}});
       return response.data;
     } catch (error) {
       console.error("Error updating password:", error);
@@ -63,7 +63,7 @@ export const createUser = async (userData) => {
 
 export const updateUser= async (userId, status) => {
     try {
-      const response = await axios.put(`${API_URL}/${route}/${userId}`, { status });
+      const response = await axios.put(`${API_URL}/${route}/${userId}`, { status },{headers:{ "ngrok-skip-browser-warning": "true"}});
       return response.data;
     } catch (error) {
       console.error("Error updating user:", error);
