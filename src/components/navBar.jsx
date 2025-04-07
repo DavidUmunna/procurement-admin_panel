@@ -2,12 +2,8 @@ import { Disclosure, Menu } from '@headlessui/react';
 import { Bars4Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from "react-router-dom";
 import React from 'react';
+import {useUser} from "./usercontext"
 
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl: require("./assets/profile.png")
-};
 
 const navigation = [
   { name: 'RequestList', to: '/requestlist', current: false },
@@ -28,9 +24,10 @@ function classNames(...classes) {
 }
 
 export default function User() {
+  const {user}=useUser()
   return (
     <>
-      <div className="min-h-full">
+      <div className="min-h-full w-full  ">
         <Disclosure as="nav" className="bg-gray-800">
           {({ open }) => (
             <>

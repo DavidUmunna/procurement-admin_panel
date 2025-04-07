@@ -64,7 +64,7 @@ const App = () => {
 
   return (
     <UserProvider>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100 w-full  px-0 ">
         {/* Show Navbar only if user is authenticated */}
         {isauthenticated && <Adminav />}
 
