@@ -4,7 +4,7 @@ import axios from "axios";
 //const circuitBreaker=require("opossum")
 
 
-const API_URL=" https://4a1c-102-90-81-110.ngrok-free.app/api"
+const API_URL=" https://d0b8-102-90-101-230.ngrok-free.app/api"
 
 const route="users"
 

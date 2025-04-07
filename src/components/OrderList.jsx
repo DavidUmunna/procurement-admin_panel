@@ -89,7 +89,7 @@ const OrderList = ({searchResults}) => {
   return (
     <div>
 
-      <motion.div>
+      <motion.div className="flex justify-center">
         <Searchbar/>
       </motion.div>
       <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
@@ -164,7 +164,7 @@ const OrderList = ({searchResults}) => {
                               initial={{ opacity: 0, y: -10 }}
                               animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
                               exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-                              className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
+                              className="absolute  mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
                             >
                               <button
                                 className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"

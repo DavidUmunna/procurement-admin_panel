@@ -1,7 +1,7 @@
 import axios from "axios";
 //const circuitBreaker=require("opossum")
 
-const API_URL = " https://4a1c-102-90-81-110.ngrok-free.app/api"; //  backend URL
+const API_URL = " https://d0b8-102-90-101-230.ngrok-free.app/api"; //  backend URL
 
 const orders="orders"
 
@@ -69,7 +69,8 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 export const downloadFile = async (fileName) => {
   try {
-    const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileName}`, { responseType: "blob" });
+    const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileName}`, { responseType: "blob" ,
+      headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {
     console.error({ err });
