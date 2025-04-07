@@ -1,19 +1,18 @@
 {
   "files": {
-    "main.css": "/procurement-admin_panel/static/css/main.459b4429.css",
-    "main.js": "/procurement-admin_panel/static/js/main.6b84f338.js",
+    "main.css": "/procurement-admin_panel/static/css/main.208c15c7.css",
+    "main.js": "/procurement-admin_panel/static/js/main.af094858.js",
     "static/js/488.2bc29b07.chunk.js": "/procurement-admin_panel/static/js/488.2bc29b07.chunk.js",
     "static/media/admin-panel.png": "/procurement-admin_panel/static/media/admin-panel.778c14247979eca87e1e.png",
-    "static/media/profile.png": "/procurement-admin_panel/static/media/profile.5faf09a7795d28bf5a2b.png",
     "static/media/admin.png": "/procurement-admin_panel/static/media/admin.1c8504e494c1d28bd802.png",
     "static/media/user.png": "/procurement-admin_panel/static/media/user.a6143582309785dca610.png",
     "index.html": "/procurement-admin_panel/index.html",
-    "main.459b4429.css.map": "/procurement-admin_panel/static/css/main.459b4429.css.map",
-    "main.6b84f338.js.map": "/procurement-admin_panel/static/js/main.6b84f338.js.map",
+    "main.208c15c7.css.map": "/procurement-admin_panel/static/css/main.208c15c7.css.map",
+    "main.af094858.js.map": "/procurement-admin_panel/static/js/main.af094858.js.map",
     "488.2bc29b07.chunk.js.map": "/procurement-admin_panel/static/js/488.2bc29b07.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.459b4429.css",
-    "static/js/main.6b84f338.js"
+    "static/css/main.208c15c7.css",
+    "static/js/main.af094858.js"
   ]
 }
