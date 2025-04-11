@@ -103,7 +103,7 @@ export default function Sign_in({ setAuth }) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-none border border-gray-300 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
-                />
+                  />
               </div>
             </div>
 
