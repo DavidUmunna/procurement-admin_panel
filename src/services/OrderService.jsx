@@ -1,7 +1,7 @@
 import axios from "axios";
 //const circuitBreaker=require("opossum")
 
-const API_URL = " https://d0b8-102-90-101-230.ngrok-free.app/api"; //  backend URL
+const API_URL = " https://localhost:5000/api"; //  backend URL
 
 const orders="orders"
 

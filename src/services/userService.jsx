@@ -4,7 +4,7 @@ import axios from "axios";
 //const circuitBreaker=require("opossum")
 
 
-const API_URL=" https://d0b8-102-90-101-230.ngrok-free.app/api"
+const API_URL=" https://localhost:5000/api"
 
 const route="users"
 
@@ -41,7 +41,7 @@ export const getuserbymail=async(email)=>{
 export const createUser = async (userData) => {
     try {
       console.log(userData)
-      const response = await axios.post(`${API_URL}/${route}`,{headers:{ "ngrok-skip-browser-warning": "true"}}, userData);
+      const response = await axios.post(`${API_URL}/${route}`,userData,{ headers:{ "ngrok-skip-browser-warning": "true"}});
       console.log(response)
       return response.data;
     } catch (error) {

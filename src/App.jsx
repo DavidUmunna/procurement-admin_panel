@@ -42,7 +42,7 @@ const App = () => {
     const checkAuth = async () => {
       try {
         const token=localStorage.getItem("authToken")
-        const response = await axios.get("https://d0b8-102-90-101-230.ngrok-free.app/api/access",
+        const response = await axios.get("https://localhost:5000/api/access",
            {headers: {Authorization:`Bearer ${token}`, "ngrok-skip-browser-warning": "true",}, 
           withCredentials: true });
         setisauthenticated(response.data.authenticated);

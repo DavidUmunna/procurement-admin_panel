@@ -14,13 +14,19 @@ const Add_user = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user_data = await createUser({ name, email, password, role });
-    console.log("Submitting User data:", user_data);
-    setname("");
-    setemail("");
-    setpassword("");
-    setrole(roles[0]);
-    alert("User Created!");
+    try{
+      const user_data = await createUser({ name, email, password, role });
+      console.log("Submitting User data:", user_data);
+      setname("");
+      setemail("");
+      setpassword("");
+      setrole(roles[0]);
+      alert("User Created!");
+    }catch(error){
+      console.error("user not created:",error)
+
+    }
+    
   };
 
   return (
