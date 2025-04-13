@@ -21,13 +21,11 @@ export default function Sign_in({ setAuth }) {
 
     try {
       const response = await axios.post(
-        " https://localhost:5000/api/admin-user/login",
+        " /api/admin-user/login",
         { username, password },
         { withCredentials: true
 
-         },{headers:{
-          "ngrok-skip-browser-warning": "true",
-         }}
+         }
       );
 
       if (response.data.success) {
@@ -37,7 +35,7 @@ export default function Sign_in({ setAuth }) {
         setUser(response.data.user);
         console.log(response.data.user)
         setUserData(response.data.user);
-        navigate("/adminav");
+        navigate("/dashboard");
         console.log(userData)
       } else {
         setError(response.data.message);

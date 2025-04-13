@@ -23,7 +23,7 @@ const OrderList = ({searchResults}) => {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [user?.email]);
 
   const fetchOrders = async () => {
     try {
@@ -45,7 +45,7 @@ const OrderList = ({searchResults}) => {
       console.log(orderId,"this is for ap[proved")
       const adminName=user.name
       try {
-        const response = await axios.put(`http://localhost:5000/api/orders/${orderId}/approve`, {adminName,orderId});
+        const response = await axios.put(`api/orders/${orderId}/approve`, {adminName,orderId});
         console.log(response.data.message);
     } catch (error) {
         console.error("Error approving order:", error.response?.data?.message || error.message);
@@ -117,8 +117,19 @@ const OrderList = ({searchResults}) => {
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div className="flex-1 mb-4 md:mb-0">
-                      <p className="font-serif text-lg text-gray-700 mb-2">Ordered By: {order.orderedBy}</p>
-                      <p className="font-serif text-lg text-gray-700 mb-2">Approvals: {order.Approvals}</p>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">
+                      Order Number: <span className="text-blue-500">{order.orderNumber}</span>
+                    </h3>
+                    <p className="text-gray-700 mb-2">
+                      <span className="font-medium">Ordered By:</span> {order.orderedBy}
+                    </p>
+                    <p className="text-gray-700 mb-2">
+                      <span className="font-medium">Approvals:</span> {order.Approvals || "None"}
+                    </p>
+                    <p className="text-gray-700 mb-2">
+                      <span className="font-medium">User Email:</span> {order.email}
+                    </p>
+                      
 
                       <p className="font-serif text-lg text-gray-700 mb-2">
                         Products: {order.products.map((item, index) => (
@@ -127,7 +138,6 @@ const OrderList = ({searchResults}) => {
                           </span>
                         ))}
                       </p>
-                      <p className="font-serif text-lg text-gray-700 mb-2">User email: {order.email}</p>
                       <p className={`font-serif text-lg mb-2 ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
                         Urgency: {order.urgency}
                       </p>

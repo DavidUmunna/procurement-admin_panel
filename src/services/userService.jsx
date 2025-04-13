@@ -4,7 +4,7 @@ import axios from "axios";
 //const circuitBreaker=require("opossum")
 
 
-const API_URL=" https://localhost:5000/api"
+const API_URL="http://127.0.0.1:5000/api"
 
 const route="users"
 
@@ -41,7 +41,7 @@ export const getuserbymail=async(email)=>{
 export const createUser = async (userData) => {
     try {
       console.log(userData)
-      const response = await axios.post(`${API_URL}/${route}`,userData,{ headers:{ "ngrok-skip-browser-warning": "true"}});
+      const response = await axios.post(`${API_URL}/${route}`,userData);
       console.log(response)
       return response.data;
     } catch (error) {
@@ -52,7 +52,7 @@ export const createUser = async (userData) => {
 
   export const updateUserpassword = async (email, newPassword) => {
     try {
-      const response = await axios.put(`${API_URL}/${route}/${email}`, { email,newPassword },{headers:{ "ngrok-skip-browser-warning": "true"}});
+      const response = await axios.put(`${API_URL}/${route}/${email}`, { email,newPassword });
       return response.data;
     } catch (error) {
       console.error("Error updating password:", error);
@@ -63,7 +63,7 @@ export const createUser = async (userData) => {
 
 export const updateUser= async (userId, status) => {
     try {
-      const response = await axios.put(`${API_URL}/${route}/${userId}`, { status },{headers:{ "ngrok-skip-browser-warning": "true"}});
+      const response = await axios.put(`${API_URL}/${route}/${userId}`, { status });
       return response.data;
     } catch (error) {
       console.error("Error updating user:", error);

@@ -12,7 +12,10 @@ import Userdetails from "./pages/user_details";
 import Logout from "./components/logout";
 import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios"
+import { Dashboard } from "./pages/Dashboard";
 import ForgotPassword from "./pages/forgotpassword";
+import Fallback from "./components/errorboundary";
+import { ErrorBoundary } from 'react-error-boundary';
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -42,8 +45,8 @@ const App = () => {
     const checkAuth = async () => {
       try {
         const token=localStorage.getItem("authToken")
-        const response = await axios.get("https://localhost:5000/api/access",
-           {headers: {Authorization:`Bearer ${token}`, "ngrok-skip-browser-warning": "true",}, 
+        const response = await axios.get("/api/access",
+           {headers: {Authorization:`Bearer ${token}`,}, 
           withCredentials: true });
         setisauthenticated(response.data.authenticated);
       } catch (error) {
@@ -63,100 +66,104 @@ const App = () => {
   }
 
   return (
-    <UserProvider>
-      <div className="min-h-screen bg-gray-100 w-full  px-0 ">
-        {/* Show Navbar only if user is authenticated */}
-        {isauthenticated && <Adminav />}
+    <ErrorBoundary fallback={<Fallback/>}>
 
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route
-              path="/adminlogin"
-              element={
-                !isauthenticated ? (
-                  <PageTransition>
-                    <Adminlogin setAuth={setisauthenticated} />
-                  </PageTransition>
-                ) : (
-                  <Navigate to="/userdetails" />
-                )
-              }
-            />
-            <Route
-              path="/addusers"
-              element={
-                isauthenticated ? (
-                  <PageTransition>
-                    <Addusers />
-                  </PageTransition>
-                ) : (
-                  <Navigate to="/adminlogin" />
-                )
-              }
-            />
-            <Route
-              path="/requestlist"
-              element={
-                isauthenticated ? (
-                  <PageTransition>
-                    <OrderList />
-                  </PageTransition>
-                ) : (
-                  <Navigate to="/adminlogin" />
-                )
-              }
-            />
-            <Route
-              path="/createorder"
-              element={
-                isauthenticated ? (
-                  <PageTransition>
-                    <CreateOrder />
-                  </PageTransition>
-                ) : (
-                  <Navigate to="/adminlogin" />
-                )
-              }
-            />
-            <Route
-              path="/users"
-              element={
-                isauthenticated ? (
-                  <PageTransition>
-                    <Users />
-                  </PageTransition>
-                ) : (
-                  <Navigate to="/adminlogin" />
-                )
-              }
-            />
-            <Route
-              path="/userdetails"
-              element={
-                isauthenticated ? (
-                  <PageTransition>
+      <UserProvider>
+        <div className="min-h-screen bg-gray-100 w-full  px-0 ">
+          {/* Show Navbar only if user is authenticated */}
+          {isauthenticated && <Adminav />}
+  
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route
+                path="/adminlogin"
+                element={
+                  !isauthenticated ? (
+                    <PageTransition>
+                      <Adminlogin setAuth={setisauthenticated} />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/userdetails" />
+                  )
+                }
+              />
+              <Route
+                path="/addusers"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <Addusers />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+              <Route
+                path="/requestlist"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <OrderList />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+              <Route
+                path="/createorder"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <CreateOrder />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+                />
+              <Route
+                path="/users"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <Users />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+             { /*<Route
+                path="/userdetails"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
                     <Userdetails />
-                  </PageTransition>
-                ) : (
-                  <Navigate to="/adminlogin" />
-                )
-              }
-            />
-            <Route path="/forgotpassword"
-            element={
-              <PageTransition>
-                <ForgotPassword/>
-              </PageTransition>
-            }/>
-            <Route
-              path="/signout"
-              element={<PageTransition><Logout setAuth={setisauthenticated} /></PageTransition>}
-            />
-            <Route path="*" element={<Navigate to={isauthenticated ? "/userdetails" : "/adminlogin"} />} />
-          </Routes>
-        </AnimatePresence>
-      </div>
-    </UserProvider>
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />*/}
+              <Route path="/forgotpassword"
+              element={
+                <PageTransition>
+                  <ForgotPassword/>
+                </PageTransition>
+              }/>
+              <Route
+                path="/signout"
+                element={<PageTransition><Logout setAuth={setisauthenticated} /></PageTransition>}
+                />
+              <Route path="/dashboard" element={isauthenticated ? <PageTransition><Dashboard /></PageTransition> : <Navigate to="/signin" />} />
+              <Route path="*" element={<Navigate to={isauthenticated ? "/dashboard" : "/adminlogin"} />} />
+            </Routes>
+          </AnimatePresence>
+        </div>
+      </UserProvider>
+    </ErrorBoundary>  
   );
 };
 
