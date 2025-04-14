@@ -1,21 +1,57 @@
-//import {searchbyname} from "../actions/actions"
-import { SEARCH_BY_NAME } from "../constants/action-types";
+import { createSlice } from '@reduxjs/toolkit';
 
-const initialstate={
-    searchResults:[]
-}
+const initialState = {
+  keyword: '',
+  status: '',
+  dateRange: {
+    start: null,
+    end: null,
+  },
+  orderedby: '', // Added orderedby field
+};
 
-const rootReducer=(state=initialstate,action)=>{
-    switch(action.types){
-        case SEARCH_BY_NAME:
-            return {
+const searchSlice = createSlice({
+  name: 'search',
+  initialState,
+  reducers: {
+    setKeyword: (state, action) => {
+      state.keyword = action.payload;
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
+    },
+    setDateRange: (state, action) => {
+      state.dateRange = action.payload;
+    },
+    setOrderedBy: (state, action) => { // Added orderedby setter
+      state.orderedby = action.payload;
+    },
+    resetKeyword: (state) => {
+      state.keyword = '';
+    },
+    resetStatus: (state) => {
+      state.status = '';
+    },
+    resetDateRange: (state) => {
+      state.dateRange = { start: null, end: null };
+    },
+    resetOrderedBy: (state) => { // Added reset for orderedby
+      state.orderedby = '';
+    },
+    resetFilters: () => initialState, // Reset all fields at once
+  },
+});
 
-                ...state,
-                searchResults:action.payload
-            }
-        default:
-            return state;
-    }
-}
+export const { 
+  setKeyword, 
+  setStatus, 
+  setDateRange, 
+  setOrderedBy,  // Export the setter
+  resetKeyword, 
+  resetStatus, 
+  resetDateRange, 
+  resetOrderedBy, // Export the resetter
+  resetFilters 
+} = searchSlice.actions;
 
-export default rootReducer
+export default searchSlice.reducer;

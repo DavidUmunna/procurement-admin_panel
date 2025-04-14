@@ -20,7 +20,7 @@ export const Dashboard=()=>{
             if (!user || !user.email) return 
             try{
                   const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get("http://127.0.0.1:5000/api/orders",{headers:{Authorization:`Bearer ${token}`, 
+                  const userReq=await axios.get("/api/orders",{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
                   console.log("user orders for count:",userReq)
