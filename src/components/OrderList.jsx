@@ -16,7 +16,11 @@ const mapstatetoprop = (state) => {
   };
 };
 
-const OrderList = ({ searchResults }) => {
+const OrderList = () => {
+  const { keyword, status, dateRange, orderedby } = useSelector(
+    (state) => state.search
+  );
+  
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -43,7 +47,15 @@ const OrderList = ({ searchResults }) => {
   // Filter orders based on the searchResults
   const filterOrders = (orders, filters) => {
     return orders.filter(order => {
-      const { keyword, status, dateRange } = filters;
+      const { orderedby, keyword, status, dateRange } = filters;
+      if (orderedby){
+        const matchesOrderedby = orderedby ? order.orderedBy.toLowerCase() === orderedby.toLowerCase() : true;
+        //console.log("this is for orderedby",order.orderedBy.toLowerCase() === orderedby.toLowerCase());
+        //console.log("entered orderedby",orderedby)
+        return matchesOrderedby
+
+      }
+
       if (keyword){
 
         const matchesKeyword = order.orderNumber.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -52,6 +64,8 @@ const OrderList = ({ searchResults }) => {
       }
       if (status){
         const matchesStatus = status ? order.status === status : true;
+        //console.log("this is for status",order.status === status);
+        //console.log("entered status",status)
         return matchesStatus
       }
                              
@@ -115,7 +129,7 @@ const OrderList = ({ searchResults }) => {
   };
 
   // Filtered orders using Redux state
-  const displayedOrders = searchResults.length > 0 ? searchResults : filterOrders(orders, searchResults);
+  const displayedOrders =  filterOrders(orders, { keyword, status, dateRange, orderedby })
 
   return (
     <div>
@@ -248,4 +262,4 @@ const OrderList = ({ searchResults }) => {
   );
 };
 
-export default connect(mapstatetoprop)(OrderList);
+export default OrderList;

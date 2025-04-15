@@ -77,9 +77,9 @@ const Searchbar = () => {
               onChange={(e) => dispatch(setStatus(e.target.value))}
             >
               <option value="">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
             </select>
           )}
 
