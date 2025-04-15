@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { getOrders, updateOrderStatus, deleteOrder, downloadFile } from "../services/OrderService";
+import {
+  getOrders,
+  updateOrderStatus,
+  deleteOrder,
+  downloadFile,
+} from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile } from "react-icons/fa";
-import { connect } from "react-redux";
 import { useUser } from "./usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
-import { useSelector, useDispatch } from 'react-redux';
-import { store } from '../js/store/store';
-import { resetFilters } from "../js/reducer/rootreducer"; // Import resetFilters
-
-const mapstatetoprop = (state) => {
-  return {
-    searchResults: state // Getting the filtered results from Redux
-  };
-};
+import { useSelector } from "react-redux";
 
 const OrderList = () => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
-  
+
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -34,7 +30,7 @@ const OrderList = () => {
     try {
       const data = await getOrders();
       if (Array.isArray(data)) {
-        setOrders(data || []); // Sets orders if data is valid
+        setOrders(data || []);
       } else {
         console.log(data);
         throw new Error("Invalid data format");
@@ -44,55 +40,73 @@ const OrderList = () => {
     }
   };
 
-  // Filter orders based on the searchResults
   const filterOrders = (orders, filters) => {
-    return orders.filter(order => {
+    return orders.filter((order) => {
       const { orderedby, keyword, status, dateRange } = filters;
-      if (orderedby){
-        const matchesOrderedby = orderedby ? order.orderedBy.toLowerCase() === orderedby.toLowerCase() : true;
-        //console.log("this is for orderedby",order.orderedBy.toLowerCase() === orderedby.toLowerCase());
-        //console.log("entered orderedby",orderedby)
-        return matchesOrderedby
 
+      if (orderedby) {
+        return (
+          order.orderedBy.toLowerCase() === orderedby.toLowerCase()
+        );
+      }
+      if (keyword) {
+        return (
+          order.orderNumber.toLowerCase().includes(keyword.toLowerCase()) ||
+          order.orderedBy.toLowerCase().includes(keyword.toLowerCase())
+        );
+      }
+      if (status) {
+        return order.status === status;
+      }
+      if (dateRange) {
+        const matchesDateRange =
+          dateRange.start && dateRange.end
+            ? new Date(order.date) >= new Date(dateRange.start) &&
+              new Date(order.date) <= new Date(dateRange.end)
+            : true;
+        return matchesDateRange;
       }
 
-      if (keyword){
-
-        const matchesKeyword = order.orderNumber.toLowerCase().includes(keyword.toLowerCase()) ||
-        order.orderedBy.toLowerCase().includes(keyword.toLowerCase());
-        return matchesKeyword
-      }
-      if (status){
-        const matchesStatus = status ? order.status === status : true;
-        //console.log("this is for status",order.status === status);
-        //console.log("entered status",status)
-        return matchesStatus
-      }
-                             
-      if (dateRange){
-         const matchesDateRange = dateRange.start && dateRange.end
-        ? new Date(order.date) >= new Date(dateRange.start) && new Date(order.date) <= new Date(dateRange.end)
-        : true;
-        
-        return   matchesDateRange;
-      }
-      return orders
-      
+      return orders;
     });
   };
 
   const handleStatusChange = async (orderId, newStatus) => {
     await updateOrderStatus(orderId, newStatus);
     if (newStatus === "Approved") {
-      console.log(orderId, "this is for approved");
       const adminName = user.name;
       try {
-        const response = await axios.put(`api/orders/${orderId}/approve`, { adminName, orderId });
+        const response = await axios.put(
+          `api/orders/${orderId}/approve`,
+          { adminName, orderId }
+        );
         console.log(response.data.message);
       } catch (error) {
-        console.error("Error approving order:", error.response?.data?.message || error.message);
+        console.error(
+          "Error approving order:",
+          error.response?.data?.message || error.message
+        );
       }
     }
+    if (newStatus === "Rejected") {
+      const adminName=user.name;
+      try{
+        const response = await axios.put(
+          `api/orders/${orderId}/reject`,
+          { adminName, orderId }
+        );
+        console.log(response.data.message);
+
+      }catch(error){
+        console.error(
+          "Error rejecting order:",
+          error.response?.data?.message || error.message
+        );
+
+      }
+    }
+
+
     fetchOrders();
     setDropdownOpen(null);
   };
@@ -114,7 +128,6 @@ const OrderList = () => {
     event.preventDefault();
     try {
       const fileData = await downloadFile(fileName);
-      console.log(fileData);
       const url = window.URL.createObjectURL(new Blob([fileData]));
       const link = document.createElement("a");
       link.href = url;
@@ -128,13 +141,17 @@ const OrderList = () => {
     }
   };
 
-  // Filtered orders using Redux state
-  const displayedOrders =  filterOrders(orders, { keyword, status, dateRange, orderedby })
+  const displayedOrders = filterOrders(orders, {
+    keyword,
+    status,
+    dateRange,
+    orderedby,
+  });
 
   return (
     <div>
       <motion.div className="flex justify-center">
-        <Searchbar /> {/* Adding the Searchbar component here */}
+        <Searchbar />
       </motion.div>
 
       <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
@@ -143,7 +160,9 @@ const OrderList = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } }}
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">📦 Request List</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
+            📦 Request List
+          </h2>
 
           {displayedOrders.length === 0 ? (
             <p className="text-gray-500 text-center">No orders found.</p>
@@ -157,58 +176,23 @@ const OrderList = () => {
                     animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }}
                     exit={{ opacity: 0, y: -20, transition: { duration: 0.3, ease: "easeIn" } }}
                     layout
-                    className="p-4 sm:p-6 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all"
+                    className="p-4 sm:p-6 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all cursor-pointer"
+                    onClick={() => toggleOrderDetails(order._id)}
                   >
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                      <div className="flex-1 mb-4 md:mb-0">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-800">
                           Order Number: <span className="text-blue-500">{order.orderNumber}</span>
                         </h3>
-                        <p className="text-gray-700 mb-2">
-                          <span className="font-medium">Ordered By:</span> {order.orderedBy}
-                        </p>
-                        <p className="text-gray-700 mb-2">
-                          <span className="font-medium">Approvals:</span> {order.Approvals || "None"}
-                        </p>
-                        <p className="text-gray-700 mb-2">
-                          <span className="font-medium">User Email:</span> {order.email}
-                        </p>
-
-                        <p className="font-serif text-lg text-gray-700 mb-2">
-                          Products: {order.products.map((item, index) => (
-                            <span key={index}>
-                              {item.name} (Qty: {item.quantity}, Price: {item.price})
-                            </span>
-                          ))}
-                        </p>
-                        <p className={`font-serif text-lg mb-2 ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
-                          Urgency: {order.urgency}
-                        </p>
-                        <p className="font-serif flex text-lg text-gray-700 mb-2">
-                          File Uploaded: {order.filenames && order.filenames.length > 0 ? (
-                            order.filenames.map((filename, index) => (
-                              <a
-                                key={index}
-                                href="#"
-                                onClick={(event) => handleFileDownload(filename, event)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500 underline"
-                              >
-                                <FaFilePdf color="red" size={20} title="View File" />
-                              </a>
-                            ))
-                          ) : (
-                            <FaFile color="gray" size={20} title="No File Available" />
-                          )}
-                        </p>
-                        <p className="font-serif text-lg text-gray-700 mb-2">Remarks: {order.remarks || "No remarks"}</p>
                       </div>
-                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2 md:mt-0">
                         <div className="relative">
                           <button
                             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                            onClick={() => toggleDropdown(order._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleDropdown(order._id);
+                            }}
                           >
                             {order.status}
                           </button>
@@ -218,39 +202,83 @@ const OrderList = () => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
                                 exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-                                className="absolute mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
+                                className="absolute mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
                               >
-                                <button
-                                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => handleStatusChange(order._id, "Completed")}
-                                >
-                                  Complete
-                                </button>
-                                <button
-                                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => handleStatusChange(order._id, "Pending")}
-                                >
-                                  Pending
-                                </button>
-                                <button
-                                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => handleStatusChange(order._id, "Approved")}
-                                >
-                                  Approved
-                                </button>
-                                <button
-                                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => handleStatusChange(order._id, "Rejected")}
-                                >
-                                  Rejected
-                                </button>
+                                {["Completed", "Pending", "Approved", "Rejected"].map((statusOption) => (
+                                  <button
+                                    key={statusOption}
+                                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange(order._id, statusOption);
+                                    }}
+                                  >
+                                    {statusOption}
+                                  </button>
+                                ))}
                               </motion.div>
                             )}
                           </AnimatePresence>
                         </div>
-                        <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" onClick={() => handleDelete(order._id)}>Delete</button>
+                        <button
+                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(order._id);
+                          }}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
+
+                    <AnimatePresence>
+                      {expandedOrder === order._id && (
+                        <motion.div
+                          className="mt-4 space-y-2"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <p className="text-gray-700"><strong>Ordered By:</strong> {order.orderedBy}</p>
+                          <p className="text-gray-700"><strong>Approvals:</strong> {order.Approvals || "None"}</p>
+                          <p className="text-gray-700"><strong>User Email:</strong> {order.email}</p>
+                          <p className="text-gray-700 font-serif">
+                            <strong>Products:</strong>{" "}
+                            {order.products.map((item, index) => (
+                              <span key={index}>
+                                {item.name} (Qty: {item.quantity}, Price: {item.price}){" "}
+                              </span>
+                            ))}
+                          </p>
+                          <p className={`font-serif ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
+                            <strong>Urgency:</strong> {order.urgency}
+                          </p>
+                          <p className="text-gray-700 flex items-center gap-2">
+                            <strong>File Uploaded:</strong>
+                            {order.filenames && order.filenames.length > 0 ? (
+                              order.filenames.map((filename, index) => (
+                                <a
+                                  key={index}
+                                  href="#"
+                                  onClick={(event) => handleFileDownload(filename, event)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 underline"
+                                >
+                                  <FaFilePdf color="red" size={20} title="View File" />
+                                </a>
+                              ))
+                            ) : (
+                              <FaFile color="gray" size={20} title="No File Available" />
+                            )}
+                          </p>
+                          <p className="text-gray-700"><strong>Remarks:</strong> {order.remarks || "No remarks"}</p>
+                          <p className="text-gray-700"><strong>Date Created:</strong> {order.createdAt.split("T")[0]}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.li>
                 ))}
               </AnimatePresence>
