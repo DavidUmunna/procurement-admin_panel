@@ -16,6 +16,8 @@ import { Dashboard } from "./pages/Dashboard";
 import ForgotPassword from "./pages/forgotpassword";
 import Fallback from "./components/errorboundary";
 import { ErrorBoundary } from 'react-error-boundary';
+import {Menu,  X } from 'lucide-react';
+import Sidebar from './components/Sidebar';
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -55,7 +57,7 @@ const App = () => {
       }
     };
     checkAuth();
-  }, [isauthenticated]);
+  }, []);
 
   if (isauthenticated === null) {
     return (

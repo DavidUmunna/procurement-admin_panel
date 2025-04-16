@@ -8,7 +8,7 @@ const UserDetails = ({ user ,request_amount,Approved_req,Pending_req,Rejected_re
   
    
   return (
-     <div className="flex justify-center  md:mx-auto flex-wrap">
+     <div className="flex justify-center  md:mx-auto flex-wrap bg-gray-300 rounded-2xl max-h-full pb-5">
     
             <div className="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6 px-10 text-center sm:mx-auto mt-10 ">
               {user?

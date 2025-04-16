@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
-  const roles = ["staff", "admin", "procurement_officer"];
+  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management","PVT","lab","accounts"];
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
@@ -83,7 +83,7 @@ const Add_user = () => {
                   className="absolute right-3 top-5/6 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </motion.div>
     

@@ -4,6 +4,7 @@ import {
   updateOrderStatus,
   deleteOrder,
   downloadFile,
+  get_user_orders,
 } from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile } from "react-icons/fa";
@@ -16,14 +17,20 @@ const OrderList = () => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
+  const admin_roles=["admin","prcurement_officer","human_resources","internal_auditor","global_admin"]
 
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
-
+  const email=user?.email
   useEffect(() => {
-    fetchOrders();
+    if (admin_roles.includes(user.role)){
+
+      fetchOrders();
+    }else{
+      fetch_user_orders(email)
+    }
   }, [user?.email]);
 
   const fetchOrders = async () => {
@@ -39,6 +46,19 @@ const OrderList = () => {
       console.error(err);
     }
   };
+  const fetch_user_orders=async(email)=>{
+    try{
+       const data=await get_user_orders(email)
+       if (Array.isArray(data.orders)) {
+        setOrders(data.orders || []);
+      } else {
+        console.log(data.orders);
+        throw new Error("Invalid data format");
+      }
+    }catch(error){
+        console.error(error)
+    }
+  }
 
   const filterOrders = (orders, filters) => {
     return orders.filter((order) => {
@@ -167,10 +187,15 @@ const OrderList = () => {
           {displayedOrders.length === 0 ? (
             <p className="text-gray-500 text-center">No orders found.</p>
           ) : (
+            
             <motion.ul className="space-y-4 sm:space-y-6">
-              <AnimatePresence>
+              
+
+                <AnimatePresence>
                 {displayedOrders.map((order) => (
-                  <motion.li
+                  
+
+                    <motion.li
                     key={order._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }}
@@ -178,15 +203,15 @@ const OrderList = () => {
                     layout
                     className="p-4 sm:p-6 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all cursor-pointer"
                     onClick={() => toggleOrderDetails(order._id)}
-                  >
+                    >
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-800">
+                    <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-800">
                           Order Number: <span className="text-blue-500">{order.orderNumber}</span>
                         </h3>
                       </div>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2 md:mt-0">
-                        <div className="relative">
+                      <div className="relative">
                           <button
                             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                             onClick={(e) => {
@@ -196,14 +221,14 @@ const OrderList = () => {
                           >
                             {order.status}
                           </button>
+                            {user?.canApprove&&(
                           <AnimatePresence>
                             {dropdownOpen === order._id && (
                               <motion.div
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
                                 exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-                                className="absolute mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
-                              >
+                                className="absolute mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                                 {["Completed", "Pending", "Approved", "Rejected"].map((statusOption) => (
                                   <button
                                     key={statusOption}
@@ -214,30 +239,35 @@ const OrderList = () => {
                                     }}
                                   >
                                     {statusOption}
-                                  </button>
-                                ))}
+                                  </button>)
+                                )}
                               </motion.div>
                             )}
-                          </AnimatePresence>
+                          </AnimatePresence>)}
                         </div>
-                        <button
+                        {user?.canApprove&&(
+
+                          <button
                           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(order._id);
                           }}
-                        >
-                          Delete
-                        </button>
+                          >
+                            Delete
+                          </button>
+                          )
+                        }
+                        
                       </div>
                     </div>
 
                     <AnimatePresence>
                       {expandedOrder === order._id && (
                         <motion.div
-                          className="mt-4 space-y-2"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
+                        className="mt-4 space-y-2"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.3 }}
                         >
@@ -253,7 +283,7 @@ const OrderList = () => {
                             ))}
                           </p>
                           <p className={`font-serif ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
-                            <strong>Urgency:</strong> {order.urgency}
+                          <strong>Urgency:</strong> {order.urgency}
                           </p>
                           <p className="text-gray-700 flex items-center gap-2">
                             <strong>File Uploaded:</strong>
@@ -279,15 +309,17 @@ const OrderList = () => {
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  
                   </motion.li>
                 ))}
-              </AnimatePresence>
-            </motion.ul>
-          )}
-        </motion.div>
-      </div>
-    </div>
-  );
+                </AnimatePresence>
+              
+              </motion.ul>
+            )}
+            </motion.div>
+            </div>
+            </div>
+          );
 };
 
 export default OrderList;

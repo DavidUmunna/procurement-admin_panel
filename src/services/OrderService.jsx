@@ -20,6 +20,26 @@ export const getOrders = async () => {
     console.error("Error fetching orders:", error);
     return [];
   }
+};export const get_user_orders = async ( email ) => {
+  try {
+    const requests = [];
+
+    if (email) {
+      const token=localStorage.getItem("authToken")
+      requests.push(axios.get(`${API_URL}/${orders}/${email}`,{headers:{Authorization:`Bearer ${token}`},withCredentials:true}));
+      requests.push(axios.get(`${API_URL}/fileupload/${email}`, { responseType: "blob" },{headers:{Authorization:`Bearer ${token}`},withCredentials:true}));
+    }
+
+    const results = await Promise.allSettled(requests);
+
+    const orderResponse = results[0].status === "fulfilled" ? results[0].value : null;
+    const fileResponse = results[1].status === "fulfilled" ? results[1].value : null;
+
+    return { orders: orderResponse?.data, file: fileResponse };
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return {};
+  }
 };
 
 
