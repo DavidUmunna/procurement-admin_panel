@@ -5,8 +5,8 @@ export default function Sidebar({ isOpen, onClose }) {
   const sidebar = [
     { name: "Inventory", to: "/#", icon: Boxes },
     { name: "Create Inventory", to: "/#", icon: PlusSquare },
-    { name: "Add Supplier", to: "/#", icon: UserPlus },
-    { name: "Supplier", to: "/#", icon: Truck },
+    { name: "Add Supplier", to: "/addsupplier", icon: UserPlus },
+    { name: "Supplier", to: "/supplierlist", icon: Truck },
     { name: "Duplicates", to: "/#", icon: Copy }
   ];
 

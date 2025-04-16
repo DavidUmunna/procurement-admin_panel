@@ -1,11 +1,13 @@
-import React from "react";
+import React,{useState} from "react";
 import { useUser } from "../components/usercontext";
 import request_img from "../components/assets/quote-request.png"
 import user_img from "../components/assets/user.png"
 //import Navbar from "../components/navBar";
 
-const UserDetails = ({ user ,request_amount,Approved_req,Pending_req,Rejected_req}) => {
-  
+const UserDetails = ({ user ,request_amount,approvedOrders,rejectedOrders,pendingOrders}) => {
+  const [showApproved, setShowApproved] = useState(false);
+  const [showPending, setShowPending] = useState(false);
+  const [showRejected, setShowRejected] = useState(false);
    
   return (
      <div className="flex justify-center  md:mx-auto flex-wrap bg-gray-300 rounded-2xl max-h-full pb-5">
@@ -41,39 +43,80 @@ const UserDetails = ({ user ,request_amount,Approved_req,Pending_req,Rejected_re
               </>:null}
               
             </div>
-            <div className="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-4 px-10 text-center sm:mx-auto mt-10">
+          <div className="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-4 px-10 text-center sm:mx-auto mt-10">
     
             <div className="flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full flex justify-center items-center  overflow-hidden bg-gray-200">
-                  {request_amount ? (
-                    <img   src={request_img} alt={user.name} className="w-10 h-10 m-4 " />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold">
-                      {user.name.charAt(0).toUpperCase()} {/* Display first letter as fallback */}
-                    </div>
-                  )}
+            <div className="w-20 h-20 rounded-full flex justify-center items-center overflow-hidden bg-gray-200">
+              {request_amount ? (
+                <img src={request_img} alt={user.name} className="w-10 h-10 m-4" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold">
+                  {user.name.charAt(0).toUpperCase()}
                 </div>
-                
+              )}
+            </div>
+      
+            <div className="mt-6 space-y-4 text-gray-700 w-full max-w-md">
+              <div className="bg-gray-400 rounded-2xl p-2">
+                <h3 className="text-xl font-semibold text-gray-800">Request Amount: {request_amount}</h3>
               </div>
-              <div className="mt-6 space-y-4 text-gray-700">
-                <div className="bg-gray-400 rounded-2xl p-1">
-    
-                  <h3 className=" text-xl font-semibold text-gray-800  ">Request Amount:{request_amount}</h3>
-                </div>
-                <div className="bg-green-300 rounded-2xl p-2">
-                  <h3 className=" text-xl font-semibold text-gray-800">Approved Requests:{Approved_req}</h3>
-                </div>
-                <div className="bg-yellow-300 rounded-2xl p-2">
-    
-                  <h3 className=" text-xl font-semibold text-gray-800">Pending Requests:{Pending_req}</h3>
-                </div>
-                <div className="bg-red-300 rounded-2xl p-2">
-                  <h3 className="text-xl font-semibold text-gray-800">Rejected Requests:{Rejected_req}</h3>
-                </div>
+      
+              {/* Approved */}
+              <div className="bg-green-400 rounded-2xl p-2 shadow-md hover:translate-y-1">
+                <button
+                  className="w-full text-left text-xl font-semibold text-white "
+                  onClick={() => setShowApproved(!showApproved)}
+                >
+                  {approvedOrders.length} Approved Requests
+                </button>
+                {showApproved && (
+                  <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
+                    {approvedOrders.map((req, index) => (
+                      <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+      
+              {/* Pending */}
+              <div className="bg-yellow-500 rounded-2xl p-2 shadow-md hover:translate-y-1">
+                <button
+                  className="w-full text-left text-xl font-semibold text-white"
+                  onClick={() => setShowPending(!showPending)}
+                >
+                   {pendingOrders.length} Pending Requests
+                </button>
+                {showPending && (
+                  <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
+                    {pendingOrders.map((req, index) => (
+                      <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+      
+              {/* Rejected */}
+              <div className="bg-red-500 rounded-2xl p-2 shadow-md hover:translate-y-1">
+                <button
+                  className="w-full text-left text-xl font-semibold text-white"
+                  onClick={() => setShowRejected(!showRejected)}
+                >
+                   {rejectedOrders.length}  Rejected Requests
+                </button>
+                {showRejected && (
+                  <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
+                    {rejectedOrders.map((req, index) => (
+                      <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
+          </div>
     
-         </div>
+    
+        </div>
+    </div>
   );
 };
 

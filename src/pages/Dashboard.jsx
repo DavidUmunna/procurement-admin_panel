@@ -5,16 +5,18 @@ import { getOrders } from "../services/OrderService";
 import { useEffect } from "react";
 import axios from "axios"
 import { type } from "@testing-library/user-event/dist/cjs/utility/type.js";
+import CostDashboard from "./CostDashboard";
 
 
 
 export const Dashboard=()=>{
     const { user } = useUser();
-    const admin_roles=["admin","prcurement_officer","human_resources","internal_auditor","global_admin"]
+    const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
     const [request,setRequest]=useState()
-    const [Approved_req,setAproved_req]=useState(0)
-    const [Pending_req,setPending_req]=useState(0)
-    const [Rejected_req,setRejected_req]=useState(0)
+    const [orders,setorders]=useState([])
+    const [approvedOrders, setApprovedOrders] = useState([]);
+    const [pendingOrders, setPendingOrders] = useState([]);
+    const [rejectedOrders, setRejectedOrders] = useState([]);
     const email=user?.email||"no email provided"
    
     useEffect(()=>{
@@ -41,11 +43,12 @@ export const Dashboard=()=>{
                     setRequest(orders)
                     
                     
-                    const Approved=orders.reduce((count,item)=>count+(item.status==="Approved"?1:0),0)
-                    setAproved_req(Approved)
-                    setPending_req(orders.reduce((count,item)=>count+(item.status==="Pending"?1:0),0))
-                    setRejected_req(orders.reduce((count,item)=>count+(item.status==="Rejected"?1:0),0))
-                    console.log("number approved",Approved)
+                   
+                    setApprovedOrders(orders.filter((order) => order.status === "Approved"));
+                    setPendingOrders(orders.filter((order) => order.status === "Pending"));
+                    setRejectedOrders(orders.filter((order) => order.status === "Rejected"));
+                   
+                    //console.log("number approved",Approved)
                  }else{
                     console.error("invalid data format")
                  }
@@ -59,7 +62,7 @@ export const Dashboard=()=>{
           }
           const fetchuserOrder=async (email)=>{
             if (!user || !user.email) return 
-
+            
             try{
                   const token=localStorage.getItem("authToken")
                   const userReq=await axios.get(`/api/orders/${email}`,{headers:{Authorization:`Bearer ${token}`, 
@@ -69,14 +72,14 @@ export const Dashboard=()=>{
                   if (Array.isArray(userReq.data||[])){
                     const orders=userReq.data
                     console.log("orders",orders)
-                    setRequest(orders)
+                    setorders(orders)
                     
                     
-                    const Approved=orders.reduce((count,item)=>count+(item.status==="Approved"?1:0),0)
-                    setAproved_req(Approved)
-                    setPending_req(orders.reduce((count,item)=>count+(item.status==="Pending"?1:0),0))
-                    setRejected_req(orders.reduce((count,item)=>count+(item.status==="Rejected"?1:0),0))
-                    console.log("number approved",Approved)
+                    
+                    setApprovedOrders(orders.filter((order) => order.status === "Approved"));
+                    setPendingOrders(orders.filter((order) => order.status === "Pending"));
+                    setRejectedOrders(orders.filter((order) => order.status === "Rejected"));
+                    //console.log("number approved",Approved)
                  }else{
                     console.error("invalid data format")
                  }
@@ -90,9 +93,11 @@ export const Dashboard=()=>{
 
           }
 
-       
+    
     console.log(user)
-    console.log(request)
+    console.log("user orders",request)
+    console.log(approvedOrders)
+    console.log(pendingOrders)
     const request_length=(request)=>{
         return Array.isArray(request) ? request.length : 0;
     }
@@ -101,14 +106,15 @@ export const Dashboard=()=>{
    
 
     return(
-        <div className=" min-h-screen bg-gray-100 ">
+        <div className=" min-h-screen bg-gray-300 ">
             
            
            
                 
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
-            <UserDetails user={user}  Approved_req={Approved_req} Pending_req={Pending_req} Rejected_req={Rejected_req} request_amount={request_amount} />
+            <UserDetails user={user}   rejectedOrders={rejectedOrders} request_amount={request_amount} approvedOrders={approvedOrders} pendingOrders={pendingOrders} />
+            <CostDashboard orders={orders}/>
             
         </div>
     )

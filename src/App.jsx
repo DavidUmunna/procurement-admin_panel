@@ -16,8 +16,8 @@ import { Dashboard } from "./pages/Dashboard";
 import ForgotPassword from "./pages/forgotpassword";
 import Fallback from "./components/errorboundary";
 import { ErrorBoundary } from 'react-error-boundary';
-import {Menu,  X } from 'lucide-react';
-import Sidebar from './components/Sidebar';
+import AddSupplier from "./pages/add_suppliers";
+import SupplierList from "./pages/supplierList";
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -39,7 +39,7 @@ const PageTransition = ({ children }) => (
 
 const App = () => {
   const location = useLocation();
-  const [isauthenticated, setisauthenticated] = useState(null);
+  const [isauthenticated, setisauthenticated] = useState(false);
 
 
   useEffect(() => {
@@ -85,7 +85,7 @@ const App = () => {
                       <Adminlogin setAuth={setisauthenticated} />
                     </PageTransition>
                   ) : (
-                    <Navigate to="/userdetails" />
+                    <Navigate to="/dashboard" />
                   )
                 }
               />
@@ -101,12 +101,36 @@ const App = () => {
                   )
                 }
               />
+               <Route
+                path="/addsupplier"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <AddSupplier />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
               <Route
                 path="/requestlist"
                 element={
                   isauthenticated ? (
                     <PageTransition>
                       <OrderList />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+               <Route
+                path="/supplierlist"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <SupplierList />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
