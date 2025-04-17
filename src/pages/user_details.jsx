@@ -70,11 +70,14 @@ const UserDetails = ({ user ,request_amount,approvedOrders,rejectedOrders,pendin
                   {approvedOrders.length} Approved Requests
                 </button>
                 {showApproved && (
-                  <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
-                    {approvedOrders.map((req, index) => (
-                      <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
-                    ))}
-                  </ul>
+                  <div className="max-h-[300px] overflow-y-auto">
+
+                      <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
+                        {approvedOrders.map((req, index) => (
+                          <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
+                        ))}
+                      </ul>
+                  </div>
                 )}
               </div>
       
@@ -87,11 +90,14 @@ const UserDetails = ({ user ,request_amount,approvedOrders,rejectedOrders,pendin
                    {pendingOrders.length} Pending Requests
                 </button>
                 {showPending && (
-                  <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
-                    {pendingOrders.map((req, index) => (
-                      <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
-                    ))}
-                  </ul>
+                  <div  className="max-h-[300px] overflow-y-auto">
+
+                      <ul className="mt-2 bg-white text-sm text-gray-800 rounded p-2 shadow">
+                        {pendingOrders.map((req, index) => (
+                          <li key={index} className="border-b py-1 last:border-none">{req.orderNumber}-{req.orderedBy}</li>
+                        ))}
+                      </ul>
+                  </div>
                 )}
               </div>
       
