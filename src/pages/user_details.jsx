@@ -18,10 +18,10 @@ const UserDetails = ({ user ,request_amount,approvedOrders,rejectedOrders,pendin
               <div className="flex flex-col items-center mb-10">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200">
                   {user?.imageurl ? (
-                    <img src={user_img} alt={user.name} className="w-full h-full object-cover" />
+                    <img src={user_img} alt={user.name || "user"} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold">
-                      {user.name.charAt(0).toUpperCase()} {/* Display first letter as fallback */}
+                      { "U"} {/* Display first letter as fallback */}
                     </div>
                   )}
                 </div>
@@ -48,10 +48,10 @@ const UserDetails = ({ user ,request_amount,approvedOrders,rejectedOrders,pendin
             <div className="flex flex-col items-center">
             <div className="w-20 h-20 rounded-full flex justify-center items-center overflow-hidden bg-gray-200">
               {request_amount ? (
-                <img src={request_img} alt={user.name} className="w-10 h-10 m-4" />
+                <img src={request_img} alt={user.name || "user"} className="w-10 h-10 m-4" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user?.name.charAt(0).toUpperCase() || "U"}
                 </div>
               )}
             </div>

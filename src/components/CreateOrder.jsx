@@ -29,6 +29,7 @@ const CreateOrder = () => {
   const [remarks, setRemarks] = useState("");
   const [email, setEmail] = useState("");
   const [filenames,setfilenames]=useState("")
+  const [Title,settitle]=useState("")
 
   useEffect(() => {
     if (user) {
@@ -59,7 +60,8 @@ const CreateOrder = () => {
         filenames,
         urgency,
         remarks,
-        products, // Sending products separately as a JSON object
+        products,
+        Title
       }
     //console.log(formdataobject)
     formData.append("email", email);
@@ -74,6 +76,7 @@ const CreateOrder = () => {
 
         //setUser((prev)=>({...prev,filename:fileupload.files.map(file=>file.filename)}))
         console.log("file uploaded:",fileupload.file);
+        console.log("file uploaded:",fileupload.orders);
       }
       
 
@@ -136,6 +139,16 @@ const CreateOrder = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Create Purchase Request</h2>
           <motion.form onSubmit={handleSubmit} className="space-y-4">
             <motion.div className="mb-4" variants={inputVariants} initial="hidden" animate="visible">
+              <motion.div className="mb-4" variants={inputVariants} initial="hidden" animate="visible">
+                <label className="block text-gray-700 font-bold mb-2">Title:</label>
+                <input
+                  type="text"
+                  value={Title}
+                  onChange={(e) => settitle(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </motion.div>
               <label className="block text-gray-700 font-bold mb-2">Supplier:</label>
               <input
                 type="text"

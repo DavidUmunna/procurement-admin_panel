@@ -10,6 +10,7 @@ function CostDashboard({ orders }) {
         month: 'short',
         year: 'numeric',
       });
+      console.log("months ",month)
 
       if (!grouped[month]) grouped[month] = 0;
 

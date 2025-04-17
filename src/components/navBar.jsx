@@ -9,11 +9,12 @@ import { PanelLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 
+export const admin_roles=["procurement_officer","human_resources","internal_auditor","global_admin"]
 const navigation = [
-  { name: 'RequestList', to: '/requestlist', icon: ClipboardDocumentListIcon },
+  { name: 'RequestList', to: '/requestlist', icon: ClipboardDocumentListIcon},
   { name: 'CreateRequest', to: '/createorder', icon: PlusCircleIcon },
-  { name: 'AddUsers', to: '/addusers', icon: UserIcon },
-  { name: 'UserList', to: '/users', icon: UsersIcon },
+  { name: 'AddUsers', to: '/addusers', icon: UserIcon, visibleTo:['admin','global_admin'] },
+  { name: 'UserList', to: '/users', icon: UsersIcon, visibleTo:['admin','global_admin']}
   //{ name: 'Profile', to: '/dashboard', icon: UserIcon },
 ];
 const sidebar=[
@@ -47,14 +48,24 @@ export default function Navbar() {
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                   <div className="flex items-center">
-                    <div>
-                        {sidebar.map((item)=>(
-                          <Link 
-                          href={item.to}
-                          onClick={() => setIsSidebarOpen(prev=>!prev)}
-                          key={item.name} className="flex items-center gap-2 p-2 hover:bg-muted rounded-md">
-                            <item.icon className='w-10 h-10 font-extrabold text-white '/>
-                            
+                  <div>
+                      {sidebar
+                        .filter(item => {
+                          // If `visibleTo` exists, check if user has permission
+                          if (item.visibleTo) {
+                            return item.visibleTo.includes(user?.role);
+                          }
+                          // If no restriction, show it to everyone
+                          return true;
+                        })
+                        .map(item => (
+                          <Link
+                            href={item.to}
+                            onClick={() => setIsSidebarOpen(prev => !prev)}
+                            key={item.name}
+                            className="flex items-center gap-2 p-2 hover:bg-muted rounded-md"
+                          >
+                            <item.icon className="w-10 h-10 font-extrabold text-white" />
                           </Link>
                         ))}
                     </div>
@@ -67,7 +78,14 @@ export default function Navbar() {
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
+                        {navigation.filter(item => {
+                          // If `visibleTo` exists, check if user has permission
+                          if (item.visibleTo) {
+                            return item.visibleTo.includes(user?.role);
+                          }
+                          // If no restriction, show it to everyone
+                          return true;
+                        }).map((item) => (
                           <Link
                             to={item.to}
                             key={item.name}
@@ -189,7 +207,14 @@ export default function Navbar() {
           animate={{ y: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
         >
-          {navigation.map((item) => (
+          {navigation.filter(item => {
+                          // If `visibleTo` exists, check if user has permission
+                          if (item.visibleTo) {
+                            return item.visibleTo.includes(user?.role);
+                          }
+                          // If no restriction, show it to everyone
+                          return true;
+                        }).map((item) => (
             <Link
               to={item.to}
               key={item.name}

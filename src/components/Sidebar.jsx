@@ -1,13 +1,17 @@
-import { Boxes, PlusSquare, UserPlus, Truck, Copy } from 'lucide-react';
+import { Boxes, PlusSquare, UserPlus, Truck, Copy,Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import { admin_roles } from './navBar';
+import { useUser } from './usercontext';
 export default function Sidebar({ isOpen, onClose }) {
+  
+  const {user}=useUser()
   const sidebar = [
-    { name: "Inventory", to: "/#", icon: Boxes },
-    { name: "Create Inventory", to: "/#", icon: PlusSquare },
-    { name: "Add Supplier", to: "/addsupplier", icon: UserPlus },
-    { name: "Supplier", to: "/supplierlist", icon: Truck },
-    { name: "Duplicates", to: "/#", icon: Copy }
+    { name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
+    { name: "Create Inventory", to: "/#", icon: PlusSquare,visibleTo: ["procurement_officer","admin","waste_management"] },
+    { name: "Add Supplier", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin'] },
+    { name: "Supplier", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin'] },
+    { name: "Duplicates", to: "/#", icon: Copy, visibleTo:["admin","global_admin"]},
+    { name: "Department Assignment", to: "/depatmentassignment", icon: Building2,visibleTo:["human_resources",'Admin',"global_admin"] }
   ];
 
   return (
@@ -22,7 +26,14 @@ export default function Sidebar({ isOpen, onClose }) {
       </div>
 
       <nav className="flex flex-col gap-2 p-4">
-        {sidebar.map((item) => (
+        {sidebar .filter(item => {
+                          // If `visibleTo` exists, check if user has permission
+                          if (item.visibleTo) {
+                            return item.visibleTo.includes(user?.role);
+                          }
+                          // If no restriction, show it to everyone
+                          return true;
+                        }).map((item) => (
           <Link
             to={item.to}
             key={item.name}

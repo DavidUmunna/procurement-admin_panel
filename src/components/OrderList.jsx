@@ -17,7 +17,7 @@ const OrderList = () => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
-  const admin_roles=["admin","prcurement_officer","human_resources","internal_auditor","global_admin"]
+  const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
 
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
@@ -207,8 +207,9 @@ const OrderList = () => {
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-800">
-                          Order Number: <span className="text-blue-500">{order.orderNumber}</span>
+                              Title: <span className="text-blue-500"> {order.Title || undefined}</span>
                         </h3>
+                       
                       </div>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2 md:mt-0">
                       <div className="relative">
@@ -271,6 +272,7 @@ const OrderList = () => {
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.3 }}
                         >
+                          <p className="text-gray-700"><strong>Order Number:</strong> {order.orderNumber || undefined}</p>
                           <p className="text-gray-700"><strong>Ordered By:</strong> {order.orderedBy}</p>
                           <p className="text-gray-700"><strong>Approvals:</strong> {order.Approvals || "None"}</p>
                           <p className="text-gray-700"><strong>User Email:</strong> {order.email}</p>

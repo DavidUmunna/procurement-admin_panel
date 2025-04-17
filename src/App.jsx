@@ -57,7 +57,7 @@ const App = () => {
       }
     };
     checkAuth();
-  }, []);
+  }, [isauthenticated]);
 
   if (isauthenticated === null) {
     return (

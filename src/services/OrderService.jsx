@@ -14,7 +14,7 @@ export const getOrders = async () => {
     const response = await axios.get(`${API_URL}/${orders}`,{headers:{Authorization:`Bearer ${token}`, 
       "ngrok-skip-browser-warning": "true"},
       withCredential:true});
-    console.log(response)
+    console.log("response",response)
     return response.data;
   } catch (error) {
     console.error("Error fetching orders:", error);

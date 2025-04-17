@@ -9,7 +9,7 @@ const Searchbar = () => {
   const dispatch = useDispatch();
   const search = useSelector((state) => state.search);
   const [isMobile, setIsMobile] = useState(false);
-  const [searchMode, setSearchMode] = useState('orderedby');
+  const [searchMode, setSearchMode] = useState('keyword');
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -45,21 +45,21 @@ const Searchbar = () => {
             value={searchMode}
             onChange={(e) => setSearchMode(e.target.value)}
           >
-            <option value="orderedby">Ordered By</option>
+           
             <option value="keyword">Keyword</option>
             <option value="status">Status</option>
             <option value="date">Date Range</option>
           </select>
 
           {/* Conditionally Render Inputs */}
-          {searchMode === 'orderedby' && (
+          {/*searchMode === 'orderedby' && (
             <input
               placeholder="Ordered by"
               className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={search.orderedby}
               onChange={(e) => dispatch(setOrderedBy(e.target.value))}
             />
-          )}
+          )*/}
 
           {searchMode === 'keyword' && (
             <input
