@@ -7,146 +7,124 @@ import {
   get_user_orders,
 } from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaFilePdf, FaFile } from "react-icons/fa";
+import { FaFilePdf, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock } from "react-icons/fa";
+import { FiDownload, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useUser } from "./usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Duplicates from "../pages/Duplicates";
 
-const OrderList = () => {
+const ADMIN_ROLES = ["admin", "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
+
+const OrderList = ({orders, selectedOrderId}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
-  const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
-
   const { user } = useUser();
-  const [orders, setOrders] = useState([]);
+  //const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
-  const email=user?.email
-  useEffect(() => {
-    if (admin_roles.includes(user.role)){
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
 
-      fetchOrders();
-    }else{
-      fetch_user_orders(email)
-    }
-  }, [user?.email]);
-
-  const fetchOrders = async () => {
-    try {
-      const data = await getOrders();
-      if (Array.isArray(data)) {
-        setOrders(data || []);
-      } else {
-        console.log(data);
-        throw new Error("Invalid data format");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const fetch_user_orders=async(email)=>{
-    try{
-       const data=await get_user_orders(email)
-       if (Array.isArray(data.orders)) {
-        setOrders(data.orders || []);
-      } else {
-        console.log(data.orders);
-        throw new Error("Invalid data format");
-      }
-    }catch(error){
-        console.error(error)
-    }
-  }
+ 
+ 
 
   const filterOrders = (orders, filters) => {
+    const { orderedby, keyword, status, dateRange } = filters;
+  
+    
     return orders.filter((order) => {
-      const { orderedby, keyword, status, dateRange } = filters;
-
-      if (orderedby) {
-        return (
-          order.orderedBy.toLowerCase() === orderedby.toLowerCase()
-        );
+      if (orderedby && order.orderedBy.toLowerCase() !== orderedby.toLowerCase()) {
+        return false;
       }
+      
       if (keyword) {
-        return (
-          order.orderNumber.toLowerCase().includes(keyword.toLowerCase()) ||
-          order.orderedBy.toLowerCase().includes(keyword.toLowerCase())
-        );
+        const searchTerm = keyword.toLowerCase();
+        const matchesOrderNumber = order.orderNumber?.toLowerCase().includes(searchTerm);
+        const matchesOrderedBy = order.orderedBy?.toLowerCase().includes(searchTerm);
+        const matchesTitle = order.Title?.toLowerCase().includes(searchTerm);
+        
+        if (!matchesOrderNumber && !matchesOrderedBy && !matchesTitle) {
+          return false;
+        }
       }
-      if (status) {
-        return order.status === status;
+      
+      if (status && order.status !== status) {
+        return false;
       }
-      if (dateRange) {
-        const matchesDateRange =
-          dateRange.start && dateRange.end
-            ? new Date(order.date) >= new Date(dateRange.start) &&
-              new Date(order.date) <= new Date(dateRange.end)
-            : true;
-        return matchesDateRange;
+      
+      if (dateRange?.start && dateRange?.end) {
+        const orderDate = new Date(order.createdAt);
+        const startDate = new Date(dateRange.start);
+        const endDate = new Date(dateRange.end);
+        
+        if (orderDate < startDate || orderDate > endDate) {
+          return false;
+        }
       }
-
-      return orders;
+      
+      return true;
     });
   };
 
   const handleStatusChange = async (orderId, newStatus) => {
-    await updateOrderStatus(orderId, newStatus);
-    if (newStatus === "Approved") {
-      const adminName = user.name;
-      try {
-        const response = await axios.put(
-          `api/orders/${orderId}/approve`,
-          { adminName, orderId }
-        );
-        console.log(response.data.message);
-      } catch (error) {
-        console.error(
-          "Error approving order:",
-          error.response?.data?.message || error.message
-        );
+    try {
+      setIsLoading(true);
+      await updateOrderStatus(orderId, newStatus);
+      
+      if (newStatus === "Approved") {
+        await axios.put(`api/orders/${orderId}/approve`, { 
+          adminName: user.name, 
+          orderId 
+        });
+      } else if (newStatus === "Rejected") {
+        await axios.put(`api/orders/${orderId}/reject`, { 
+          adminName: user.name, 
+          orderId 
+        });
       }
+      
+      orders.map(order => 
+        order._id === orderId ? { ...order, status: newStatus } : order
+      );
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update order status");
+    } finally {
+      setIsLoading(false);
+      setDropdownOpen(null);
     }
-    if (newStatus === "Rejected") {
-      const adminName=user.name;
-      try{
-        const response = await axios.put(
-          `api/orders/${orderId}/reject`,
-          { adminName, orderId }
-        );
-        console.log(response.data.message);
-
-      }catch(error){
-        console.error(
-          "Error rejecting order:",
-          error.response?.data?.message || error.message
-        );
-
-      }
-    }
-
-
-    fetchOrders();
-    setDropdownOpen(null);
   };
 
   const handleDelete = async (orderId) => {
-    await deleteOrder(orderId);
-    setOrders(orders.filter((order) => order._id !== orderId));
+    try {
+      setIsLoading(true);
+      await deleteOrder(orderId);
+      orders.filter(order => order._id !== orderId);
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      setError("Failed to delete order");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleOrderDetails = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
-  const toggleDropdown = (orderId) => {
+  const toggleDropdown = (orderId, e) => {
+    e.stopPropagation();
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
 
   const handleFileDownload = async (fileName, event) => {
-    event.preventDefault();
+    event.stopPropagation();
     try {
+      setIsLoading(true);
       const fileData = await downloadFile(fileName);
       const url = window.URL.createObjectURL(new Blob([fileData]));
       const link = document.createElement("a");
@@ -158,8 +136,122 @@ const OrderList = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading file:", error);
+      setError("Failed to download file");
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const getStatusBadge = (status) => {
+    let bgColor, textColor, icon;
+    
+    switch (status) {
+      case "Approved":
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        icon = <FaCheck className="mr-1" />;
+        break;
+      case "Rejected":
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        icon = <FaTimes className="mr-1" />;
+        break;
+      case "Pending":
+        bgColor = "bg-yellow-100";
+        textColor = "text-yellow-800";
+        icon = <FaClock className="mr-1" />;
+        break;
+      case "Completed":
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
+        icon = <FaCheck className="mr-1" />;
+        break;
+      default:
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
+    }
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>
+        {icon} {status}
+      </span>
+    );
+  };
+
+  const renderOrderDetails = (order) => (
+    <motion.div
+      className="mt-4 space-y-3 text-sm"
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p className="text-gray-600"><span className="font-medium">Order Number:</span> {order.orderNumber || "N/A"}</p>
+          <p className="text-gray-600"><span className="font-medium">Ordered By:</span> {order.orderedBy}</p>
+          <p className="text-gray-600"><span className="font-medium">User Email:</span> {order.email}</p>
+        </div>
+        <div>
+          <p className="text-gray-600"><span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
+          <p className="text-gray-600"><span className="font-medium">Approvals:</span> {order.Approvals || "None"}</p>
+          <p className={`${order.urgency === "VeryUrgent" ? "text-red-600" : "text-gray-600"}`}>
+            <span className="font-medium">Urgency:</span> {order.urgency}
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <p className="font-medium text-gray-600">Products:</p>
+        <ul className="mt-1 space-y-1">
+          {order.products?.map((item, index) => (
+            <li key={index} className="text-gray-600">
+              • {item.name} (Qty: {item.quantity}, Price: ₦{item.price})
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="font-medium text-gray-600">Files:</span>
+        {order.filenames?.length > 0 ? (
+          order.filenames.map((filename, index) => (
+            <button
+              key={index}
+              onClick={(e) => handleFileDownload(filename, e)}
+              className="flex items-center text-blue-600 hover:text-blue-800"
+            >
+              <FaFilePdf className="mr-1" /> {filename}
+            </button>
+          ))
+        ) : (
+          <span className="text-gray-500 flex items-center">
+            <FaFile className="mr-1" /> No files attached
+          </span>
+        )}
+      </div>
+
+      {order.remarks && (
+        <div>
+          <p className="font-medium text-gray-600">Remarks:</p>
+          <p className="text-gray-600">{order.remarks}</p>
+        </div>
+      )}
+    </motion.div>
+  );
+
+  const renderEmptyState = () => (
+    <div className="p-8 text-center">
+      <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
+        <FaFile className="h-5 w-5 text-gray-400" />
+      </div>
+      <h3 className="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        Try adjusting your search filters or create a new order
+      </p>
+    </div>
+  );
 
   const displayedOrders = filterOrders(orders, {
     keyword,
@@ -169,159 +261,162 @@ const OrderList = () => {
   });
 
   return (
-    <div>
-      <motion.div className="flex justify-center">
-        <Searchbar />
-      </motion.div>
-
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
-        <motion.div
-          className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-8"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } }}
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
-            📦 Request List
-          </h2>
+          <Searchbar />
+        </motion.div>
 
-          {displayedOrders.length === 0 ? (
-            <p className="text-gray-500 text-center">No orders found.</p>
+        <motion.div
+          className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+              <span className="mr-2">📦</span> Request List
+              {isLoading && (
+                <span className="ml-3 text-sm text-gray-500">Loading...</span>
+              )}
+            </h2>
+          </div>
+
+          {error && (
+            <div className="p-4 bg-red-50 text-red-600 border-l-4 border-red-500">
+              {error}
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : displayedOrders.length === 0 ? (
+            renderEmptyState()
           ) : (
-            
-            <motion.ul className="space-y-4 sm:space-y-6">
-              
-
-                <AnimatePresence>
+            <motion.ul className="divide-y divide-gray-200">
+              <AnimatePresence>
                 {displayedOrders.map((order) => (
-                  
-
-                    <motion.li
+                  <motion.li
                     key={order._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }}
-                    exit={{ opacity: 0, y: -20, transition: { duration: 0.3, ease: "easeIn" } }}
-                    layout
-                    className="p-4 sm:p-6 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all cursor-pointer"
-                    onClick={() => toggleOrderDetails(order._id)}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    id={`order-${order._id}`}
+                    className={`p-4 border rounded-lg ${selectedOrderId === order._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+                  >
+                    <div 
+                      className="p-4 sm:p-6 cursor-pointer"
+                      onClick={() => toggleOrderDetails(order._id)}
                     >
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800">
-                              Title: <span className="text-blue-500"> {order.Title || undefined}</span>
-                        </h3>
-                       
-                      </div>
-                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2 md:mt-0">
-                      <div className="relative">
-                          <button
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleDropdown(order._id);
-                            }}
-                          >
-                            {order.status}
-                          </button>
-                            {user?.canApprove&&(
-                          <AnimatePresence>
-                            {dropdownOpen === order._id && (
-                              <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
-                                exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-                                className="absolute mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                                {["Completed", "Pending", "Approved", "Rejected"].map((statusOption) => (
-                                  <button
-                                    key={statusOption}
-                                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleStatusChange(order._id, statusOption);
-                                    }}
-                                  >
-                                    {statusOption}
-                                  </button>)
-                                )}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>)}
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-semibold text-gray-800 truncate">
+                              {order.Title || "Untitled Order"}
+                            </h3>
+                            {getStatusBadge(order.status)}
+                          </div>
+                          <p className="text-sm text-gray-500 mt-1">
+                            #{order.orderNumber} • {order.orderedBy}
+                          </p>
                         </div>
-                        {user?.canApprove&&(
 
-                          <button
-                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(order._id);
-                          }}
-                          >
-                            Delete
-                          </button>
-                          )
-                        }
-                        
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center text-sm text-gray-500">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </div>
+                          
+                          {order.filenames?.length > 0 && (
+                            <button
+                              onClick={(e) => handleFileDownload(order.filenames[0], e)}
+                              className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                              title="Download file"
+                            >
+                              <FiDownload />
+                            </button>
+                          )}
+
+                          {ADMIN_ROLES.includes(user?.role) && (
+                            <div className="relative">
+                              <button
+                                onClick={(e) => toggleDropdown(order._id, e)}
+                                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                                aria-label="Order actions"
+                              >
+                                <FaEllipsisV />
+                              </button>
+
+                              <AnimatePresence>
+                                {dropdownOpen === order._id && (
+                                  <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                                  >
+                                    <div className="py-1">
+                                      {["Pending", "Approved", "Rejected", "Completed"].map((statusOption) => (
+                                        <button
+                                          key={statusOption}
+                                          className={`flex items-center w-full px-4 py-2 text-sm ${
+                                            order.status === statusOption 
+                                              ? "bg-blue-50 text-blue-600" 
+                                              : "text-gray-700 hover:bg-gray-100"
+                                          }`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleStatusChange(order._id, statusOption);
+                                          }}
+                                        >
+                                          <span className="mr-2">
+                                            {statusOption === "Approved" && <FaCheck className="text-green-500" />}
+                                            {statusOption === "Rejected" && <FaTimes className="text-red-500" />}
+                                            {statusOption === "Pending" && <FaClock className="text-yellow-500" />}
+                                            {statusOption === "Completed" && <FaCheck className="text-blue-500" />}
+                                          </span>
+                                          {statusOption}
+                                        </button>
+                                      ))}
+                                      <button
+                                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDelete(order._id);
+                                        }}
+                                      >
+                                        <FaTrash className="mr-2" />
+                                        Delete
+                                      </button>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    <AnimatePresence>
-                      {expandedOrder === order._id && (
-                        <motion.div
-                        className="mt-4 space-y-2"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <p className="text-gray-700"><strong>Order Number:</strong> {order.orderNumber || undefined}</p>
-                          <p className="text-gray-700"><strong>Ordered By:</strong> {order.orderedBy}</p>
-                          <p className="text-gray-700"><strong>Approvals:</strong> {order.Approvals || "None"}</p>
-                          <p className="text-gray-700"><strong>User Email:</strong> {order.email}</p>
-                          <p className="text-gray-700 font-serif">
-                            <strong>Products:</strong>{" "}
-                            {order.products.map((item, index) => (
-                              <span key={index}>
-                                {item.name} (Qty: {item.quantity}, Price: {item.price}){" "}
-                              </span>
-                            ))}
-                          </p>
-                          <p className={`font-serif ${order.urgency === "VeryUrgent" ? "text-red-500" : "text-gray-700"}`}>
-                          <strong>Urgency:</strong> {order.urgency}
-                          </p>
-                          <p className="text-gray-700 flex items-center gap-2">
-                            <strong>File Uploaded:</strong>
-                            {order.filenames && order.filenames.length > 0 ? (
-                              order.filenames.map((filename, index) => (
-                                <a
-                                  key={index}
-                                  href="#"
-                                  onClick={(event) => handleFileDownload(filename, event)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-500 underline"
-                                >
-                                  <FaFilePdf color="red" size={20} title="View File" />
-                                </a>
-                              ))
-                            ) : (
-                              <FaFile color="gray" size={20} title="No File Available" />
-                            )}
-                          </p>
-                          <p className="text-gray-700"><strong>Remarks:</strong> {order.remarks || "No remarks"}</p>
-                          <p className="text-gray-700"><strong>Date Created:</strong> {order.createdAt.split("T")[0]}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  
+                      <AnimatePresence>
+                        {expandedOrder === order._id && renderOrderDetails(order)}
+                      </AnimatePresence>
+                    </div>
                   </motion.li>
                 ))}
-                </AnimatePresence>
-              
-              </motion.ul>
-            )}
-            </motion.div>
-            </div>
-            </div>
-          );
+              </AnimatePresence>
+            </motion.ul>
+          )}
+        </motion.div>
+      </div>
+    </div>
+  );
 };
 
 export default OrderList;

@@ -4,8 +4,9 @@ import { useUser } from "../components/usercontext";
 import { getOrders } from "../services/OrderService";
 import { useEffect } from "react";
 import axios from "axios"
-import { type } from "@testing-library/user-event/dist/cjs/utility/type.js";
+
 import CostDashboard from "./CostDashboard";
+
 
 
 
@@ -41,6 +42,7 @@ export const Dashboard=()=>{
                     const orders=userReq.data
                     console.log("orders",orders)
                     setRequest(orders)
+                    setorders(orders)
                     
                     
                    
@@ -95,13 +97,28 @@ export const Dashboard=()=>{
 
     
     console.log(user)
-    console.log("user orders",request)
+    console.log("user orders",orders)
     console.log(approvedOrders)
     console.log(pendingOrders)
     const request_length=(request)=>{
         return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
+    const sampleOrders = [
+      {
+        createdAt: '2024-04-01T00:00:00Z',
+        products: [
+          { price: 100, quantity: 1 },
+          { price: 50, quantity: 2 }
+        ]
+      },
+      {
+        createdAt: '2024-04-15T00:00:00Z',
+        products: [
+          { price: 80, quantity: 1 }
+        ]
+      }
+    ];
     
    
 
@@ -110,7 +127,7 @@ export const Dashboard=()=>{
             
            
            
-                
+             
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
             <UserDetails user={user}   rejectedOrders={rejectedOrders} request_amount={request_amount} approvedOrders={approvedOrders} pendingOrders={pendingOrders} />

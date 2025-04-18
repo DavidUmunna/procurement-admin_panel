@@ -7,11 +7,11 @@ export default function Sidebar({ isOpen, onClose }) {
   const {user}=useUser()
   const sidebar = [
     { name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
-    { name: "Create Inventory", to: "/#", icon: PlusSquare,visibleTo: ["procurement_officer","admin","waste_management"] },
-    { name: "Add Supplier", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin'] },
-    { name: "Supplier", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin'] },
-    { name: "Duplicates", to: "/#", icon: Copy, visibleTo:["admin","global_admin"]},
-    { name: "Department Assignment", to: "/depatmentassignment", icon: Building2,visibleTo:["human_resources",'Admin',"global_admin"] }
+    { name: "Inventory Management", to: "/inventorymanagement", icon: PlusSquare,visibleTo: ["procurement_officer","admin","waste_management"] },
+    { name: "Add Supplier", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
+    { name: "Supplier", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin'] },
+   
+    { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin"] }
   ];
 
   return (

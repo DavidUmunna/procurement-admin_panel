@@ -18,6 +18,10 @@ import Fallback from "./components/errorboundary";
 import { ErrorBoundary } from 'react-error-boundary';
 import AddSupplier from "./pages/add_suppliers";
 import SupplierList from "./pages/supplierList";
+import DepartmentAssignment from "./pages/Department_assignment";
+import InventoryManagement from "./pages/Inventorymanagement";
+import Duplicates from "./pages/Duplicates";
+import OrdersDashboard from "./components/Ordersmanagement";
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -118,7 +122,7 @@ const App = () => {
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                      <OrderList />
+                      <OrdersDashboard />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
@@ -161,18 +165,31 @@ const App = () => {
                   )
                 }
               />
-             { /*<Route
-                path="/userdetails"
+             <Route
+                path="/departmentassignment"
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                    <Userdetails />
+                    <DepartmentAssignment />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
                   )
                 }
-              />*/}
+              />
+               <Route
+                path="/inventorymanagement"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                    <InventoryManagement />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+              
               <Route path="/forgotpassword"
               element={
                 <PageTransition>

@@ -65,7 +65,7 @@ export default function Navbar() {
                             key={item.name}
                             className="flex items-center gap-2 p-2 hover:bg-muted rounded-md"
                           >
-                            <item.icon className="w-10 h-10 font-extrabold text-white" />
+                            <item.icon className="w-9 h-9 text-white" />
                           </Link>
                         ))}
                     </div>
@@ -97,7 +97,8 @@ export default function Navbar() {
                               'rounded-md px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out'
                             )}
                           >
-                            {item.name}
+                            <item.icon className="h-6 w-6" />
+                            
                           </Link>
                         ))}
                       </div>
