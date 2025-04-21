@@ -438,7 +438,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                                    className="absolute left-4 right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
                                   >
                                     <div className="py-1">
                                       {["Pending", "Approved", "Rejected", "Completed"].map((statusOption) => (
@@ -454,7 +454,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                             handleStatusChange(order._id, statusOption);
                                           }}
                                         >
-                                          <span className="mr-2">
+                                          <span className="mr-5">
                                             {statusOption === "Approved" && <FaCheck className="text-green-500" />}
                                             {statusOption === "Rejected" && <FaTimes className="text-red-500" />}
                                             {statusOption === "Pending" && <FaClock className="text-yellow-500" />}
