@@ -4,7 +4,7 @@ import {
   updateOrderStatus,
   deleteOrder,
   downloadFile,
-  get_user_orders,
+  
 } from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock } from "react-icons/fa";
@@ -15,9 +15,9 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Duplicates from "../pages/Duplicates";
 
-const ADMIN_ROLES = ["admin", "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
+const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
 
-const OrderList = ({orders, selectedOrderId}) => {
+const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -27,6 +27,36 @@ const OrderList = ({orders, selectedOrderId}) => {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const getOverallStatus = (approvals) => {
+    if (!approvals || approvals.length === 0) return "Pending";
+    if (approvals.some(a => a.status === "Rejected")) return "Rejected";
+    
+    const approvalCount = approvals.filter(a => a.status === "Approved").length;
+    const REQUIRED_APPROVALS = 2; // Change this to your business logic
+    
+    if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
+    if (approvalCount > 0) return "Partially Approved";
+    
+    return "Pending";
+  };
+  const getStatusExplanation = (approvals) => {
+    const status = getOverallStatus(approvals);
+    const approvalsCount = approvals?.filter(a => a.status === "Approved").length || 0;
+    const REQUIRED_APPROVALS=2
+    
+    switch(status) {
+      case "Approved":
+        return `Approved by ${approvalsCount} administrator(s)`;
+      case "Partially Approved":
+        return `Partially approved (${approvalsCount} of ${REQUIRED_APPROVALS} required approvals)`;
+      case "Rejected":
+        const rejectors = approvals?.filter(a => a.status === "Rejected").map(a => a.admin).join(", ");
+        return `Rejected by ${rejectors}`;
+      default:
+        return "Awaiting review";
+    }
+  };
   
 
  
@@ -72,27 +102,63 @@ const OrderList = ({orders, selectedOrderId}) => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      setIsLoading(true);
+      setIsLoading(false);
+      const token = localStorage.getItem("authToken");
+  
+      // Optimistic update - immediately update both status and approvals
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === orderId 
+            ? { 
+                ...order, 
+                status: newStatus,
+                Approvals: [
+                  ...(order.Approvals || []), // Include existing approvals if any
+                  {
+                    admin: user.name,
+                    status: newStatus,
+                    timestamp: new Date().toISOString()
+                  }
+                ]
+              } 
+            : order
+        )
+      );
+  
+      // First update the general status
       await updateOrderStatus(orderId, newStatus);
-      
-      if (newStatus === "Approved") {
+  
+      // Then send specific approve/reject requests
+      if (newStatus === "Approved" || newStatus === "Completed") {
         await axios.put(`api/orders/${orderId}/approve`, { 
           adminName: user.name, 
           orderId 
-        });
-      } else if (newStatus === "Rejected") {
+        }, { headers: { Authorization: `Bearer ${token}` }, withCredentials: true });
+      } else if (newStatus === "Rejected" || newStatus === "Pending") {
         await axios.put(`api/orders/${orderId}/reject`, { 
           adminName: user.name, 
           orderId 
-        });
+        }, { headers: { Authorization: `Bearer ${token}` }, withCredentials: true });
       }
-      
-      orders.map(order => 
-        order._id === orderId ? { ...order, status: newStatus } : order
-      );
+  
     } catch (error) {
       console.error("Error updating status:", error);
       setError("Failed to update order status");
+      
+      // Revert changes if API call fails
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === orderId 
+            ? { 
+                ...order, 
+                status: order.status, // Revert status
+                Approvals: order.Approvals?.filter(approval => 
+                  approval.admin !== user.name || approval.status !== newStatus
+                ) // Remove the failed approval
+              } 
+            : order
+        )
+      );
     } finally {
       setIsLoading(false);
       setDropdownOpen(null);
@@ -142,9 +208,9 @@ const OrderList = ({orders, selectedOrderId}) => {
     }
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (order) => {
     let bgColor, textColor, icon;
-    
+    const status = getOverallStatus(order.Approvals);
     switch (status) {
       case "Approved":
         bgColor = "bg-green-100";
@@ -186,7 +252,14 @@ const OrderList = ({orders, selectedOrderId}) => {
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.3 }}
     >
-      
+      <div className="p-3 bg-gray-50 rounded-lg">
+          <p className="font-semibold text-gray-700">
+            Current Status: <span className="ml-2">{getOverallStatus(order.Approvals)}</span>
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            {getStatusExplanation(order.Approvals)}
+          </p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <p className="text-gray-600"><span className="font-medium">Order Number:</span> {order.orderNumber || "N/A"}</p>
@@ -195,7 +268,12 @@ const OrderList = ({orders, selectedOrderId}) => {
         </div>
         <div>
           <p className="text-gray-600"><span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
-          <p className="text-gray-600"><span className="font-medium">Approvals:</span> {order.Approvals || "None"}</p>
+          <p className="text-gray-600">
+            <span className="font-medium">Approvals:</span> 
+            {order.Approvals?.length > 0 
+              ? order.Approvals.map(a => `${a.admin} (${a.status})`).join(", ")
+              : "None"}
+          </p>
           <p className={`${order.urgency === "VeryUrgent" ? "text-red-600" : "text-gray-600"}`}>
             <span className="font-medium">Urgency:</span> {order.urgency}
           </p>
@@ -322,7 +400,7 @@ const OrderList = ({orders, selectedOrderId}) => {
                             <h3 className="text-lg font-semibold text-gray-800 truncate">
                               {order.Title || "Untitled Order"}
                             </h3>
-                            {getStatusBadge(order.status)}
+                            {getStatusBadge(order)}
                           </div>
                           <p className="text-sm text-gray-500 mt-1">
                             #{order.orderNumber} • {order.orderedBy}

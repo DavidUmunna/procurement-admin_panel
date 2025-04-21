@@ -61,11 +61,12 @@ const OrdersDashboard = () => {
         <OrderList 
           orders={orders} 
           selectedOrderId={selectedOrderId}
+          setOrders={setOrders}
         />
       </div>
       
       {/* Duplicates Panel (takes 1/3 width on large screens) */}
-      <div className="lg:w-1/3">
+      <div className="lg:w-1/3 mb-8">
         <Duplicates 
           orders={orders} 
           onOrderSelect={handleOrderSelect}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useUser } from "../components/usercontext";
 import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiCalendar, FiUser } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import requestImg from "../components/assets/quote-request.png";
@@ -138,7 +137,7 @@ const UserDetails = ({
             transition={{ duration: 0.5 }}
             className="bg-white rounded-2xl shadow-xl overflow-hidden lg:col-span-1"
           >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-32"></div>
+            <div className="bg-gradient-to-r from-gray-800 to-gray-600 h-32"></div>
             <div className="px-6 pb-8 relative">
               <div className="flex justify-center -mt-16">
                 <div className="relative">

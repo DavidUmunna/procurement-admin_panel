@@ -20,8 +20,10 @@ import AddSupplier from "./pages/add_suppliers";
 import SupplierList from "./pages/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
 import InventoryManagement from "./pages/Inventorymanagement";
-import Duplicates from "./pages/Duplicates";
 import OrdersDashboard from "./components/Ordersmanagement";
+import ProtectedRoute from "./components/Protectedroute";
+import UnauthorizedPage from "./pages/Unauthorized";
+
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -42,6 +44,7 @@ const PageTransition = ({ children }) => (
 );
 
 const App = () => {
+  //const {user}=useUser()
   const location = useLocation();
   const [isauthenticated, setisauthenticated] = useState(false);
 
@@ -177,19 +180,41 @@ const App = () => {
                   )
                 }
               />
-               <Route
+              <Route
                 path="/inventorymanagement"
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                    <InventoryManagement />
+                    <InventoryManagement  />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
                   )
                 }
               />
-              
+              <Route
+                path="/unauthorized"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                    <UnauthorizedPage  />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+              {/* <Route
+                path="/admin-dashboard"
+                element={
+                  <ProtectedRoute requiredRoles={['admin', 'global_admin',]}>
+                    <PageTransition>
+                      <InventoryManagement  />
+                    </PageTransition>
+                  </ProtectedRoute>
+                }
+              />*/}
+                    
               <Route path="/forgotpassword"
               element={
                 <PageTransition>

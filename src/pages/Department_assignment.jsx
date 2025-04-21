@@ -1,314 +1,747 @@
 import { useState, useEffect } from 'react';
-import { FiUsers, FiUserPlus, FiEdit2, FiTrash2, FiChevronDown, FiChevronUp, FiSearch, FiCheck, FiX } from 'react-icons/fi';
+import { 
+  FiUsers, FiUserPlus, FiEdit2, FiTrash2, FiChevronDown, FiChevronUp, 
+  FiSearch, FiCheck, FiX, FiClipboard, FiBarChart2, FiPlus 
+} from 'react-icons/fi';
+import axios from 'axios';
+import { useUser } from '../components/usercontext';
+  
 
-const DepartmentAssignment = () => {
-  // State for departments and users
-  const [departments, setDepartments] = useState([
-    { id: 1, name: 'IT', head: null, users: [101, 102] },
-    { id: 2, name: 'HR', head: 103, users: [103, 104] },
-    { id: 3, name: 'Finance', head: 105, users: [105] },
-  ]);
-
-  const [allUsers, setAllUsers] = useState([
-    { id: 101, name: 'John Doe', email: 'john@example.com' },
-    { id: 102, name: 'Jane Smith', email: 'jane@example.com' },
-    { id: 103, name: 'Mike Johnson', email: 'mike@example.com' },
-    { id: 104, name: 'Sarah Williams', email: 'sarah@example.com' },
-    { id: 105, name: 'David Brown', email: 'david@example.com' },
-    { id: 106, name: 'Emily Davis', email: 'emily@example.com' }, // Unassigned user
-  ]);
-
-  // UI state
-  const [expandedDept, setExpandedDept] = useState(null);
-  const [showAddDeptModal, setShowAddDeptModal] = useState(false);
-  const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [currentDept, setCurrentDept] = useState(null);
+const global_ADMIN_ROLES=["admin","global_admin","human_resources"]
+const DepartmentManagement = () => {
+  // State
+  const {user}=useUser()
+  const currentuser=user
+  const [departments, setDepartments] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [newDeptName, setNewDeptName] = useState('');
-  const [editingDept, setEditingDept] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
-  // Filter users not assigned to any department
-  const unassignedUsers = allUsers.filter(
-    user => !departments.some(dept => dept.users.includes(user.id))
-  );
 
-  // Filter users based on search term
-  const filteredUsers = allUsers.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
+  // UI State
+  const [expandedDept, setExpandedDept] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [modal, setModal] = useState({ 
+    show: false, 
+    type: '', // 'addDept', 'editDept', 'addUser', 'assignTask', 'stats', 'deleteDept'
+    data: null 
+  });
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    headOfDepartment: '', 
+    taskTitle: '', 
+    taskDescription: '', 
+    assignedTo: '',
+    dueDate: '',
+    status:'Pending'
+  });
 
-  // Toggle department expansion
-  const toggleDept = (deptId) => {
-    setExpandedDept(expandedDept === deptId ? null : deptId);
-  };
+  // Fetch all data
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const token = localStorage.getItem("authToken");
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        withCredentials: true 
+      };
 
-  // Add new department
-  const addDepartment = () => {
-    if (!newDeptName.trim()) return;
-    
-    const newDept = {
-      id: Date.now(),
-      name: newDeptName,
-      head: null,
-      users: []
+      try {
+        const [deptRes, usersRes, tasksRes, statsRes] = await Promise.allSettled([
+          axios.get('/api/department', { headers }),
+          axios.get('/api/users', { headers }),
+          axios.get('/api/tasks', { headers }),
+          axios.get('/api/department/stats', { headers })
+        ]);
+
+        setDepartments(deptRes.status === 'fulfilled' ? deptRes.value.data.data : []);
+        setUsers(usersRes.status === 'fulfilled' ? usersRes.value.data : []);
+        setTasks(tasksRes.status === 'fulfilled' ? tasksRes.value.data.data : []);
+        setStats(statsRes.status === 'fulfilled' ? statsRes.value.data : {});
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    setDepartments([...departments, newDept]);
-    setNewDeptName('');
-    setShowAddDeptModal(false);
-  };
+    fetchData();
+  }, []);
+  
+  // Add this right after the state declarations
+const fetchDepartments = async () => {
+  try {
+    const token = localStorage.getItem("authToken");
+    const headers = { 
+      Authorization: `Bearer ${token}`,
+      withCredentials: true 
+    };
+    const response = await axios.get('/api/department', { headers });
+    setDepartments(response.data.data);
+  } catch (err) {
+    console.error("Failed to fetch departments:", err);
+  }
+};
 
-  // Edit department name
-  const editDepartment = () => {
-    if (!newDeptName.trim()) return;
-    
-    setDepartments(departments.map(dept =>
-      dept.id === editingDept.id ? { ...dept, name: newDeptName } : dept
-    ));
-    
-    setEditingDept(null);
-    setNewDeptName('');
-  };
+const refreshDepartments = () => {
+  fetchDepartments(); // Simply recall the fetch function
+};
+  
+  // Filter departments based on search term
+  const filteredDepartments = departments.filter(dept =>
+    dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (dept.headOfDepartment?.name && dept.headOfDepartment.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
-  // Delete department
-  const deleteDepartment = (deptId) => {
-    setDepartments(departments.filter(dept => dept.id !== deptId));
-  };
+  const deleteTask=async(taskId)=>{
+    try{
+      setTasks(prevTasks => prevTasks.filter(t => t._id !== taskId));
+      const response=await axios.delete(
+        `api/tasks/${taskId}`
+      );
+      setTasks(prev=>prev.map(t=>
+        t._id===taskId?response.data.data:t
+      ))
+    }catch(error){
+      setTasks(prevTasks => [...prevTasks, tasks.find(t => t._id === taskId)]);
+      console.error(error.response?.data||error.message)
+    }
 
-  // Add user to department
-  const addUserToDept = (userId) => {
-    setDepartments(departments.map(dept =>
-      dept.id === currentDept.id
-        ? { ...dept, users: [...dept.users, userId] }
-        : dept
-    ));
-    setShowAddUserModal(false);
-  };
 
-  // Remove user from department
-  const removeUserFromDept = (deptId, userId) => {
-    setDepartments(departments.map(dept =>
-      dept.id === deptId
-        ? { 
-            ...dept, 
-            users: dept.users.filter(id => id !== userId),
-            head: dept.head === userId ? null : dept.head
-          }
-        : dept
-    ));
-  };
-
-  // Set department head
-  const setDepartmentHead = (deptId, userId) => {
-    setDepartments(departments.map(dept =>
-      dept.id === deptId ? { ...dept, head: userId } : dept
-    ));
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Department Management</h1>
+  }
+  
+  // Modal handling
+  const closeModal = () => {
+    setModal({ show: false, type: '', data: null });
+    setFormData({
+      name: '', 
+      headOfDepartment: '', 
+      taskTitle: '', 
+      taskDescription: '', 
+      assignedTo: '',
+      dueDate: '',
+      status:''
       
-      {/* Search and Add Department */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative w-64">
-          <FiSearch className="absolute left-3 top-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search users..."
-            className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    });
+    setSelectedUserId('');
+  };
+  
+
+  const openModal = async (type, data = null, userId = null) => {
+    setModalLoading(true);
+    try {
+      let modalData;
+  
+      switch(type) {
+        case 'addDept':
+          modalData = { users }; // All users for dropdown
+          break;
+          
+        case 'editDept':
+          modalData = { 
+            ...data, 
+            users,
+            currentHead: data.headOfDepartment?.user?._id 
+          };
+          setFormData({
+            name: data.name,
+            headOfDepartment: data.headOfDepartment?.user?._id || ''
+          });
+          break;
+          
+        case 'deleteDept':
+          modalData = data;
+          break;
+          
+        case 'addUser':
+          const existingUserIds = data.users.map(d => 
+            d.user?._id?.toString() || d.user?.toString()
+          ).filter(Boolean);
+          
+          modalData = {
+            ...data,
+            availableUsers: users.filter(user => 
+              !existingUserIds.includes(user._id.toString()))
+          };
+          break;
+          
+        
+          
+        case 'assignTask':
+          modalData = { 
+            ...data,
+            availableUsers: Array.isArray(data.users) 
+              ? data.users
+              : []
+          };
+          break;
+          
+        default:
+          modalData = data;
+      }
+  
+      console.log("Modal data:", modalData);
+      setModal({
+        show: true,
+        type,
+        data: modalData
+      });
+      
+    } catch (err) {
+      console.error("Error opening modal:", err);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+  
+  // Department Operations
+  const handleDepartmentSubmit = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        withCredentials: true 
+      };
+
+      const departmentData = {
+        name: formData.name,
+        headOfDepartment: {
+          user: formData.headOfDepartment,
+          name: users.find(u => u._id === formData.headOfDepartment)?.name
+        }
+      };
+
+      let response;
+      if (modal.type === 'addDept') {
+        response = await axios.post('/api/department', departmentData, { headers });
+        setDepartments(prev => [...prev, response.data.data]);
+      } else {
+        response = await axios.put(`/api/department/${modal.data._id}`, departmentData, { headers });
+        setDepartments(prev => prev.map(d => d._id === modal.data._id ? response.data.data : d));
+      }
+      
+      closeModal();
+    } catch (err) {
+      console.error("Department error:", err.response?.data || err.message);
+    }
+  };
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get('/api/tasks', {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      });
+      setTasks(response.data.data);
+    } catch (err) {
+      console.error("Failed to fetch tasks:", err);
+    }
+  };
+
+  const deleteDepartment = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(`/api/department/${modal.data._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      });
+      setDepartments(prev => prev.filter(d => d._id !== modal.data._id));
+      closeModal();
+    } catch (err) {
+      console.error("Delete error:", err.response?.data || err.message);
+    }
+  };
+
+  // User Operations
+  const addUserToDepartment = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.post(
+        `/api/department/${modal.data._id}/users`,
+        { userId: selectedUserId, name:users.find(u=>String(u._id)===String(selectedUserId))?.name },
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true 
+        }
+      );
+      
+      setDepartments(prev => prev.map(d => 
+        d._id === modal.data._id ? response.data.data : d
+      ));
+      closeModal();
+    } catch (err) {
+      console.error("Add user error:", err.response?.data || err.message);
+    }
+  };
+
+  const removeUserFromDepartment = async (departmentId,userId) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(
+        `/api/department/${departmentId}/users/${userId}`,
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true 
+        }
+      );
+      
+      refreshDepartments()
+    } catch (err) {
+      console.error("Remove user error:", err.response?.data || err.message);
+    }
+  };
+  const visibleDepartments = filteredDepartments.filter(dept => {
+    const isGlobalAccess = global_ADMIN_ROLES.includes(user.role);
+    const isDepartmentHead = String(dept.headOfDepartment.user._id) === String(user.userId);
+    //console.log(dept.headOfDepartment?.user?._id)
+    return isGlobalAccess || isDepartmentHead;
+  })
+  // Task Operations
+  const assignTask = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.post('/api/tasks', {
+        title: formData.taskTitle,
+        description: formData.taskDescription,
+        assignedTo: formData.assignedTo,
+        department: modal.data._id,
+        dueDate: formData.dueDate,
+        createdBy: user.userId,
+        status:formData.status|| 'Pending'
+       // status:
+      }, { 
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true 
+      });
+      //console.log(response)
+      //setTasks(prev => [...prev, response.data.data]);
+      fetchTasks()
+      closeModal();
+    } catch (err) {
+      console.error("Task error:", err.response?.data || err.message);
+    }
+  };
+    console.log(modal) 
+    console.log("selecteduserID:",selectedUserId) 
+    //console.log(tasks.map(task=>task._id))
+
+  // Components
+  const StatsPanel = ({ department }) => (
+    <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+      <h3 className="font-bold text-lg mb-3 flex items-center">
+        <FiBarChart2 className="mr-2" /> Department Statistics
+      </h3>
+      <div className="grid grid-cols-2 gap-4">
+        <StatCard 
+          title="Total Members" 
+          value={department.users.length} 
+          trend="↗︎ 2 this month" 
+        />
+        <StatCard 
+          title="Active Tasks" 
+          value={stats[department._id]?.activeTasks || 0} 
+          trend={`${stats[department._id]?.taskCompletion || 0}% completed`} 
+        />
+        <StatCard 
+          title="Avg. Task Time" 
+          value={stats[department._id]?.avgTaskTime || 'N/A'} 
+          trend="Last month: 3.2 days" 
+        />
+        <StatCard 
+          title="Head Since" 
+          value={new Date(department.createdAt.split("T")[0]).toLocaleDateString() || 'N/A'} 
+        />
+      </div>
+    </div>
+  );
+
+  const TaskList = ({ department }) => (
+    <div className="mt-4">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="font-medium text-gray-700">Department Tasks</h3>
+        {(department.headOfDepartment?.user._id === user.userId || global_ADMIN_ROLES.includes(user.role)) && (
+          <button
+            onClick={() => openModal('assignTask', department)}
+            className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded flex items-center"
+          >
+            <FiClipboard className="mr-1" /> Assign Task
+          </button>
+        )}
+      </div>
+      {tasks.filter(t => t.department?._id === department._id || t.department === department._id).length === 0 ? (
+        <p className="text-gray-500 text-sm italic">No tasks assigned</p>
+      ) : (
+        <div className="space-y-2">
+          {tasks.filter(t => t.department._id === department._id).map(task => (
+            <div key={task._id} className="p-3 bg-white rounded border border-gray-200">
+
+               <div className='flex '>
+                {console.log("task",task.department)}
+                <button
+                      onClick={() => deleteTask(task._id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <FiX />
+                  </button>
+              </div>
+              <div className="flex justify-between">
+                <div>
+                  <p className="font-medium">{task.title}</p>
+                  <p className="text-sm text-gray-500">{task.description}</p>
+                </div>
+                <span className="text-xs bg-green-100 text-green-800 px-2 py-2 rounded-full">
+                    Assigned to: {department.users.find(u => String(u._id) === String(task.assignedTo._id))?.name || 'Unassigned'}
+                </span>
+              </div>
+              <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                <span>Status: {task.status}</span>
+              </div>
+             
+             
+              
+            </div>
+          ))}
         </div>
+      )}
+    </div>
+  );
+
+  const MembersList = ({ department }) => (
+    <div className="mt-4">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="font-medium text-gray-700">Department Members</h3>
         <button
-          onClick={() => {
-            setEditingDept(null);
-            setNewDeptName('');
-            setShowAddDeptModal(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105"
+          onClick={() => openModal('addUser', department)}
+          className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded flex items-center"
         >
-          <FiUserPlus className="mr-2" />
-          Add Department
+          <FiUserPlus className="mr-1" /> Add Member
         </button>
       </div>
-
-      {/* Departments List */}
-      <div className="space-y-4">
-        {departments.map((dept) => (
-          <div key={dept.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-300">
-            <div 
-              className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
-              onClick={() => toggleDept(dept.id)}
-            >
-              <div className="flex items-center">
-                <h2 className="font-semibold text-lg text-gray-800">{dept.name}</h2>
-                {dept.head && (
-                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    Head: {allUsers.find(u => u.id === dept.head)?.name}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
-                  {dept.users.length} {dept.users.length === 1 ? 'member' : 'members'}
+      <div className="space-y-2">
+        {department.users.map(user => (
+          
+          <div key={user._id} className="flex justify-between items-center p-3 bg-white rounded border border-gray-200">
+            <div className="flex items-center">
+              <FiUsers className="mr-2 text-gray-400" />
+              <span>{user.name}</span>
+              {department.headOfDepartment?.user._id === user._id && (
+                <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                  Head
                 </span>
-                {expandedDept === dept.id ? (
-                  <FiChevronUp className="text-gray-500" />
-                ) : (
-                  <FiChevronDown className="text-gray-500" />
-                )}
-              </div>
+              )}
             </div>
-
-            {/* Expanded Department Details */}
-            {expandedDept === dept.id && (
-              <div className="border-t border-gray-200 p-4 bg-gray-50 transition-all duration-300 animate-fadeIn">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium text-gray-700">Department Members</h3>
-                  <div className="space-x-2">
-                    <button
-                      onClick={() => {
-                        setCurrentDept(dept);
-                        setShowAddUserModal(true);
-                      }}
-                      className="text-sm bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded flex items-center transition-colors"
-                    >
-                      <FiUserPlus className="mr-1" /> Add User
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingDept(dept);
-                        setNewDeptName(dept.name);
-                        setShowAddDeptModal(true);
-                      }}
-                      className="text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded flex items-center transition-colors"
-                    >
-                      <FiEdit2 className="mr-1" /> Edit
-                    </button>
-                    <button
-                      onClick={() => deleteDepartment(dept.id)}
-                      className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded flex items-center transition-colors"
-                    >
-                      <FiTrash2 className="mr-1" /> Delete
-                    </button>
-                  </div>
-                </div>
-
-                {/* Department Members List */}
-                <div className="space-y-2">
-                  {dept.users.length === 0 ? (
-                    <p className="text-gray-500 text-sm italic">No members in this department</p>
-                  ) : (
-                    dept.users.map(userId => {
-                      const user = allUsers.find(u => u.id === userId);
-                      if (!user) return null;
-                      return (
-                        <div key={userId} className="flex justify-between items-center p-3 bg-white rounded border border-gray-200 hover:shadow-sm transition-all">
-                          <div>
-                            <p className="font-medium">{user.name}</p>
-                            <p className="text-sm text-gray-500">{user.email}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {dept.head === userId ? (
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Head</span>
-                            ) : (
-                              <button
-                                onClick={() => setDepartmentHead(dept.id, userId)}
-                                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-1 rounded transition-colors"
-                              >
-                                Make Head
-                              </button>
-                            )}
-                            <button
-                              onClick={() => removeUserFromDept(dept.id, userId)}
-                              className="text-red-500 hover:text-red-700 transition-colors"
-                            >
-                              <FiX />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+            {console.log(user.name)}
+            {(department.headOfDepartment?.user._id === currentuser.userId || global_ADMIN_ROLES.includes(currentuser.role) )&& (
+              <button
+                onClick={() =>removeUserFromDepartment(department._id,user._id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <FiX />
+              </button>
             )}
           </div>
         ))}
       </div>
+    </div>
+  );
 
-      {/* Add/Edit Department Modal */}
-      {showAddDeptModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300 animate-scaleIn">
-            <h2 className="text-xl font-bold mb-4">
-              {editingDept ? 'Edit Department' : 'Add New Department'}
-            </h2>
+  if (loading) return <div className="text-center py-8">Loading departments...</div>;
+
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      {/* Header and Search */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Department Management</h1>
+        <div className="flex space-x-4">
+          {global_ADMIN_ROLES.includes(user.role)&&<div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Department name"
-              className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={newDeptName}
-              onChange={(e) => setNewDeptName(e.target.value)}
-              autoFocus
+              placeholder="Search departments..."
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div className="flex justify-end space-x-3">
+          </div>}
+          {global_ADMIN_ROLES.includes(user.role)&&<button
+            onClick={() => openModal('addDept')}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
+            disabled={modalLoading}
+          >
+            <FiPlus className="mr-2" /> Add Department
+          </button>}
+        </div>
+      </div>
+
+      {/* Departments List */}
+      <div className="space-y-6">
+        {visibleDepartments.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No departments found{searchTerm && ` matching "${searchTerm}"`}
+          </div>
+        ) : (
+          visibleDepartments.map(dept => (
+            <div key={dept._id} className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div 
+                className="p-4 cursor-pointer hover:bg-gray-50 flex justify-between items-center"
+                onClick={() => setExpandedDept(expandedDept === dept._id ? null : dept._id)}
+              >
+                <div>
+                  <h2 className="font-bold text-lg">{dept.name}</h2>
+                  <p className="text-gray-600">
+                    Head: {dept.headOfDepartment?.name || 'Not assigned'}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                    {dept.users.length} members
+                  </span>
+                  {expandedDept === dept._id ? <FiChevronUp /> : <FiChevronDown />}
+                </div>
+              </div>
+
+              {expandedDept === dept._id && (
+                <div className="border-t border-gray-200 p-4 bg-gray-50 space-y-4">
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={() => openModal('editDept', dept)}
+                      className="text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded flex items-center"
+                      disabled={modalLoading}
+                    >
+                      <FiEdit2 className="mr-1" /> Edit
+                    </button>
+                    <button
+                      onClick={() => openModal('deleteDept', dept)}
+                      className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded flex items-center"
+                      disabled={modalLoading}
+                    >
+                      <FiTrash2 className="mr-1" /> Delete
+                    </button>
+                  </div>
+
+                  <MembersList department={dept} />
+                  <StatsPanel department={dept} />
+                  <TaskList department={dept} />
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Universal Modal */}
+      {modal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                {modal.type === 'addDept' && 'Add Department'}
+                {modal.type === 'editDept' && `Edit ${modal.data.name}`}
+                {modal.type === 'addUser' && `Add User to ${modal.data.name}`}
+                {modal.type === 'assignTask' && `Assign Task in ${modal.data.name}`}
+                {modal.type === 'deleteDept' && `Delete ${modal.data.name}?`}
+                {modal.type === 'deleteTask' && `Delete ${modal.data.name}?`}
+              </h2>
+              <button 
+                onClick={closeModal} 
+                className="text-gray-500 hover:text-gray-700"
+                disabled={modalLoading}
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            {/* Department Form */}
+            {['addDept', 'editDept'].includes(modal.type) && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                  <input
+                    type="text"
+                    placeholder="Department name"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    disabled={modalLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Head of Department</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    value={formData.headOfDepartment}
+                    onChange={(e) => setFormData({...formData, headOfDepartment: e.target.value})}
+                    disabled={modalLoading}
+                  >
+                    <option value="">Select Head of Department</option>
+                    {modal.data?.users?.map(user => (
+                      <option key={user._id} value={user._id}>{user.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Add User Form */}
+            {modal.type === 'addUser' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select User</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                    disabled={modalLoading}
+                  >
+                    <option value="">Select a user to add</option>
+                    {modal.data?.availableUsers?.map(user => (
+                      <option key={user._id} value={user._id}>{user.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Task Assignment Form */}
+            {modal.type === 'assignTask' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
+                  <input
+                    type="text"
+                    placeholder="Task title"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    value={formData.taskTitle}
+                    onChange={(e) => setFormData({...formData, taskTitle: e.target.value})}
+                    disabled={modalLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    placeholder="Description"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    value={formData.taskDescription}
+                    onChange={(e) => setFormData({...formData, taskDescription: e.target.value})}
+                    disabled={modalLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    value={formData.assignedTo}
+                    onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
+                    disabled={modalLoading}
+                  >
+                    <option value="">Assign to...</option>
+                    {modal.data?.availableUsers?.map(user => (
+                      <option key={user._id} value={user._id}>{user.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                      <option value="Pending" className="text-gray-700">Pending</option>
+                      <option value="InProgress" className="text-gray-700">In Progress</option>
+                      <option value="Completed" className="text-gray-700">Completed</option>
+                    </select>
+                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                  <input
+                    type="date"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+                    disabled={modalLoading}
+                  />
+                </div>
+              </div>
+            )}
+            {/*task deletion confirmation */}
+            {/*---------------------------*/}
+
+            {/* Delete Confirmation */}
+            {modal.type === 'deleteDept' && (
+              <div className="space-y-4">
+                <p className="text-gray-700">
+                  Are you sure you want to delete the "{modal.data.name}" department? 
+                  This action cannot be undone.
+                </p>
+                {modal.data.users.length > 0 && (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          This department has {modal.data.users.length} members who will need to be reassigned.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 mt-6">
               <button
-                onClick={() => {
-                  setShowAddDeptModal(false);
-                  setEditingDept(null);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={closeModal}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                disabled={modalLoading}
               >
                 Cancel
               </button>
               <button
-                onClick={editingDept ? editDepartment : addDepartment}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={async () => {
+                  try {
+                    if (['addDept', 'editDept'].includes(modal.type)) await handleDepartmentSubmit();
+                    if (modal.type === 'addUser') await addUserToDepartment();
+                    if (modal.type === 'assignTask') await assignTask();
+                    if (modal.type === 'deleteDept') await deleteDepartment();
+                    
+                  } catch (err) {
+                    console.error("Action failed:", err);
+                  }
+                }}
+                className={`px-4 py-2 text-white rounded-lg ${
+                  modal.type === 'deleteDept' 
+                    ? 'bg-red-600 hover:bg-red-700' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+                disabled={modalLoading}
               >
-                {editingDept ? 'Save Changes' : 'Add Department'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add User to Department Modal */}
-      {showAddUserModal && currentDept && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300 animate-scaleIn">
-            <h2 className="text-xl font-bold mb-4">
-              Add User to {currentDept.name}
-            </h2>
-            <div className="max-h-96 overflow-y-auto">
-              {unassignedUsers.length === 0 ? (
-                <p className="text-gray-500">No unassigned users available</p>
-              ) : (
-                unassignedUsers.map(user => (
-                  <div key={user.id} className="flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-50">
-                    <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                    </div>
-                    <button
-                      onClick={() => addUserToDept(user.id)}
-                      className="text-green-600 hover:text-green-800 transition-colors"
-                    >
-                      <FiCheck size={20} />
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={() => setShowAddUserModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                Close
+                {modalLoading ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  <>
+                    {modal.type === 'addDept' && 'Create Department'}
+                    {modal.type === 'editDept' && 'Save Changes'}
+                    {modal.type === 'addUser' && 'Add Member'}
+                    {modal.type === 'assignTask' && 'Assign Task'}
+                    {modal.type === 'deleteDept' && 'Delete Department'}
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -318,4 +751,13 @@ const DepartmentAssignment = () => {
   );
 };
 
-export default DepartmentAssignment;
+// Helper Components
+const StatCard = ({ title, value, trend }) => (
+  <div className="bg-gray-50 p-3 rounded-lg">
+    <p className="text-sm text-gray-500">{title}</p>
+    <p className="text-2xl font-bold">{value}</p>
+    {trend && <p className="text-xs text-gray-400 mt-1">{trend}</p>}
+  </div>
+);
+
+export default DepartmentManagement;
