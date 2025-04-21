@@ -5,6 +5,8 @@ import InventoryAnalytics from "../components/InventoryAnalytics";
 import InventoryConditionChart from './Inventoryvisuals';
 import axios from 'axios';
 
+
+const ADMIN_ROLES=['admin','global_admin','human_resources','internal_auditor']
 const InventoryManagement = () => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
@@ -17,6 +19,9 @@ const InventoryManagement = () => {
     quantity: 1,
     condition: 'New',
     description: '',
+    
+    location:'',
+    
     value: 0
   });
   const [editingItem, setEditingItem] = useState(null);
@@ -55,6 +60,7 @@ const InventoryManagement = () => {
 
     fetchData();
   }, []);
+  console.log(categories)
    
   const formatCategory = (category) => {
     const formatted = category
@@ -162,6 +168,7 @@ const InventoryManagement = () => {
       quantity: item.quantity,
       condition: item.condition,
       description: item.description || '',
+      location:item.location,
       value: item.value || 0
     });
     setShowForm(true);
@@ -205,7 +212,7 @@ const InventoryManagement = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="All">All Categories</option>
-            {categories.map(category => (
+            {categories.categories.map(category => (
               <option key={category} value={category}>
                 {formatCategory(category)}
                 </option>
@@ -234,6 +241,7 @@ const InventoryManagement = () => {
               <h2 className="text-xl font-bold">
                 {editingItem ? 'Edit Inventory Item' : 'Add New Inventory Item'}
               </h2>
+              
               <button
                 onClick={() => {
                   setShowForm(false);
@@ -246,9 +254,21 @@ const InventoryManagement = () => {
             </div>
             
             <form onSubmit={editingItem ? handleUpdate : handleSubmit}>
+
               <div className="space-y-4">
                 {/* Form fields remain the same as your original */}
                 {/* ... */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Name*</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                  />
+                </div>
                 <select
                 name="category"
                 value={formData.category}
@@ -257,13 +277,81 @@ const InventoryManagement = () => {
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                >
                     <option value="">Select a category</option>
-                    {categories.map(category => (
+                    {categories.categories.map(category => (
                       <option key={category} value={category}>
-                        {formatCategory(category  )}
+                        {formatCategory(category )}
                       </option>
                     ))}
                 </select>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity*</label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      min="1"
+                      value={formData.quantity}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Monetary Value</label>
+                    <input
+                      type="number"
+                      name="value"
+                      min="1"
+                      value={formData.value}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Condition*</label>
+                    <select
+                      name="condition"
+                      value={formData.condition}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    >
+                      <option value="New">New</option>
+                      <option value="Used">Used</option>
+                      <option value="Refurbished">Refurbished</option>
+                      <option value="Damaged">Damaged</option>
+                    </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">location</label>
+                    <input
+                      type="text"
+                      name="location.warehouse"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows="3"
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                  />
+                </div>
+              
+                
+
               
               <div className="flex justify-end space-x-3 mt-6">
                 <button
@@ -306,19 +394,93 @@ const InventoryManagement = () => {
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-sm font-medium text-gray-500">Total Value</h3>
           <p className="text-2xl font-bold text-gray-800">
-            ₦{stats.totalValue ? stats.totalValue.toLocaleString() : 0}
+            ₦{stats.totalvalue ? stats.totalvalue.toLocaleString() : 0}
           </p>
         </div>
       </div>
 
       {/* Inventory Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {/* Table structure remains the same */}
-        {/* ... */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {/* Table headers */}
+                    <th onClick={() => requestSort('name')}>Item Name</th>
+                    <th onClick={() => requestSort('category')}>Category</th>
+                    <th onClick={() => requestSort('quantity')}>Quantity</th>
+                    <th onClick={() => requestSort('condition')}>Condition</th>
+                    <th onClick={() => requestSort('lastUpdated')}>Last Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredItems.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                        No inventory items found
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredItems.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        {/* Table cells */}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            <button onClick={() => toggleItem(item.id)}>
+                              {expandedItem === item.id ? <FiChevronUp /> : <FiChevronDown />}
+                            </button>
+                            <div className="ml-2">{item.name}</div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="category-badge">{item.category}</span>
+                        </td>
+                        <td className="px-6 py-4">{item.quantity}</td>
+                        <td className="px-6 py-4">
+                          <span className={`condition-badge ${item.condition}`}>
+                            {item.condition}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">{item.lastUpdated.split("T")[0]}</td>
+                        <td className="px-6 py-4 text-right">
+                          <button onClick={() => setupEdit(item)}>
+                            <FiEdit2 className="edit-icon" />
+                          </button>
+                          <button onClick={() => deleteItem(item.id)}>
+                            <FiTrash2 className="delete-icon" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          
+            {/* Expanded row details */}
+            {filteredItems.map(item=>expandedItem === item.id && (
+              <tr>
+                <td colSpan="6" className="px-6 py-4 bg-gray-50">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium">SKU:</h4>
+                      <p>{item.sku || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Description:</h4>
+                      <p>{item.description || 'No description'}</p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </div>
       </div>
 
       {/* Analytics */}
-      <div className="mt-8 px-4 sm:px-6 lg:px-8">
+      {ADMIN_ROLES.includes(user.role)&&(<div className="mt-8 px-4 sm:px-6 lg:px-8">
         <div className="h-64 mt-20 md:h-80 flex items-center justify-center bg-gray-50 rounded">
           <InventoryAnalytics inventoryItems={inventoryItems} />
         </div>
@@ -328,7 +490,7 @@ const InventoryManagement = () => {
             <InventoryConditionChart inventoryItems={inventoryItems} />
           </div>
         </div>
-      </div>
+      </div>)}
     </div>
   );
 };

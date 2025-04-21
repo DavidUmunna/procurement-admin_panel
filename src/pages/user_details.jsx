@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiCalendar, FiUser } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import requestImg from "../components/assets/quote-request.png";
-import userImg from "../components/assets/user.png";
+import requestImg from "../components/assets/quote-request.avif";
+import userImg from "../components/assets/user.avif";
 
 const UserDetails = ({ 
   user, 

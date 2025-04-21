@@ -7,6 +7,7 @@ export default function AddSupplier() {
     email: "",
     phone: "",
     address: "",
+    description: "", // Added description field
     status: "active",
   });
 
@@ -24,7 +25,7 @@ export default function AddSupplier() {
     setMessage("");
 
     try {
-      const response = await fetch("/api/suppliers", {
+      const response = await fetch("/api/supplier", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,11 +35,18 @@ export default function AddSupplier() {
       });
 
       if (!response.ok) {
-        console.error("Failed to add supplier");
+        throw new Error("Failed to add supplier");
       }
 
       setMessage("Supplier added successfully ✅");
-      setForm({ name: "", email: "", phone: "", address: "", status: "active" });
+      setForm({ 
+        name: "", 
+        email: "", 
+        phone: "", 
+        address: "", 
+        description: "",
+        status: "active" 
+      });
       navigate("/suppliers"); // redirect after success
     } catch (err) {
       setMessage(err.message || "Something went wrong");
@@ -102,6 +110,18 @@ export default function AddSupplier() {
             value={form.address}
             onChange={handleChange}
             className="w-full border rounded-md px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label className="block font-medium mb-1">Products/Services Description</label>
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            rows={3}
+            className="w-full border rounded-md px-3 py-2"
+            placeholder="Describe what this supplier provides"
           />
         </div>
 

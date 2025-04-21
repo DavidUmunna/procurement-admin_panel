@@ -16,7 +16,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="bg-white p-4 shadow-lg rounded-lg border border-gray-200">
         <p className="font-bold text-gray-800">{label}</p>
         <p className="text-blue-600">
-          Total: <span className="font-semibold">${payload[0].value.toLocaleString()}</span>
+          Total: <span className="font-semibold">₦{payload[0].value.toLocaleString()}</span>
         </p>
         <p className="text-sm text-gray-500 mt-1">
           {payload[0].payload.count} order{payload[0].payload.count !== 1 ? 's' : ''}
@@ -138,7 +138,7 @@ function CostDashboard({ orders }) {
                   {highestMonth.month && (
                     <>
                       <br /><br />
-                      <span className="font-semibold">Highest month:</span> {highestMonth.month} (${highestMonth.total.toLocaleString()})
+                      <span className="font-semibold">Highest month:</span> {highestMonth.month} (₦{highestMonth.total.toLocaleString()})
                     </>
                   )}
                 </p>
@@ -191,7 +191,7 @@ function CostDashboard({ orders }) {
                 strokeDasharray="4 4" 
                 label={{
                   position: 'top',
-                  value: `Avg: $${Math.round(averageCost).toLocaleString()}`,
+                  value: `Avg: ₦${Math.round(averageCost).toLocaleString()}`,
                   fill: '#64748b',
                   fontSize: 12
                 }}

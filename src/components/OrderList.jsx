@@ -13,7 +13,7 @@ import { useUser } from "./usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import Duplicates from "../pages/Duplicates";
+
 
 const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
 
