@@ -80,7 +80,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
 
   const mergeOrders = (orderIds) => {
     console.log('Merging orders:', orderIds);
-    // Implement your merge logic here
+    // Implementatiion of logic
   };
 
   const handleOrderClick = (orderId, e) => {
