@@ -480,17 +480,20 @@ const InventoryManagement = () => {
       </div>
 
       {/* Analytics */}
-      {ADMIN_ROLES.includes(user.role)&&(<div className="mt-8 px-4 sm:px-6 lg:px-8">
-        <div className="h-64 mt-20 md:h-80 flex items-center justify-center bg-gray-50 rounded">
-          <InventoryAnalytics inventoryItems={inventoryItems} />
-        </div>
-        
-        <div className="bg-white p-6 mt-25 rounded-lg shadow-sm bordermt-10 border-gray-200">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <InventoryConditionChart inventoryItems={inventoryItems} />
+      <div className='items-center flex justify-center'>
+
+        {ADMIN_ROLES.includes(user.role)&&(<div className=" mt-8  px-4 sm:px-6 lg:px-8">
+          <div className="h-64 mt-20 md:h-80 flex items-center justify-center bg-gray-50 rounded">
+            <InventoryAnalytics inventoryItems={inventoryItems} />
           </div>
-        </div>
-      </div>)}
+          
+          <div className="bg-white p-6 mt-25 rounded-lg shadow-sm bordermt-10 border-gray-200">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <InventoryConditionChart inventoryItems={inventoryItems} />
+            </div>
+          </div>
+        </div>)}
+      </div>
     </div>
   );
 };
