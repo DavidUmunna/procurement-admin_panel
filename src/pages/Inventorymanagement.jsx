@@ -378,7 +378,7 @@ const InventoryManagement = () => {
       )}
 
       {/* Inventory Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {stats&&(<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-sm font-medium text-gray-500">Total Items</h3>
           <p className="text-2xl font-bold text-gray-800">{stats.totalItems || 0}</p>
@@ -397,7 +397,7 @@ const InventoryManagement = () => {
             ₦{stats.totalvalue ? stats.totalvalue.toLocaleString() : 0}
           </p>
         </div>
-      </div>
+      </div>)}
 
       {/* Inventory Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

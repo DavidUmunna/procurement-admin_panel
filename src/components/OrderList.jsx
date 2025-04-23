@@ -13,6 +13,7 @@ import { useUser } from "./usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { setStatus } from "../js/reducer/rootreducer";
 
 
 const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
@@ -129,7 +130,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       await updateOrderStatus(orderId, newStatus);
   
       // Then send specific approve/reject requests
-      if (newStatus === "Approved" || newStatus === "Completed") {
+      if (newStatus === "Approved") {
         await axios.put(`api/orders/${orderId}/approve`, { 
           adminName: user.name, 
           orderId 
@@ -140,6 +141,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
           orderId 
         }, { headers: { Authorization: `Bearer ${token}` }, withCredentials: true });
       }
+      
   
     } catch (error) {
       console.error("Error updating status:", error);
@@ -438,7 +440,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="absolute left-4 right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                                    className="absolute  right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
                                   >
                                     <div className="py-1">
                                       {["Pending", "Approved", "Rejected", "Completed"].map((statusOption) => (
