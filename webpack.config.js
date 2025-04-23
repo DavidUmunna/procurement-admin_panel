@@ -17,5 +17,16 @@ module.exports = {
     new webpack.ProvidePlugin({
       process: 'process/browser',
     }),
-  ]
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+        exclude: [/node_modules\/html-entities/] // <- skip broken source maps
+      },
+    ],
+  } 
+
 };

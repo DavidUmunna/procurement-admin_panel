@@ -167,9 +167,9 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
 
   const handleDelete = async (orderId) => {
     try {
-      setIsLoading(true);
+      setIsLoading(false);
       await deleteOrder(orderId);
-      orders.filter(order => order._id !== orderId);
+      setOrders(orders.filter(order => order._id !== orderId))
     } catch (error) {
       console.error("Error deleting order:", error);
       setError("Failed to delete order");
@@ -269,7 +269,8 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
         <div>
           <p className="text-gray-600"><span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
           <p className="text-gray-600">
-            <span className="font-medium">Approvals:</span> 
+            <span className="font-medium">Approvals:</span>
+            {console.log("order approvals",orders.map(order=>order.Approvals))} 
             {order.Approvals?.length > 0 
               ? order.Approvals.map(a => `${a.admin} (${a.status})`).join(", ")
               : "None"}

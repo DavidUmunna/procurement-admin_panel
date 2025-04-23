@@ -34,7 +34,7 @@ function CostDashboard({ orders }) {
   const { monthlyData, averageCost, highestMonth } = useMemo(() => {
     const now = new Date();
     let cutoffDate = new Date();
-    
+    console.log("current month",cutoffDate.setMonth(now.getMonth()-12))
     // Calculate cutoff date based on selected time range
     if (timeRange === '12') {
       cutoffDate.setMonth(now.getMonth() - 12);
