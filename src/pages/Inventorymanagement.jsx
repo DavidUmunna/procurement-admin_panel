@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React,{ useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp, FiFilter, FiSearch } from 'react-icons/fi';
 import { useUser } from '../components/usercontext';
 import InventoryAnalytics from "../components/InventoryAnalytics";
@@ -98,6 +98,10 @@ const InventoryManagement = () => {
       [name]: name === 'quantity' || name === 'value' ? parseInt(value) || 0 : value
     });
   };
+  
+const handleExpand = (id) => {
+  setExpandedItem((prev) => (prev === id ? null : id));
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -181,6 +185,7 @@ const InventoryManagement = () => {
     }
     setSortConfig({ key, direction });
   };
+  console.log("filtered items",filteredItems)
 
   const toggleItem = (id) => {
     setExpandedItem(expandedItem === id ? null : id);
@@ -424,12 +429,14 @@ const InventoryManagement = () => {
                     </tr>
                   ) : (
                     filteredItems.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
+                      <React.Fragment key={item._id}>
+
+                      <tr key={item._id} className="hover:bg-gray-50">
                         {/* Table cells */}
                         <td className="px-6 py-4">
                           <div className="flex items-center">
-                            <button onClick={() => toggleItem(item.id)}>
-                              {expandedItem === item.id ? <FiChevronUp /> : <FiChevronDown />}
+                            <button onClick={() => toggleItem(item._id)}>
+                              {expandedItem === item._id ? <FiChevronUp /> : <FiChevronDown />}
                             </button>
                             <div className="ml-2">{item.name}</div>
                           </div>
@@ -448,34 +455,37 @@ const InventoryManagement = () => {
                           <button onClick={() => setupEdit(item)}>
                             <FiEdit2 className="edit-icon" />
                           </button>
-                          <button onClick={() => deleteItem(item.id)}>
+                          <button onClick={() => deleteItem(item._id)}>
                             <FiTrash2 className="delete-icon" />
                           </button>
                         </td>
+                        
                       </tr>
-                    ))
+                      {expandedItem===item._id&&(
+                    <tr>
+                     {console.log(expandedItem)}
+                     <td colSpan="6" className="px-6 py-4 bg-gray-50">
+                       <div className="grid grid-cols-2 gap-4">
+                         <div>
+                           <h4 className="font-medium">SKU:</h4>
+                           <p>{item.sku || 'Not specified'}</p>
+                         </div>
+                         <div>
+                           <h4 className="font-medium">Description:</h4>
+                           <p>{item.description || 'No description'}</p>
+                         </div>
+                       </div>
+                     </td>
+                   </tr>
                   )}
+                 </React.Fragment>
+                    )))}
                 </tbody>
               </table>
-            </div>
+              </div>
           
             {/* Expanded row details */}
-            {filteredItems.map(item=>expandedItem === item.id && (
-              <tr>
-                <td colSpan="6" className="px-6 py-4 bg-gray-50">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium">SKU:</h4>
-                      <p>{item.sku || 'Not specified'}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Description:</h4>
-                      <p>{item.description || 'No description'}</p>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            ))}
+           
           </div>
       </div>
 
