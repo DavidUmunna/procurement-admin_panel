@@ -64,6 +64,7 @@ export default function Sign_in({ setAuth }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+        data-testid='pagelogin'
       >
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <motion.img

@@ -189,7 +189,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
 
-  const handleFileDownload = async (fileName, event) => {
+   const handleFileDownload = async (fileName, event) => {
     event.stopPropagation();
     try {
       setIsLoading(true);

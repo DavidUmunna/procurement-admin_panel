@@ -89,7 +89,7 @@ const App = () => {
                 element={
                   !isauthenticated ? (
                     <PageTransition>
-                      <Adminlogin setAuth={setisauthenticated} />
+                      <Adminlogin setAuth={setisauthenticated}  />
                     </PageTransition>
                   ) : (
                     <Navigate to="/dashboard" />
