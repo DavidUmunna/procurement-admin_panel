@@ -212,17 +212,22 @@ const handleExpand = (id) => {
           </div>
           
           <select
-            className="w-full sm:w-48 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="All">All Categories</option>
-            {categories.categories.map(category => (
-              <option key={category} value={category}>
-                {formatCategory(category)}
-                </option>
-            ))}
-          </select>
+              className="w-full sm:w-48 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="All">All Categories</option>
+              
+              {Array.isArray(categories?.categories) && categories.categories.length > 0 ? (
+                categories.categories.map((category) => (
+                  <option key={category} value={category}>
+                    {formatCategory(category)}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No categories available</option>
+              )}
+            </select>
         </div>
         
         <button
@@ -281,12 +286,16 @@ const handleExpand = (id) => {
                 required
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                >
-                    <option value="">Select a category</option>
-                    {categories.categories.map(category => (
-                      <option key={category} value={category}>
-                        {formatCategory(category )}
-                      </option>
-                    ))}
+                  <option value="">Select a category</option>
+                {Array.isArray(categories?.categories) && categories.categories.length > 0 ? (
+                  categories.categories.map((category) => (
+                    <option key={category} value={category}>
+                      {formatCategory(category)}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No categories available</option>
+                )}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">

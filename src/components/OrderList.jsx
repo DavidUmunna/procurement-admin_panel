@@ -32,6 +32,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const getOverallStatus = (approvals) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
+    if (approvals.some(a=>a.status==="Completed")) return "Completed"
     
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     const REQUIRED_APPROVALS = 2; // Change this to your business logic
@@ -43,7 +44,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   };
   const getStatusExplanation = (approvals) => {
     const status = getOverallStatus(approvals);
-    const approvalsCount = approvals?.filter(a => a.status === "Approved").length || 0;
+    const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
     const REQUIRED_APPROVALS=2
     
     switch(status) {
@@ -103,31 +104,42 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      setIsLoading(false);
+      setIsLoading(true);
       const token = localStorage.getItem("authToken");
       const headers = { 
         Authorization: `Bearer ${token}`,
         withCredentials: true,"ngrok-skip-browser-warning": "true"
       };
       // Optimistic update - immediately update both status and approvals
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
+      setOrders(prevOrders => {
+        const updatedOrders=prevOrders.map(order => 
           order._id === orderId 
             ? { 
                 ...order, 
                 status: newStatus,
-                Approvals: [
-                  ...(order.Approvals || []), // Include existing approvals if any
-                  {
-                    admin: user.name,
-                    status: newStatus,
-                    timestamp: new Date().toISOString()
-                  }
-                ]
+                Approvals: (()=>{
+                  const existingApprovals= Array.isArray(order.Approvals) ? order.Approvals : [];
+                  const filteredApprovals=existingApprovals.filter(a=>a.admin!==user.name)
+
+                  return  [
+                    ...filteredApprovals, 
+                    {
+                      admin: user.name,
+                      status: newStatus,
+                      timestamp: new Date().toISOString()
+                    }
+                  ] })()
+                
               } 
             : order
         )
-      );
+        return updatedOrders.sort((a,b)=>{
+          if (a.status === "Completed" && b.status !== "Completed") return 1;
+          if (a.status !== "Completed" && b.status === "Completed") return -1;
+          return 0;
+        })
+    });
+  
   
       // First update the general status
       await updateOrderStatus(orderId, newStatus);
@@ -157,14 +169,13 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
             ? { 
                 ...order, 
                 status: order.status, // Revert status
-                Approvals: order.Approvals?.filter(approval => 
+                Approvals: Array.isArray(order.Approvals)?order.Approvals?.filter(approval => 
                   approval.admin !== user.name || approval.status !== newStatus
-                ) // Remove the failed approval
+                ):[] // Remove the failed approval
               } 
             : order
         )
-      );
-    } finally {
+      );   } finally {
       setIsLoading(false);
       setDropdownOpen(null);
     }
