@@ -1,18 +1,20 @@
 {
   "files": {
-    "main.css": "/procurement-admin_panel/static/css/main.208c15c7.css",
-    "main.js": "/procurement-admin_panel/static/js/main.4947130c.js",
-    "static/js/488.2bc29b07.chunk.js": "/procurement-admin_panel/static/js/488.2bc29b07.chunk.js",
+    "main.css": "/procurement-admin_panel/static/css/main.0293943b.css",
+    "main.js": "/procurement-admin_panel/static/js/main.0fbd3fb2.js",
+    "static/js/488.f31f1573.chunk.js": "/procurement-admin_panel/static/js/488.f31f1573.chunk.js",
     "static/media/admin-panel.png": "/procurement-admin_panel/static/media/admin-panel.778c14247979eca87e1e.png",
     "static/media/admin.png": "/procurement-admin_panel/static/media/admin.1c8504e494c1d28bd802.png",
     "static/media/user.png": "/procurement-admin_panel/static/media/user.a6143582309785dca610.png",
+    "static/media/user.avif": "/procurement-admin_panel/static/media/user.0d1c1355761cb310367e.avif",
+    "static/media/quote-request.avif": "/procurement-admin_panel/static/media/quote-request.54cd64bbc004cbcdbb49.avif",
     "index.html": "/procurement-admin_panel/index.html",
-    "main.208c15c7.css.map": "/procurement-admin_panel/static/css/main.208c15c7.css.map",
-    "main.4947130c.js.map": "/procurement-admin_panel/static/js/main.4947130c.js.map",
-    "488.2bc29b07.chunk.js.map": "/procurement-admin_panel/static/js/488.2bc29b07.chunk.js.map"
+    "main.0293943b.css.map": "/procurement-admin_panel/static/css/main.0293943b.css.map",
+    "main.0fbd3fb2.js.map": "/procurement-admin_panel/static/js/main.0fbd3fb2.js.map",
+    "488.f31f1573.chunk.js.map": "/procurement-admin_panel/static/js/488.f31f1573.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.208c15c7.css",
-    "static/js/main.4947130c.js"
+    "static/css/main.0293943b.css",
+    "static/js/main.0fbd3fb2.js"
   ]
 }
