@@ -47,7 +47,7 @@ const DepartmentManagement = () => {
       const token = localStorage.getItem("authToken");
       const headers = { 
         Authorization: `Bearer ${token}`,
-        withCredentials: true 
+        withCredentials: true,"ngrok-skip-browser-warning": "true"
       };
 
       try {

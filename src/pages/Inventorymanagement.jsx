@@ -40,12 +40,12 @@ const InventoryManagement = () => {
         const token = localStorage.getItem('authToken');
         const [inventoryRes, statsRes,categoriesRes] = await Promise.all([
           axios.get('/api/inventory', {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },"ngrok-skip-browser-warning": "true"
           }),
           axios.get('/api/inventory/stats', {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },"ngrok-skip-browser-warning": "true"
           }),
-          axios.get('/api/inventory/categories', { headers: { Authorization: `Bearer ${token}` } })
+          axios.get('/api/inventory/categories', { headers: { Authorization: `Bearer ${token}` },"ngrok-skip-browser-warning": "true" })
         ]);
         
         setInventoryItems(inventoryRes.data.data);

@@ -1,5 +1,5 @@
 import React from 'react'
-import CostDashboard from './CostDashboard'
+import CostDashboard from '../../src/pages/CostDashboard'
 describe('<CostDashboard />', () => {
   it('renders without crashing', () => {
     cy.mount(<CostDashboard />);

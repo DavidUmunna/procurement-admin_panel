@@ -26,8 +26,8 @@ export const getOrders = async () => {
 
     if (email) {
       const token=localStorage.getItem("authToken")
-      requests.push(axios.get(`${API_URL}/${orders}/${email}`,{headers:{Authorization:`Bearer ${token}`},withCredentials:true}));
-      requests.push(axios.get(`${API_URL}/fileupload/${email}`, { responseType: "blob" },{headers:{Authorization:`Bearer ${token}`},withCredentials:true}));
+      requests.push(axios.get(`${API_URL}/${orders}/${email}`,{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
+      requests.push(axios.get(`${API_URL}/fileupload/${email}`, { responseType: "blob" },{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
     }
 
     const results = await Promise.allSettled(requests);
