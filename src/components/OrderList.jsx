@@ -105,7 +105,10 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
     try {
       setIsLoading(false);
       const token = localStorage.getItem("authToken");
-  
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        withCredentials: true,"ngrok-skip-browser-warning": "true"
+      };
       // Optimistic update - immediately update both status and approvals
       setOrders(prevOrders => 
         prevOrders.map(order => 
@@ -128,18 +131,18 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   
       // First update the general status
       await updateOrderStatus(orderId, newStatus);
-  
+      
       // Then send specific approve/reject requests
       if (newStatus === "Approved") {
         await axios.put(`api/orders/${orderId}/approve`, { 
           adminName: user.name, 
           orderId 
-        }, { headers: { Authorization: `Bearer ${token}` }, withCredentials: true });
+        }, {headers});
       } else if (newStatus === "Rejected" || newStatus === "Pending") {
         await axios.put(`api/orders/${orderId}/reject`, { 
           adminName: user.name, 
           orderId 
-        }, { headers: { Authorization: `Bearer ${token}` }, withCredentials: true });
+        }, {headers});
       }
       
   
@@ -189,7 +192,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
 
-  const handleFileDownload = async (fileName, event) => {
+   const handleFileDownload = async (fileName, event) => {
     event.stopPropagation();
     try {
       setIsLoading(true);

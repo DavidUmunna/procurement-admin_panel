@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import OrderList from './OrderList';
 import Duplicates from '../pages/Duplicates';
 import { getOrders,get_user_orders } from '../services/OrderService';
+import CompletedOrdersList from './Completed';
 const ADMIN_ROLES = ["admin", "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
 const OrdersDashboard = () => {
   const {user}=useUser()
@@ -101,12 +102,20 @@ const OrdersDashboard = () => {
       </div>
       
       {/* Duplicates Panel (takes 1/3 width on large screens) */}
-      <div className="lg:w-1/3 mb-8">
-        <Duplicates 
-          orders={orders} 
-          onOrderSelect={handleOrderSelect}
-        />
+      <div className='"lg:w-1/3 mb-8"'> 
+          <div >
+            <Duplicates 
+              orders={orders} 
+              onOrderSelect={handleOrderSelect}
+            />
+          </div>
+          <div className='mt-4'>
+            <CompletedOrdersList
+            orders={orders}
+            itemsPerPage={itemsperpage}/>
+          </div>
       </div>
+      
     </div>
   );
 };

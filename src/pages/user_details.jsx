@@ -72,17 +72,17 @@ const UserDetails = ({
 
   const statusConfig = {
     approved: {
-      color: "bg-green-500",
+      color: "bg-green-400",
       icon: "✅",
       title: "Approved Requests"
     },
     pending: {
-      color: "bg-yellow-500",
+      color: "bg-yellow-300",
       icon: "⏳",
       title: "Pending Requests"
     },
     rejected: {
-      color: "bg-red-500",
+      color: "bg-red-400",
       icon: "❌",
       title: "Rejected Requests"
     }

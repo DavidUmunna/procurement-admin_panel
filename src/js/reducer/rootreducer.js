@@ -10,7 +10,7 @@ const initialState = {
   orderedby: '', // Added orderedby field
 };
 
-const searchSlice = createSlice({
+export const searchSlice = createSlice({
   name: 'search',
   initialState,
   reducers: {
@@ -54,4 +54,4 @@ export const {
   resetFilters 
 } = searchSlice.actions;
 
-export default searchSlice.reducer;
+export default searchSlice.reducer ;
