@@ -5,7 +5,7 @@ import Duplicates from '../pages/Duplicates';
 import { getOrders,get_user_orders } from '../services/OrderService';
 import CompletedOrdersList from './Completed';
 const ADMIN_ROLES = ["admin", "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
-const OrdersDashboard = () => {
+const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
   const [orders, setOrders] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -34,8 +34,18 @@ const OrdersDashboard = () => {
           throw new Error("Invalid data format");
         }
       } catch (err) {
-        console.error(err);
-        setError("Failed to load orders. Please try again later.");
+        if (err.response?.status===401|| err.response?.status===403){
+          setError("Session expired. Please log in again.");
+          localStorage.removeItem('authToken');
+          setAuth(false)
+          window.location.href = '/adminlogin'; 
+        }else{
+
+          console.error(err);
+          setError("Failed to load orders. Please try again later.");
+        }
+  
+        // Redirect to login page
       } finally {
         setIsLoading(false);
       }

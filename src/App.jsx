@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import OrderList from "./components/OrderList";
+
 import CreateOrder from "./components/CreateOrder";
 import Addusers from "./pages/add_users";
 import Adminav from "./components/navBar";
@@ -8,7 +8,6 @@ import { UserProvider } from "./components/usercontext";
 import "./index.css";
 import Users from "./pages/User_list";
 import Adminlogin from "./pages/admin_login";
-import Userdetails from "./pages/user_details";
 import Logout from "./components/logout";
 import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios"
@@ -21,7 +20,7 @@ import SupplierList from "./pages/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
 import InventoryManagement from "./pages/Inventorymanagement";
 import OrdersDashboard from "./components/Ordersmanagement";
-import ProtectedRoute from "./components/Protectedroute";
+
 import UnauthorizedPage from "./pages/Unauthorized";
 
 // Page transition animation
@@ -125,7 +124,7 @@ const App = () => {
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                      <OrdersDashboard />
+                      <OrdersDashboard setAuth={setisauthenticated}/>
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
@@ -173,7 +172,7 @@ const App = () => {
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                    <DepartmentAssignment />
+                    <DepartmentAssignment setAuth={setisauthenticated} />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
@@ -185,7 +184,7 @@ const App = () => {
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                    <InventoryManagement  />
+                    <InventoryManagement setAuth={setisauthenticated} />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />

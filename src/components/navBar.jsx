@@ -98,6 +98,7 @@ export default function Navbar() {
                             )}
                           >
                             <item.icon className="h-6 w-6" />
+                            <span className="text-xs">{item.name}</span>
                             
                           </Link>
                         ))}

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { createOrder } from "../services/OrderService";
-import {  FileText } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "./usercontext";
-//import { Form } from "react-router-dom";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -20,7 +19,7 @@ const buttonVariants = {
 };
 
 const CreateOrder = () => {
-  const { user} = useUser();
+  const { user } = useUser();
   const [supplier, setSupplier] = useState("Halden");
   const [products, setProducts] = useState([{ name: "", quantity: 1, price: 0 }]);
   const [orderedBy, setOrderedBy] = useState("");
@@ -28,8 +27,9 @@ const CreateOrder = () => {
   const [files, setFiles] = useState([]);
   const [remarks, setRemarks] = useState("");
   const [email, setEmail] = useState("");
-  const [filenames,setfilenames]=useState("")
-  const [Title,settitle]=useState("")
+  const [filenames, setfilenames] = useState("");
+  const [Title, settitle] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -41,71 +41,55 @@ const CreateOrder = () => {
   const handleFileChange = (event) => {
     const uploadedFiles = event.target.files ? Array.from(event.target.files) : [];
     setFiles(uploadedFiles);
-    console.log(files)
-    if (uploadedFiles.length>0){
-      setfilenames(uploadedFiles.map(file=>file.name))
+    if (uploadedFiles.length > 0) {
+      setfilenames(uploadedFiles.map(file => file.name));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(filenames)
-    //const form=e.target
+    setIsSubmitting(true);
+
     const formData = new FormData();
-    //let formdataobject=Object.fromEntries(formData.entries())
-    const payload= {
-        supplier,
-        orderedBy,
-        email,
-        filenames,
-        urgency,
-        remarks,
-        products,
-        Title
-      }
-    //console.log(formdataobject)
+    const payload = {
+      supplier,
+      orderedBy,
+      email,
+      filenames,
+      urgency,
+      remarks,
+      products,
+      Title
+    };
+
     formData.append("email", email);
     files.forEach((file) => {
       formData.append("files", file);
-    }); 
-    
+    });
+
     try {
+      const fileupload = await createOrder({ formData: formData, orderData: payload });
       
-      const fileupload=await createOrder({formData:formData,orderData:payload});
-      if (files.length>0){
-
-        //setUser((prev)=>({...prev,filename:fileupload.files.map(file=>file.filename)}))
-        console.log("file uploaded:",fileupload.file);
-        console.log("file uploaded:",fileupload.orders);
+      if (files.length > 0) {
+        console.log("File uploaded:", fileupload.file);
+        console.log("Order created:", fileupload.orders);
       }
-      
 
-    
-    
-
-    
-      //const orderData = await createOrder({ supplier, orderedBy,email,products, urgency, files, remarks });
-  
-      //console.log("Submitting order data:", orderData);
-  
-      setOrderedBy("");
-      
-
-
-      //console.log("Order created:", orderData);
-
-
+      // Reset form
       setSupplier("Halden");
       setProducts([{ name: "", quantity: 1, price: 0 }]);
       setUrgency("");
       setFiles([]);
       setRemarks("");
-      alert("Order Created!");
+      settitle("");
+      //alert("Order Created!");
     } catch (error) {
       console.error("Error creating order:", error);
-      alert("Failed to create order. Please try again.");
+      //alert("Failed to create order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...products];
@@ -123,7 +107,35 @@ const CreateOrder = () => {
   };
 
   return (
-    <div>
+    <div className="relative">
+      {/* Loading Modal */}
+      <AnimatePresence>
+        {isSubmitting && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center max-w-md w-full mx-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 20 }}
+            >
+              <Loader2 className="animate-spin h-12 w-12 text-blue-500 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Processing Your Request</h3>
+              <p className="text-gray-600 text-center">
+                Please wait while we submit your purchase request. 
+                This may take a moment, especially if you've attached files.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
         className="min-h-screen bg-gray-100 flex justify-center items-center p-6"
         variants={containerVariants}
@@ -174,6 +186,7 @@ const CreateOrder = () => {
               value={urgency}
               onChange={(e) => setUrgency(e.target.value)}
               className="w-full p-2 border rounded mb-4"
+              required
             >
               <option value="">Select Urgency</option>
               <option className="text-red-500" value="VeryUrgent">Very Urgent</option>
@@ -263,7 +276,21 @@ const CreateOrder = () => {
             >
               Add Product
             </motion.button>
-            <motion.button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Create Request</motion.button>
+            <motion.button 
+              type="submit" 
+              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex justify-center items-center gap-2"
+              disabled={isSubmitting}
+              whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin h-5 w-5" />
+                  <span>Processing Request...</span>
+                </>
+              ) : (
+                "Create Request"
+              )}
+            </motion.button>
           </motion.form>
         </motion.div>
       </motion.div>

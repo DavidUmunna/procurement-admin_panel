@@ -7,7 +7,7 @@ import axios from 'axios';
 
 
 const ADMIN_ROLES=['admin','global_admin','human_resources','internal_auditor']
-const InventoryManagement = () => {
+const InventoryManagement = ({setAuth}) => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
 
@@ -32,6 +32,7 @@ const InventoryManagement = () => {
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
+  const [Error,setError]=useState("")
 
   // Fetch inventory data
   useEffect(() => {
@@ -52,7 +53,15 @@ const InventoryManagement = () => {
         setStats(statsRes.data.data);
         setCategories(categoriesRes.data.data)
       } catch (err) {
-        console.error('Failed to fetch data:', err);
+        if (err.response?.status===401|| err.response?.status===403){
+          setError("Session expired. Please log in again.");
+          localStorage.removeItem('authToken');
+          setAuth(false)
+          window.location.href = '/adminlogin'; 
+        }else{
+
+          console.error('Failed to fetch data:', err);
+        }
       } finally {
         setLoading(false);
       }
@@ -118,7 +127,17 @@ const handleExpand = (id) => {
       resetForm();
       setShowForm(false);
     } catch (err) {
-      console.error('Create failed:', err.response?.data || err.message);
+      if (err.response?.status===401|| err.response?.status===403){
+        setError("Session expired. Please log in again.");
+        localStorage.removeItem('authToken');
+        setAuth(false)
+        window.location.href = '/adminlogin'; 
+      }else{
+
+        console.error('Create failed:', err.response?.data || err.message);
+      }
+
+      
     }
   };
 
@@ -512,6 +531,7 @@ const handleExpand = (id) => {
             </div>
           </div>
         </div>)}
+        {Error}
       </div>
     </div>
   );

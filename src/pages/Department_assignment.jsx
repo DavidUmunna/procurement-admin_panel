@@ -8,7 +8,7 @@ import { useUser } from '../components/usercontext';
   
 
 const global_ADMIN_ROLES=["admin","global_admin","human_resources"]
-const DepartmentManagement = () => {
+const DepartmentManagement = (setAuth) => {
   // State
   const {user}=useUser()
   const currentuser=user
@@ -19,7 +19,7 @@ const DepartmentManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalLoading, setModalLoading] = useState(false);
-
+  const [Error,setError]=useState("")
 
   
   // UI State
@@ -63,7 +63,15 @@ const DepartmentManagement = () => {
         setTasks(tasksRes.status === 'fulfilled' ? tasksRes.value.data.data : []);
         setStats(statsRes.status === 'fulfilled' ? statsRes.value.data : {});
       } catch (err) {
+        if (err.response?.status===401|| err.response?.status===403){
+        setError("Session expired. Please log in again.");
+        localStorage.removeItem('authToken');
+        setAuth(false)
+        window.location.href = '/adminlogin'; 
+      }else{
+
         console.error("Fetch error:", err);
+      }
       } finally {
         setLoading(false);
       }
@@ -273,7 +281,15 @@ const refreshDepartments = () => {
       ));
       closeModal();
     } catch (err) {
-      console.error("Add user error:", err.response?.data || err.message);
+      if (err.response?.status===401|| err.response?.status===403){
+        setError("Session expired. Please log in again.");
+        localStorage.removeItem('authToken');
+        setAuth(false)
+        window.location.href = '/adminlogin'; 
+      }else{
+
+        console.error("Add user error:", err.response?.data || err.message);
+      }
     }
   };
 
@@ -290,7 +306,15 @@ const refreshDepartments = () => {
       
       refreshDepartments()
     } catch (err) {
-      console.error("Remove user error:", err.response?.data || err.message);
+      if (err.response?.status===401|| err.response?.status===403){
+        setError("Session expired. Please log in again.");
+        localStorage.removeItem('authToken');
+        setAuth(false)
+        window.location.href = '/adminlogin'; 
+      }else{
+
+        console.error("Remove user error:", err.response?.data || err.message);
+      }
     }
   };
   const visibleDepartments = filteredDepartments.filter(dept => {
@@ -747,6 +771,7 @@ const refreshDepartments = () => {
           </div>
         </div>
       )}
+      {Error}
     </div>
   );
 };

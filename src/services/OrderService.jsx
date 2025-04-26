@@ -10,7 +10,7 @@ const orders="orders"
 export const getOrders = async () => {
   try {
     const token=localStorage.getItem("authToken")
-    console.log(token)
+  
     const response = await axios.get(`${API_URL}/${orders}`,{headers:{Authorization:`Bearer ${token}`, 
       "ngrok-skip-browser-warning": "true"},
       withCredential:true});
