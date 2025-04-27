@@ -51,16 +51,23 @@ const App = () => {
     console.log("isauthenticated", isauthenticated);
     const checkAuth = async () => {
       try {
-        const token=localStorage.getItem("authToken")
-        const response = await axios.get("/api/access",
-           {headers: {Authorization:`Bearer ${token}`,}, 
-          withCredentials: true,"ngrok-skip-browser-warning": "true" });
+        const token = localStorage.getItem("authToken");
+    
+        const response = await axios.get("/api/access", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",  // Move inside headers
+          },
+          withCredentials: true, // Not inside headers
+        });
+    
         setisauthenticated(response.data.authenticated);
       } catch (error) {
         setisauthenticated(false);
         console.error(error);
       }
     };
+    
     checkAuth();
   }, [isauthenticated]);
 

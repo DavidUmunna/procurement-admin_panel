@@ -39,36 +39,52 @@ const InventoryManagement = ({setAuth}) => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const [inventoryRes, statsRes,categoriesRes] = await Promise.all([
+      
+        const [inventoryRes, statsRes, categoriesRes] = await Promise.all([
           axios.get('/api/inventory', {
-            headers: { Authorization: `Bearer ${token}` },"ngrok-skip-browser-warning": "true"
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            withCredentials: true,
           }),
           axios.get('/api/inventory/stats', {
-            headers: { Authorization: `Bearer ${token}` },"ngrok-skip-browser-warning": "true"
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            withCredentials: true,
           }),
-          axios.get('/api/inventory/categories', { headers: { Authorization: `Bearer ${token}` },"ngrok-skip-browser-warning": "true" })
+          axios.get('/api/inventory/categories', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            withCredentials: true,
+          }),
         ]);
-        
+      
         setInventoryItems(inventoryRes.data.data);
         setStats(statsRes.data.data);
-        setCategories(categoriesRes.data.data)
-      } catch (err) {
-        if (err.response?.status===401|| err.response?.status===403){
+        setCategories(categoriesRes.data.data);
+      
+      } catch (err) {  // add `: any` if you want better type safety
+        if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
           localStorage.removeItem('authToken');
-          setAuth(false)
+          setAuth(false);
           window.location.href = '/adminlogin'; 
-        }else{
-
+        } else {
           console.error('Failed to fetch data:', err);
         }
       } finally {
         setLoading(false);
       }
-    };
-
+      
+    }
     fetchData();
-  }, []);
+
+}, []);
   console.log(categories)
    
   const formatCategory = (category) => {
