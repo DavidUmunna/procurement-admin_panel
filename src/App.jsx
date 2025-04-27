@@ -20,7 +20,6 @@ import SupplierList from "./pages/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
 import InventoryManagement from "./pages/Inventorymanagement";
 import OrdersDashboard from "./components/Ordersmanagement";
-
 import UnauthorizedPage from "./pages/Unauthorized";
 
 // Page transition animation
