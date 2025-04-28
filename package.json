@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "https://8a13-102-90-79-163.ngrok-free.app",
-  "homepage": "https://DavidUmunna.github.io/procurement-admin_panel",
+  "homepage": "https://davidumunna.github.io/procurement-admin_panel/",
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
