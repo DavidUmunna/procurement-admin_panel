@@ -58,7 +58,10 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-warning-comments": ["off"]
+    }
   },
   "browserslist": {
     "production": [

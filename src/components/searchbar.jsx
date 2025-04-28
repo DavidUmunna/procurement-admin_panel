@@ -13,7 +13,7 @@ const Searchbar = () => {
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
+   
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -37,7 +37,7 @@ const Searchbar = () => {
         className="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-4 mt-8"
       >
         <h2 className="text-2xl font-semibold text-gray-700">Search Orders</h2>
-
+        {isMobile}
         <div className="space-y-4">
           {/* Mode Selector */}
           <select
