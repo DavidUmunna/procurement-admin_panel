@@ -54,7 +54,7 @@ const OrdersDashboard = ({setAuth}) => {
     if (user?.email) {
       fetchData();
     }
-  }, [user?.email, user?.role]);
+  }, [user?.email, user?.role,setAuth]);
 
   const paginated_orders=orders.slice(startIndex,endIndex)
   const totalPages = Math.ceil(orders.length / itemsperpage);
@@ -125,7 +125,7 @@ const OrdersDashboard = ({setAuth}) => {
             itemsPerPage={itemsperpage}/>
           </div>
       </div>
-      
+      {error}
     </div>
   );
 };

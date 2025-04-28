@@ -1,5 +1,5 @@
 import React,{ useState, useEffect } from 'react';
-import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp, FiFilter, FiSearch } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp,  FiSearch } from 'react-icons/fi';
 import { useUser } from '../components/usercontext';
 import InventoryAnalytics from "../components/InventoryAnalytics";
 import InventoryConditionChart from './Inventoryvisuals';
@@ -84,7 +84,7 @@ const InventoryManagement = ({setAuth}) => {
     }
     fetchData();
 
-}, []);
+}, [setAuth]);
   console.log(categories)
    
   const formatCategory = (category) => {
@@ -124,9 +124,9 @@ const InventoryManagement = ({setAuth}) => {
     });
   };
   
-const handleExpand = (id) => {
+/*const handleExpand = (id) => {
   setExpandedItem((prev) => (prev === id ? null : id));
-};
+};*/
 
   const handleSubmit = async (e) => {
     e.preventDefault();

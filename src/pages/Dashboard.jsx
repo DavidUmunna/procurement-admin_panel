@@ -1,7 +1,6 @@
 import UserDetails from "./user_details"
 import React, { useState } from 'react';
 import { useUser } from "../components/usercontext";
-import { getOrders } from "../services/OrderService";
 import { useEffect } from "react";
 import axios from "axios"
 
@@ -28,7 +27,7 @@ export const Dashboard=()=>{
         }else{
             fetchuserOrder(email)
         }
-    },[])
+    },[user?.role])
     const fetchorder=async ()=>{ 
             if (!user || !user.email) return 
 
@@ -104,21 +103,7 @@ export const Dashboard=()=>{
         return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
-    const sampleOrders = [
-      {
-        createdAt: '2024-04-01T00:00:00Z',
-        products: [
-          { price: 100, quantity: 1 },
-          { price: 50, quantity: 2 }
-        ]
-      },
-      {
-        createdAt: '2024-04-15T00:00:00Z',
-        products: [
-          { price: 80, quantity: 1 }
-        ]
-      }
-    ];
+    
     
    
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaFlag, FaTimes, FaCopy, FaLink } from 'react-icons/fa';
+import { FaFlag, FaTimes, FaCopy } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Duplicates = ({ orders, onOrderSelect }) => {
@@ -78,10 +78,10 @@ const Duplicates = ({ orders, onOrderSelect }) => {
     setExpandedGroup(expandedGroup === index ? null : index);
   };
 
-  const mergeOrders = (orderIds) => {
+  /*const mergeOrders = (orderIds) => {
     console.log('Merging orders:', orderIds);
     // Implementatiion of logic
-  };
+  };*/
 
   const handleOrderClick = (orderId, e) => {
     e.stopPropagation();

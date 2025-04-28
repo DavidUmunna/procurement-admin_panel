@@ -10,7 +10,7 @@ export default function Sign_in({ setAuth }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [userData, setUserData] = useState(null);
+
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,7 @@ export default function Sign_in({ setAuth }) {
         //localStorage.setItem("auth", "true");
         setUser(response.data.user);
         //console.log(response.data.user)
-        setUserData(response.data.user);
+        
         navigate("/dashboard");
         //console.log(userData)
       } else {

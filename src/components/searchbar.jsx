@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  setKeyword, setStatus, setDateRange, setOrderedBy, resetFilters,
+  setKeyword, setStatus, setDateRange,  resetFilters,
 } from '../js/reducer/rootreducer';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   FiUsers, FiUserPlus, FiEdit2, FiTrash2, FiChevronDown, FiChevronUp, 
-  FiSearch, FiCheck, FiX, FiClipboard, FiBarChart2, FiPlus 
+  FiSearch, FiX, FiClipboard, FiBarChart2, FiPlus 
 } from 'react-icons/fi';
 import axios from 'axios';
 import { useUser } from '../components/usercontext';
@@ -77,7 +77,7 @@ const DepartmentManagement = (setAuth) => {
       }
     };
     fetchData();
-  }, []);
+  }, [setAuth]);
   
   // Add this right after the state declarations
 const fetchDepartments = async () => {
@@ -327,7 +327,7 @@ const refreshDepartments = () => {
   const assignTask = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.post('/api/tasks', {
+      await axios.post('/api/tasks', {
         title: formData.taskTitle,
         description: formData.taskDescription,
         assignedTo: formData.assignedTo,

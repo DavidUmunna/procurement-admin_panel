@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiCalendar, FiUser } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiCalendar,  } from "react-icons/fi";
+import { motion,  } from "framer-motion";
 import requestImg from "../components/assets/quote-request.avif";
 import userImg from "../components/assets/user.avif";
 
@@ -16,7 +16,6 @@ const UserDetails = ({
     pending: false,
     rejected: false
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState({
     totalRequests: 0,
     approvalRate: 0,

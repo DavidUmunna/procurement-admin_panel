@@ -1,6 +1,6 @@
-import { Boxes, PlusSquare, UserPlus, Truck, Copy,Building2 } from 'lucide-react';
+import {  PlusSquare, UserPlus, Truck, Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { admin_roles } from './navBar';
+
 import { useUser } from './usercontext';
 export default function Sidebar({ isOpen, onClose }) {
   
@@ -26,7 +26,7 @@ export default function Sidebar({ isOpen, onClose }) {
       </div>
 
       <nav className="flex flex-col gap-2 p-4">
-        {sidebar .filter(item => {
+        {sidebar.filter(item => {
                           // If `visibleTo` exists, check if user has permission
                           if (item.visibleTo) {
                             return item.visibleTo.includes(user?.role);
