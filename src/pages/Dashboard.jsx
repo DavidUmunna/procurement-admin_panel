@@ -12,24 +12,16 @@ import CostDashboard from "./CostDashboard";
 
 export const Dashboard=()=>{
     const { user } = useUser();
-    const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
     const [request,setRequest]=useState()
     const [orders,setorders]=useState([])
     const [approvedOrders, setApprovedOrders] = useState([]);
     const [pendingOrders, setPendingOrders] = useState([]);
     const [rejectedOrders, setRejectedOrders] = useState([]);
-    const email=user?.email||"no email provided"
-   
+    
     useEffect(()=>{
-       
-        if (admin_roles.includes(user?.role)){
-            fetchorder();
-
-        }else{
-            fetchuserOrder(email)
-        }
-    },[user?.role])
-    const fetchorder=async ()=>{ 
+        const email=user?.email||"no email provided"
+        const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
+        const fetchorder=async ()=>{ 
             if (!user || !user.email) return 
 
             try{
@@ -94,6 +86,14 @@ export const Dashboard=()=>{
             }
 
           }
+        if (admin_roles.includes(user?.role)){
+            fetchorder();
+
+        }else{
+            fetchuserOrder(email)
+        }
+    },[user?.role,user])
+   
 
     
     console.log(user)

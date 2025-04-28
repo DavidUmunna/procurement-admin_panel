@@ -26,15 +26,7 @@ const UserDetails = ({
     // Calculate statistics when orders change
     const total = approvedOrders.length + rejectedOrders.length + pendingOrders.length;
     const rate = total > 0 ? Math.round((approvedOrders.length / total) * 100) : 0;
-    
-    setStats({
-      totalRequests: total,
-      approvalRate: rate,
-      avgProcessingTime: calculateAvgProcessingTime()
-    });
-  }, [approvedOrders, rejectedOrders, pendingOrders]);
-
-  const calculateAvgProcessingTime = () => {
+    const calculateAvgProcessingTime = () => {
     if (approvedOrders.length === 0) return 0;
     
     const totalDays = approvedOrders.reduce((sum, order) => {
@@ -45,7 +37,15 @@ const UserDetails = ({
     }, 0);
     
     return Math.round(totalDays / approvedOrders.length);
-  };
+    };
+    setStats({
+      totalRequests: total,
+      approvalRate: rate,
+      avgProcessingTime: calculateAvgProcessingTime()
+    });
+  }, [approvedOrders, rejectedOrders, pendingOrders]);
+
+  
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
