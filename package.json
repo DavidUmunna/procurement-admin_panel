@@ -2,7 +2,7 @@
   "name": "resource_management",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://8a13-102-90-79-163.ngrok-free.app ",
+  
   "homepage": "./",
   "dependencies": {
     "@headlessui/react": "^2.2.0",

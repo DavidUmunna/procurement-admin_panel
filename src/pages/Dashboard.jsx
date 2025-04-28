@@ -25,8 +25,9 @@ export const Dashboard=()=>{
             if (!user || !user.email) return 
 
             try{
+                  const API_URL = `${process.env.REACT_APP_API_URL}/api`
                   const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get("/api/orders",{headers:{Authorization:`Bearer ${token}`, 
+                  const userReq=await axios.get(`${API_URL}/orders`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
                   console.log("user orders for count:",userReq)
@@ -58,8 +59,9 @@ export const Dashboard=()=>{
             if (!user || !user.email) return 
             
             try{
+                  const API_URL = `${process.env.REACT_APP_API_URL}/api`
                   const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get(`/api/orders/${email}`,{headers:{Authorization:`Bearer ${token}`, 
+                  const userReq=await axios.get(`${API_URL}/orders/${email}`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
                   console.log("user orders for count:",userReq)

@@ -10,7 +10,8 @@ export default function SupplierList() {
   useEffect(() => {
     async function fetchSuppliers() {
       try {
-        const res = await fetch("/api/supplier");
+        const API_URL = `${process.env.REACT_APP_API_URL}/api`
+        const res = await fetch(`${API_URL}/supplier`);
         const data = await res.json();
         setSuppliers(data);
       } catch (err) {

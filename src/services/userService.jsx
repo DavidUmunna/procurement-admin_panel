@@ -4,7 +4,7 @@ import axios from "axios";
 //const circuitBreaker=require("opossum")
 
 
-const API_URL="/api"
+const API_URL = `${process.env.REACT_APP_API_URL}/api`
 
 const route="users"
 

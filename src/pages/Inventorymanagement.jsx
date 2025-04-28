@@ -39,23 +39,23 @@ const InventoryManagement = ({setAuth}) => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('authToken');
-      
+        const API_URL = `${process.env.REACT_APP_API_URL}/api`
         const [inventoryRes, statsRes, categoriesRes] = await Promise.all([
-          axios.get('/api/inventory', {
+          axios.get(`${API_URL}/inventory`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
-          axios.get('/api/inventory/stats', {
+          axios.get(`${API_URL}/inventory/stats`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
-          axios.get('/api/inventory/categories', {
+          axios.get(`${API_URL}/inventory/categories`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -131,8 +131,9 @@ const InventoryManagement = ({setAuth}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.post('/api/inventory', {
+      const res = await axios.post(`${API_URL}/inventory`, {
         ...formData,
         addedBy: user.userId
       }, {
@@ -160,8 +161,9 @@ const InventoryManagement = ({setAuth}) => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.put(`/api/inventory/${editingItem._id}`, formData, {
+      const res = await axios.put(`${API_URL}/inventory/${editingItem._id}`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -178,8 +180,9 @@ const InventoryManagement = ({setAuth}) => {
 
   const deleteItem = async (id) => {
     try {
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      await axios.delete(`/api/inventory/${id}`, {
+      await axios.delete(`${API_URL}/inventory/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setInventoryItems(inventoryItems.filter(item => item._id !== id));

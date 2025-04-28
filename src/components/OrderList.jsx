@@ -105,6 +105,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       setIsLoading(true);
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem("authToken");
       const headers = { 
         Authorization: `Bearer ${token}`,
@@ -146,12 +147,12 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       
       // Then send specific approve/reject requests
       if (newStatus === "Approved") {
-        await axios.put(`api/orders/${orderId}/approve`, { 
+        await axios.put(`${API_URL}/orders/${orderId}/approve`, { 
           adminName: user.name, 
           orderId 
         }, {headers});
       } else if (newStatus === "Rejected" || newStatus === "Pending") {
-        await axios.put(`api/orders/${orderId}/reject`, { 
+        await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
           adminName: user.name, 
           orderId 
         }, {headers});

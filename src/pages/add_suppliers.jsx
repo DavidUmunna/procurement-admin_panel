@@ -25,7 +25,8 @@ export default function AddSupplier() {
     setMessage("");
 
     try {
-      const response = await fetch("/api/supplier", {
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
+      const response = await fetch(`${API_URL}/supplier`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

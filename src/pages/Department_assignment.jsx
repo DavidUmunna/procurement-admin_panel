@@ -44,6 +44,7 @@ const DepartmentManagement = (setAuth) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem("authToken");
       const headers = { 
         Authorization: `Bearer ${token}`,
@@ -52,10 +53,10 @@ const DepartmentManagement = (setAuth) => {
 
       try {
         const [deptRes, usersRes, tasksRes, statsRes] = await Promise.allSettled([
-          axios.get('/api/department', { headers }),
-          axios.get('/api/users', { headers }),
-          axios.get('/api/tasks', { headers }),
-          axios.get('/api/department/stats', { headers })
+          axios.get(`${API_URL}/department`, { headers }),
+          axios.get(`${API_URL}/users`, { headers }),
+          axios.get(`${API_URL}/tasks`, { headers }),
+          axios.get(`${API_URL}/department/stats`, { headers })
         ]);
 
         setDepartments(deptRes.status === 'fulfilled' ? deptRes.value.data.data : []);
@@ -81,13 +82,15 @@ const DepartmentManagement = (setAuth) => {
   
   // Add this right after the state declarations
 const fetchDepartments = async () => {
+
   try {
+    const API_URL = `${process.env.REACT_APP_API_URL}/api`
     const token = localStorage.getItem("authToken");
     const headers = { 
       Authorization: `Bearer ${token}`,
       withCredentials: true 
     };
-    const response = await axios.get('/api/department', { headers });
+    const response = await axios.get(`${API_URL}/department`, { headers });
     setDepartments(response.data.data);
   } catch (err) {
     console.error("Failed to fetch departments:", err);
@@ -106,9 +109,10 @@ const refreshDepartments = () => {
 
   const deleteTask=async(taskId)=>{
     try{
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
       setTasks(prevTasks => prevTasks.filter(t => t._id !== taskId));
       const response=await axios.delete(
-        `api/tasks/${taskId}`
+        `${API_URL}/tasks/${taskId}`
       );
       setTasks(prev=>prev.map(t=>
         t._id===taskId?response.data.data:t

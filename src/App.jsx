@@ -52,8 +52,8 @@ const App = () => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem("authToken");
-    
-        const response = await axios.get("/api/access", {
+        const API = process.env.REACT_APP_API_URL;
+        const response = await axios.get(`${API}/api/access`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",  // Move inside headers

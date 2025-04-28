@@ -1,7 +1,7 @@
 import axios from "axios";
 //const circuitBreaker=require("opossum")
 
-const API_URL = "/api"; //  backend URL
+const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 
 const orders="orders"
 
@@ -81,7 +81,7 @@ export const createOrder = async ({ formData, orderData }) => {
 
 export const updateOrderStatus = async (orderId, status) => {
   try {
-    const response = await axios.put(`api/${orders}/${orderId}`, { status },{headers:{ "ngrok-skip-browser-warning": "true"}});
+    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status },{headers:{ "ngrok-skip-browser-warning": "true"}});
     return response.data;
   } catch (error) {
     console.error("Error updating order:", error);
@@ -89,7 +89,7 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 export const downloadFile = async (fileName) => {
   try {
-    const response_2 = await axios.get(`api/fileupload/download/${fileName}`, { responseType: "blob" ,
+    const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileName}`, { responseType: "blob" ,
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {
@@ -99,7 +99,7 @@ export const downloadFile = async (fileName) => {
 
 export const deleteOrder = async (orderId) => {
   try {
-    await axios.delete(`api/${orders}/${orderId}`,{headers:{ "ngrok-skip-browser-warning": "true"}});
+    await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{ "ngrok-skip-browser-warning": "true"}});
   } catch (error) {
     console.error("Error deleting order:", error);
   }
