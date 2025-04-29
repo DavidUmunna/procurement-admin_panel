@@ -21,7 +21,7 @@ const CompletedOrdersList = ({ orders, itemsPerPage = 5 }) => {
   return (
     <div className="container mx-auto px-0 py-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Completed Orders <span className="text-blue-600">({completedOrders.length})</span>
+        Completed Requests <span className="text-blue-600">({completedOrders.length})</span>
       </h2>
       
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
