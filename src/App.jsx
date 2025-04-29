@@ -48,7 +48,11 @@ const App = () => {
 
 
   useEffect(() => {
-    console.log("isauthenticated", isauthenticated);
+    //console.log("isauthenticated", isauthenticated);
+    const handleTabClose = () => {
+      // Notify the backend to end the session
+      navigator.sendBeacon("/api/logout");
+    };
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem("authToken");
@@ -66,6 +70,11 @@ const App = () => {
         setisauthenticated(false);
         console.error(error);
       }
+    };
+    window.addEventListener("beforeunload", handleTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose);
     };
     
     checkAuth();
