@@ -51,7 +51,7 @@ const App = () => {
     //console.log("isauthenticated", isauthenticated);
     const handleTabClose = () => {
       // Notify the backend to end the session
-      navigator.sendBeacon("/api/logout");
+      navigator.sendBeacon(`${process.env.REACT_APP_API_URL}/api/logout`);
     };
     const checkAuth = async () => {
       try {
@@ -73,11 +73,11 @@ const App = () => {
     };
     window.addEventListener("beforeunload", handleTabClose);
 
+    checkAuth();
     return () => {
       window.removeEventListener("beforeunload", handleTabClose);
     };
     
-    checkAuth();
   }, [isauthenticated]);
 
   if (isauthenticated === null) {
