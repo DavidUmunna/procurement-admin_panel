@@ -21,7 +21,7 @@ import DepartmentAssignment from "./pages/Department_assignment";
 import InventoryManagement from "./pages/Inventorymanagement";
 import OrdersDashboard from "./components/Ordersmanagement";
 import UnauthorizedPage from "./pages/Unauthorized";
-
+import Landingpage from "./pages/landinpage/Resourcelanding" 
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -97,7 +97,9 @@ const App = () => {
           {isauthenticated && <Adminav />}
   
           <AnimatePresence mode="wait">
+            
             <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Landingpage/>}/>
               <Route
                 path="/adminlogin"
                 element={

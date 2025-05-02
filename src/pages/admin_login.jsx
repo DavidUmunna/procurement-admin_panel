@@ -77,7 +77,7 @@ export default function Sign_in({ setAuth }) {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-           Admin Login
+              Sign in to account
           </h2>
         </div>
 
@@ -91,9 +91,17 @@ export default function Sign_in({ setAuth }) {
             transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
           >
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-900">
-                Username
-              </label>
+              <div className="flex items-center justify-between">
+
+                 <label htmlFor="username" className="block text-sm font-medium text-gray-900">
+                   Username
+                 </label>
+                 <div className="text-sm">
+                     <Link to="/" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                       Home
+                     </Link>
+                   </div>
+                 </div>
               <div className="mt-2">
                 <input
                   id="username"
@@ -205,7 +213,6 @@ export default function Sign_in({ setAuth }) {
         </div>
       </motion.div>
 
-     
     </>
   );
 }
