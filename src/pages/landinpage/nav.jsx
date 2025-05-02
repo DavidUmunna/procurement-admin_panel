@@ -15,7 +15,7 @@ const Navbar=()=>{
               <span className="text-xl font-bold text-gray-800">ResourceFlow</span>
             </div>
             <div className="flex items-center space-x-4">
-              <a href="#features" className="text-gray-600 hover:text-indigo-600">Features</a>
+              <a href="#About us" className="text-gray-600 hover:text-indigo-600">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-indigo-600">Pricing</a>
               <button className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
                 Get Started
