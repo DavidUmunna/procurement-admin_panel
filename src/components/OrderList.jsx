@@ -374,14 +374,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              <span className="mr-2">📦</span> Request List
-              {isLoading && (
-                <span className="ml-3 text-sm text-gray-500">Loading...</span>
-              )}
-            </h2>
-          </div>
+          
 
           {error && (
             <div className="p-4 bg-red-50 text-red-600 border-l-4 border-red-500">
