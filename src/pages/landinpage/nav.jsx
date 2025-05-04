@@ -13,7 +13,7 @@ const Navbar = () => {
 
   const navLinks = [
     { id: 1, text: "About us", to:"/aboutus" },
-    { id: 2, text: "Pricing", to: "#pricing" },
+    //{ id: 2, text: "Pricing", to: "#pricing" },
   ];
 
   return (
