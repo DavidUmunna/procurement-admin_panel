@@ -1,5 +1,5 @@
 import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, BellIcon, XMarkIcon,ClipboardDocumentListIcon, PlusCircleIcon,UserIcon,UsersIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, BellIcon, XMarkIcon,ClipboardDocumentListIcon, PlusCircleIcon,UserIcon,UsersIcon,ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
 import { useUser } from "./usercontext";
@@ -8,13 +8,15 @@ import { motion } from 'framer-motion';
 import { PanelLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
 
-export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin"];
+export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
+  "Financial_manager","Waste_management","Environmental_lab_manager","PTV_manager"];
 
 const navigation = [
   { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },
   { name: 'Create', to: '/createorder', icon: PlusCircleIcon },
   { name: 'Add Users', to: '/addusers', icon: UserIcon, visibleTo: ['admin', 'global_admin'] },
-  { name: 'Users', to: '/users', icon: UsersIcon, visibleTo: ['admin', 'global_admin'] }
+  { name: 'Users', to: '/users', icon: UsersIcon, visibleTo: ['admin', 'global_admin'] },
+  {name:'Tasks', to:'/usertasks', icon: ClipboardDocumentCheckIcon }
 ];
 
 const userNavigation = [
@@ -31,7 +33,7 @@ export default function Navbar() {
   const { user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isMobileMenuOpen,setIsMobileMenuOpen]=useState(true)
+  //const [isMobileMenuOpen,setIsMobileMenuOpen]=useState(true)
 
   const isActive = (path) => location.pathname === path;
 
@@ -152,8 +154,8 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             <Disclosure.Panel className="md:hidden bg-gray-800">
-              <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-                {filteredNav.map((item) => (
+              {/*<div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+                {userNavigation.map((item) => (
                   <Disclosure.Button
                     as={Link}
                     key={item.name}
@@ -165,11 +167,11 @@ export default function Navbar() {
                       'block rounded-md px-3 py-2 text-base font-medium flex items-center gap-2'
                     )}
                   >
-                    <item.icon className="h-5 w-5" />
+                    
                     {item.name}
                   </Disclosure.Button>
                 ))}
-              </div>
+              </div>*/}
               <div className="border-t border-gray-700 pt-4 pb-3">
                 <div className="flex items-center px-5">
                   <div className="flex-shrink-0">
@@ -203,26 +205,26 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation */}
       <motion.div
-        className="fixed bottom-0 left-0 w-full bg-gray-800 p-2 flex justify-around md:hidden z-10 border-t border-gray-700"
+        className="fixed bottom-0 left-0 w-full bg-gray-800 p-2 flex justify-around sm:justify-between md:hidden lg:justify-between z-10 border-t border-gray-700"
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.3 }}
       >
-                 <div className="mt-3 space-y-1 px-2">
-              {userNavigation.map((item) => (
-                <button
-                  key={item.name}
-                  className="w-full text-left rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                  onClick={() => {
-                    navigate(item.to);
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
+        <div className="flex justify-center sm:w-full md:max-w-lg">
+          {filteredNav.map((item) => (
+            <button
+              key={item.name}
+              className="w-full sm:w-auto text-left rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+              onClick={() => {
+                navigate(item.to);
+              }}
+            >
+              <item.icon className="h-8 w-8 mx-6" />
+            </button>
+          ))}
+        </div>
       </motion.div>
+
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </>

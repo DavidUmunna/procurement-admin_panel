@@ -8,6 +8,7 @@ const Add_user = () => {
   const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management","PVT","lab","accounts"];
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
+  const [Department,setDepartment]=useState("")
   const [password, setpassword] = useState("");
   const [role, setrole] = useState(roles[0]);
   const [showPassword, setShowPassword] = useState(false);
@@ -15,11 +16,12 @@ const Add_user = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-      const user_data = await createUser({ name, email, password, role });
+      const user_data = await createUser({ name, email, password,Department, role });
       console.log("Submitting User data:", user_data);
       setname("");
       setemail("");
       setpassword("");
+      setDepartment("")
       setrole(roles[0]);
       alert("User Created!");
     }catch(error){
@@ -64,6 +66,16 @@ const Add_user = () => {
                   type="text"
                   value={email}
                   onChange={(e) => setemail(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </motion.div>
+              <motion.div className="mb-4" whileFocus={{ scale: 1.02 }}>
+                <label className="block text-gray-700 font-bold mb-2">Department:</label>
+                <input
+                  type="text"
+                  value={Department}
+                  onChange={(e) => setDepartment(e.target.value)}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />

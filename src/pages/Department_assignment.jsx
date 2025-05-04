@@ -352,9 +352,7 @@ const refreshDepartments = () => {
       console.error("Task error:", err.response?.data || err.message);
     }
   };
-    console.log(modal) 
-    console.log("selecteduserID:",selectedUserId) 
-    //console.log(tasks.map(task=>task._id))
+   
 
   // Components
   const StatsPanel = ({ department }) => (
@@ -407,7 +405,7 @@ const refreshDepartments = () => {
             <div key={task._id} className="p-3 bg-white rounded border border-gray-200">
 
                <div className='flex '>
-                {console.log("task",task.department)}
+                
                 <button
                       onClick={() => deleteTask(task._id)}
                       className="text-red-500 hover:text-red-700"
@@ -462,7 +460,7 @@ const refreshDepartments = () => {
                 </span>
               )}
             </div>
-            {console.log(user.name)}
+            
             {(department.headOfDepartment?.user._id === currentuser.userId || global_ADMIN_ROLES.includes(currentuser.role) )&& (
               <button
                 onClick={() =>removeUserFromDepartment(department._id,user._id)}
@@ -480,30 +478,38 @@ const refreshDepartments = () => {
   if (loading) return <div className="text-center py-8">Loading departments...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      {/* Header and Search */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Department Management</h1>
-        <div className="flex space-x-4">
-          {global_ADMIN_ROLES.includes(user.role)&&<div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search departments..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>}
-          {global_ADMIN_ROLES.includes(user.role)&&<button
-            onClick={() => openModal('addDept')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
-            disabled={modalLoading}
-          >
-            <FiPlus className="mr-2" /> Add Department
-          </button>}
-        </div>
+    <div className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-4xl xl:max-w-6xl mx-auto p-6 mt-10"
+      >
+            {/* Header and Search */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 flex-wrap mt-4 md:items-center">
+          <h1 className="text-2xl font-bold text-gray-800 sm:mb-0 mb-4">Department Management</h1>
+          
+          <div className="flex flex-col sm:flex-row sm:space-x-4 w-full sm:w-auto">
+            {global_ADMIN_ROLES.includes(user.role) && (
+              <div className="relative mb-4 sm:mb-0 w-full sm:w-auto">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search departments..."
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-72"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            )}
+            
+            {global_ADMIN_ROLES.includes(user.role) && (
+              <button
+                onClick={() => openModal('addDept')}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
+                disabled={modalLoading}
+              >
+                <FiPlus className="mr-2" /> Add Department
+              </button>
+            )}
+          </div>
       </div>
+
 
       {/* Departments List */}
       <div className="space-y-6">

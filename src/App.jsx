@@ -22,6 +22,10 @@ import InventoryManagement from "./pages/Inventorymanagement";
 import OrdersDashboard from "./components/Ordersmanagement";
 import UnauthorizedPage from "./pages/Unauthorized";
 import Landingpage from "./pages/landinpage/Resourcelanding" 
+import UserTasks from "./pages/Usertask";
+import Aboutus from "./pages/landinpage/Aboutus/main";
+import Layout from "./pages/landinpage/layout/Layout"
+
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -99,7 +103,11 @@ const App = () => {
           <AnimatePresence mode="wait">
             
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Landingpage/>}/>
+              <Route path="/" element={<Layout/>}>
+              
+                <Route index element={<Landingpage/>}/>
+                <Route path="/aboutus" element={<Aboutus/>}/>
+              </Route>
               <Route
                 path="/adminlogin"
                 element={
@@ -109,6 +117,18 @@ const App = () => {
                     </PageTransition>
                   ) : (
                     <Navigate to="/dashboard" />
+                  )
+                }
+              />
+               <Route
+                path="/usertasks"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <UserTasks />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
                   )
                 }
               />

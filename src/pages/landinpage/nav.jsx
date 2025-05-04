@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -12,8 +12,8 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { id: 1, text: "About us", href: "#About us" },
-    { id: 2, text: "Pricing", href: "#pricing" },
+    { id: 1, text: "About us", to:"/aboutus" },
+    { id: 2, text: "Pricing", to: "#pricing" },
   ];
 
   return (
@@ -22,19 +22,21 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex items-center">
+            <Link to={"/"}>
             <span className="text-xl font-bold text-gray-800">ResourceFlow</span>
+            </Link>
           </div>
 
           {/* Desktop Navigation (hidden on mobile) */}
           <div className="hidden md:flex items-center space-x-4">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.id}
-                href={link.href}
-                className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                to={link.to}
+                className=" cursor-pointer text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
               >
                 {link.text}
-              </a>
+              </Link>
             ))}
             <button className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">
               Get Started
@@ -75,15 +77,16 @@ const Navbar = () => {
             className="md:hidden bg-white border-t border-gray-200"
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {navLinks.map((link) => (
-                <a
-                  key={link.id}
-                  href={link.href}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-indigo-600 hover:bg-gray-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
+              {navLinks.map((item) => (
+                <Link
+                  key={item.id}
+                  to={item.to}
+                  className=" cursor-pointer block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-indigo-600  hover:bg-gray-50 "
+                 
+                
                 >
-                  {link.text}
-                </a>
+                  {item.text}
+                </Link>
               ))}
               <button className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-gray-800 hover:bg-indigo-700">
                 Get Started

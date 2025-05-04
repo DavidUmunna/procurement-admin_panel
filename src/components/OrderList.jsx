@@ -269,6 +269,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.3 }}
     >
+      
       <div className="p-3 bg-gray-50 rounded-lg">
           <p className="font-semibold text-gray-700">
             Current Status: <span className="ml-2">{getOverallStatus(order.Approvals)}</span>
@@ -358,6 +359,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      
       <div className="max-w-7xl mx-auto">
         <motion.div 
           className="mb-6"

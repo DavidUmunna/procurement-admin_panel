@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useUser } from "../components/usercontext";
 import { useEffect } from "react";
 import axios from "axios"
-
+import { admin_roles } from "../components/navBar";
 import CostDashboard from "./CostDashboard";
 
 
@@ -20,7 +20,7 @@ export const Dashboard=()=>{
     
     useEffect(()=>{
         const email=user?.email||"no email provided"
-        const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
+        //const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
         const fetchorder=async ()=>{ 
             if (!user || !user.email) return 
 
@@ -111,7 +111,7 @@ export const Dashboard=()=>{
    
 
     return(
-        <div className=" min-h-screen bg-gray-300 ">
+        <div className=" min-h-screen bg-gray-300  mt-14">
             
            
            
@@ -119,7 +119,7 @@ export const Dashboard=()=>{
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
             <UserDetails user={user}   rejectedOrders={rejectedOrders} request_amount={request_amount} approvedOrders={approvedOrders} pendingOrders={pendingOrders} />
-            <CostDashboard orders={orders}/>
+            {admin_roles.includes(user?.role)&&<CostDashboard orders={orders}/>}
             
         </div>
     )

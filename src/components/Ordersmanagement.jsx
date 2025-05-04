@@ -76,9 +76,10 @@ const OrdersDashboard = ({setAuth}) => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-4">
+    <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10">
       {/* Main Order List (takes 2/3 width on large screens) */}
       <div className="lg:w-2/3">
+        
         <OrderList 
           orders={paginated_orders} 
           selectedOrderId={selectedOrderId}
@@ -123,7 +124,7 @@ const OrdersDashboard = ({setAuth}) => {
               onOrderSelect={handleOrderSelect}
             />
           </div>
-          <div className='mt-4'>
+          <div className='mt-4 overflow-x-auto'>
             <CompletedOrdersList
             orders={orders}
             itemsPerPage={itemsperpage}/>

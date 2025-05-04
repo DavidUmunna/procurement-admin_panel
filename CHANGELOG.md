@@ -12,5 +12,17 @@ implement sign out
 -user definition after log in implemented
 
 
-##[16/0325]
+##[16/03/25]
 tried to implement user persistence after reftresh page but was not done
+
+
+##[03/05/25]
+-finish navbar enhancement ✅
+-implement task assessment ✅
+-begin implementing staff role ✅
+
+##[04/05/25]
+-finish up implementation of staff role ✅
+-about us page✅
+-pricing implementation
+-definethe scope of "get started" functionality 

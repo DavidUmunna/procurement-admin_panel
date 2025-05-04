@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiCalendar,  } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiMail, FiCalendar,  } from "react-icons/fi";
+import {FaSitemap} from "react-icons/fa"
 import { motion,  } from "framer-motion";
 import requestImg from "../components/assets/quote-request.avif";
 import userImg from "../components/assets/user.avif";
-
+import { admin_roles } from "../components/navBar";
 const UserDetails = ({ 
   user, 
   request_amount, 
@@ -126,7 +127,7 @@ const UserDetails = ({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4  sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* User Profile Card */}
@@ -169,10 +170,10 @@ const UserDetails = ({
                   <span className="text-gray-700">{user?.email || "No email provided"}</span>
                 </div>
                 
-                {user?.phone && (
+                {user?.Department && (
                   <div className="flex items-center space-x-3">
-                    <FiPhone className="text-gray-500 text-lg" />
-                    <span className="text-gray-700">{user.phone}</span>
+                    <FaSitemap className="text-gray-500 text-lg" />
+                    <span className="text-gray-700">{user.Department}</span>
                   </div>
                 )}
                 
@@ -203,7 +204,7 @@ const UserDetails = ({
                 <p className="text-3xl font-bold text-blue-600">{stats.totalRequests}</p>
               </motion.div>
               
-              <motion.div 
+              {admin_roles.includes(user?.role)&&(<><motion.div
                 whileHover={{ y: -5 }}
                 className="bg-white rounded-xl shadow-md p-6 text-center"
               >
@@ -212,20 +213,18 @@ const UserDetails = ({
                 </div>
                 <h3 className="mt-2 text-lg font-medium text-gray-700">Approval Rate</h3>
                 <p className="text-3xl font-bold text-green-600">{stats.approvalRate}%</p>
-              </motion.div>
-              
-              <motion.div 
+              </motion.div><motion.div
                 whileHover={{ y: -5 }}
                 className="bg-white rounded-xl shadow-md p-6 text-center"
               >
-                <div className="flex justify-center">
-                  <span className="h-12 w-12 flex items-center justify-center text-2xl">⏱️</span>
-                </div>
-                <h3 className="mt-2 text-lg font-medium text-gray-700">Avg. Processing</h3>
-                <p className="text-3xl font-bold text-purple-600">
-                  {stats.avgProcessingTime} {stats.avgProcessingTime === 1 ? "day" : "days"}
-                </p>
-              </motion.div>
+                  <div className="flex justify-center">
+                    <span className="h-12 w-12 flex items-center justify-center text-2xl">⏱️</span>
+                  </div>
+                  <h3 className="mt-2 text-lg font-medium text-gray-700">Avg. Processing</h3>
+                  <p className="text-3xl font-bold text-purple-600">
+                    {stats.avgProcessingTime} {stats.avgProcessingTime === 1 ? "day" : "days"}
+                  </p>
+                </motion.div></>)}
             </div>
 
             {/* Request Details */}
