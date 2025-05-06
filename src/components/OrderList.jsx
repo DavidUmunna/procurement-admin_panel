@@ -282,7 +282,8 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
         <div>
           <p className="text-gray-600"><span className="font-medium">Order Number:</span> {order.orderNumber || "N/A"}</p>
           <p className="text-gray-600"><span className="font-medium">Ordered By:</span> {order.orderedBy}</p>
-          <p className="text-gray-600"><span className="font-medium">User Email:</span> {order.email}</p>
+          <p className="text-gray-600"><span className="font-medium">Employee Email:</span> {order.email}</p>
+          <p className="text-gray-600"><span className="font-medium">Employee Department:</span> {order.Department}</p>
         </div>
         <div>
           <p className="text-gray-600"><span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
