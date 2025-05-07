@@ -1,13 +1,13 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
-const InventoryAnalytics = ({ inventoryItems }) => {
+const InventoryAnalytics = ({ AssetItems }) => {
   // Extract unique categories and calculate counts/quantities
-  const categories = [...new Set(inventoryItems.map(item => item.category))];
+  const categories = [...new Set(AssetItems.map(item => item.category))];
   
   const categoryData = categories.map(category => ({
     name: category,
-    itemCount: inventoryItems.filter(item => item.category === category).length,
-    totalQuantity: inventoryItems
+    itemCount: AssetItems.filter(item => item.category === category).length,
+    totalQuantity: AssetItems
       .filter(item => item.category === category)
       .reduce((sum, item) => sum + item.quantity, 0)
   }));
@@ -16,11 +16,11 @@ const InventoryAnalytics = ({ inventoryItems }) => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
   return (
-    <div className="mt-8 px-4 sm:px-6">
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className=" px-4 mb-5 sm:px-6">
+    <div className="grid grid-cols-1 lg:grid-cols-1 ">
       {/* Category Distribution Pie Chart */}
       <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-medium text-gray-800 mb-4">Inventory by Category</h3>
+        <h3 className="text-lg font-medium text-gray-800 mb-4">Assets by Category</h3>
         
         <div className="h-64 sm:h-72 md:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -63,7 +63,7 @@ const InventoryAnalytics = ({ inventoryItems }) => {
         </div>
   
         <p className="text-xs sm:text-sm text-gray-500 mt-3 text-center sm:text-left">
-          Showing distribution of {inventoryItems.length} items across {categories.length} categories
+          Showing distribution of {AssetItems.length} items across {categories.length} categories
         </p>
       </div>
       

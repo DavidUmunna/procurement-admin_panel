@@ -19,12 +19,12 @@ const CONDITION_COLORS = {
   Damaged: '#F44336'    // Red
 };
 
-const InventoryConditionChart = ({ inventoryItems }) => {
+const InventoryConditionChart = ({ AssetItems }) => {
   const [displayMode, setDisplayMode] = useState('quantity');
   const [activeIndex, setActiveIndex] = useState(null);
 
   // Process data - group by condition
-  const conditionData = inventoryItems.reduce((acc, item) => {
+  const conditionData = AssetItems.reduce((acc, item) => {
     if (!acc[item.condition]) {
       acc[item.condition] = {
         condition: item.condition,

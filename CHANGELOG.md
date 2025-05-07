@@ -25,4 +25,19 @@ tried to implement user persistence after reftresh page but was not done
 -finish up implementation of staff role ✅
 -about us page✅
 -pricing implementation
--definethe scope of "get started" functionality 
+-definethe scope of "get started" functionality ✅
+
+##request approval system
+-Department of users that make requests will be visible
+-conditional rendering  of requests based on role and department
+
+there are 2 to three people involved in approving a request
+-request is approved by department supervisor then it get to the department head and after that it gets to the HR who approves it finally and send it to the accounts department
+ 
+
+##inventory management  changes
+-whenever you want to make use of an item, it gets subtracted
+-and a record is generated showing the name of the item,date it was collected,quantity collected
+
+
+HR should see requests that were approved by the department heads and should be able to approve said requests and send them to the accounts department

@@ -18,13 +18,14 @@ import { ErrorBoundary } from 'react-error-boundary';
 import AddSupplier from "./pages/add_suppliers";
 import SupplierList from "./pages/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
-import InventoryManagement from "./pages/Inventorymanagement";
+import AssetsManagement from "./pages/Assetmanagement";
 import OrdersDashboard from "./components/Ordersmanagement";
 import UnauthorizedPage from "./pages/Unauthorized";
 import Landingpage from "./pages/landinpage/Resourcelanding" 
 import UserTasks from "./pages/Usertask";
 import Aboutus from "./pages/landinpage/Aboutus/main";
 import Layout from "./pages/landinpage/layout/Layout"
+import InventoryManagement from "./pages/inventorymanagement/Inventorymanagement";
 
 // Page transition animation
 const pageVariants = {
@@ -120,12 +121,24 @@ const App = () => {
                   )
                 }
               />
-               <Route
+              <Route
                 path="/usertasks"
                 element={
                   isauthenticated ? (
                     <PageTransition>
                       <UserTasks />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+              <Route
+                path="/inventorymanagement"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <InventoryManagement />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
@@ -217,11 +230,11 @@ const App = () => {
                 }
               />
               <Route
-                path="/inventorymanagement"
+                path="/assetsmanagement"
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                    <InventoryManagement setAuth={setisauthenticated} />
+                    <AssetsManagement setAuth={setisauthenticated} />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />
