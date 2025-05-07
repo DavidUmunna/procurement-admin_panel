@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../components/usercontext';
+import { useNavigate } from 'react-router';
 import axios from "axios";
 import RecentActivity from './recentactivity';
-
+import {Plus,Minus} from "lucide-react"
 
 const InventoryManagement = ({ setAuth }) => {
+  const navigate=useNavigate()
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
   const [formdata, setformdata] = useState({
-    itemname: '',
+    name: '',
     category: '',
     quantity: 1,
   });
@@ -18,7 +20,9 @@ const InventoryManagement = ({ setAuth }) => {
   const [loading, setLoading] = useState(true);
   
   const [showForm, setShowForm] = useState(false);
+  // eslint-disable-next-line
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
+  // eslint-disable-next-line
   const [expandedItem, setExpandedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -36,7 +40,7 @@ const InventoryManagement = ({ setAuth }) => {
             },
             withCredentials: true,
           }),
-          axios.get(`${API_URL}/assets/categories`, {
+          axios.get(`${API_URL}/inventory/categories`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -46,10 +50,15 @@ const InventoryManagement = ({ setAuth }) => {
         ]);
         
         setInventoryItems(inventoryRes.data.data);
-        setCategories(categoriesRes.data.data);
+        const newData = categoriesRes.data.data.categories;
+        console.log(newData)
+        setCategories(newData);
+
+        setTimeout(()=>console.log(categories),3000)
+        
         
         // Fetch recent activities
-        const activitiesRes = await axios.get(`${API_URL}/inventory/activities`, {
+        const activitiesRes = await axios.get(`${API_URL}/inventory`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -62,7 +71,7 @@ const InventoryManagement = ({ setAuth }) => {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
           localStorage.removeItem('authToken');
-          setAuth(false);
+          navigate("/logout")
           window.location.href = '/adminlogin'; 
         } else {
           console.error('Failed to fetch data:', err);
@@ -72,11 +81,11 @@ const InventoryManagement = ({ setAuth }) => {
       }
     };
     fetchData();
-  }, [setAuth]);
+  }, []);
 
   const resetForm = () => {
     setformdata({
-      itemname: '',
+      name: '',
       category: '',
       quantity: 1,
     });
@@ -86,13 +95,13 @@ const InventoryManagement = ({ setAuth }) => {
     try {
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      const res = await axios.put(`${API_URL}/inventory/${itemId}/add`, {
+      const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: 1,
         userId: user.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+      console.log("resp",res)
       setInventoryItems(inventoryItems.map(item => 
         item._id === itemId ? res.data.data : item
       ));
@@ -101,7 +110,7 @@ const InventoryManagement = ({ setAuth }) => {
       const updatedItem = inventoryItems.find(item => item._id === itemId);
       setActivities([{
         action: 'Added',
-        itemName: updatedItem.name,
+        name: updatedItem.name,
         quantity: 1,
         timestamp: new Date().toISOString(),
         user: user.name
@@ -116,13 +125,13 @@ const InventoryManagement = ({ setAuth }) => {
     try {
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      const res = await axios.put(`${API_URL}/inventory/${itemId}/remove`, {
-        quantity: 1,
+      const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
+        quantity: -1,
         userId: user.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+      console.log("resp",res)
       setInventoryItems(inventoryItems.map(item => 
         item._id === itemId ? res.data.data : item
       ));
@@ -131,7 +140,7 @@ const InventoryManagement = ({ setAuth }) => {
       const updatedItem = inventoryItems.find(item => item._id === itemId);
       setActivities([{
         action: 'Removed',
-        itemName: updatedItem.name,
+        name: updatedItem.name,
         quantity: 1,
         timestamp: new Date().toISOString(),
         user: user.name
@@ -155,7 +164,7 @@ const InventoryManagement = ({ setAuth }) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const token = localStorage.getItem('authToken');
-      const res = await axios.post(`${API_URL}/assets`, {
+      const res = await axios.post(`${API_URL}/inventory`, {
         ...formdata,
         addedBy: user.userId
       }, {
@@ -167,7 +176,7 @@ const InventoryManagement = ({ setAuth }) => {
       // Add to activities
       setActivities([{
         action: 'Added',
-        itemName: formdata.itemname,
+        name: formdata.name,
         quantity: formdata.quantity,
         timestamp: new Date().toISOString(),
         user: user.name
@@ -186,25 +195,29 @@ const InventoryManagement = ({ setAuth }) => {
       }
     }
   };
+  console.log(inventoryItems)
 
   const filteredItems = inventoryItems
-    .filter(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter(item => 
-      selectedCategory === 'All' || item.category === selectedCategory)
-    .sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    }));
+  ?.filter(item => {
+    const nameMatch = item?.name?.toLowerCase().includes(searchTerm?.toLowerCase() || '');
+    const descMatch = item?.description?.toLowerCase().includes(searchTerm?.toLowerCase() || '');
+    return nameMatch || descMatch;
+  })
+  .filter(item => {
+    return selectedCategory === 'All' || item?.category === selectedCategory;
+  })
+  .sort((a, b) => {
+    const aVal = a?.[sortConfig.key];
+    const bVal = b?.[sortConfig.key];
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 mt-20">
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Inventory Management (2/3 width) */}
         <div className="lg:w-2/3">
@@ -226,8 +239,8 @@ const InventoryManagement = ({ setAuth }) => {
                     <label className="block text-sm font-medium mb-1">Item Name</label>
                     <input
                       type="text"
-                      name="itemname"
-                      value={formdata.itemname}
+                      name="name"
+                      value={formdata.name}
                       onChange={handleInputChange}
                       className="w-full p-2 border rounded"
                       required
@@ -243,7 +256,7 @@ const InventoryManagement = ({ setAuth }) => {
                       required
                     >
                       <option value="">Select Category</option>
-                      {categories.map(category => (
+                      {categories?.map(category => (
                         <option key={category._id} value={category.name}>{category.name}</option>
                       ))}
                     </select>
@@ -262,7 +275,7 @@ const InventoryManagement = ({ setAuth }) => {
                   />
                 </div>
                 <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                  Add Item
+                  Add item
                 </button>
               </form>
             )}
@@ -281,7 +294,7 @@ const InventoryManagement = ({ setAuth }) => {
                 className="p-2 border rounded"
               >
                 <option value="All">All Categories</option>
-                {categories.map(category => (
+                {categories?.map(category => (
                   <option key={category._id} value={category.name}>{category.name}</option>
                 ))}
               </select>
@@ -323,14 +336,14 @@ const InventoryManagement = ({ setAuth }) => {
                               onClick={() => addQuantity(item._id)}
                               className="text-green-600 hover:text-green-900"
                             >
-                              + Add
+                              <Plus/>
                             </button>
                             <button 
                               onClick={() => removeQuantity(item._id)}
                               className="text-red-600 hover:text-red-900"
                               disabled={item.quantity <= 0}
                             >
-                              - Remove
+                              <Minus/>
                             </button>
                           </div>
                         </td>
