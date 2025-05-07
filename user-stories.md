@@ -12,3 +12,7 @@
 ##Pricing system 
 -monthly pricing should include hosting 
 -yearly pricing should be discounted
+
+##request approval system
+-Department of users that make requests will be visible ✅
+-
