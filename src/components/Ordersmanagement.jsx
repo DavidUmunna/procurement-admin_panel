@@ -4,7 +4,8 @@ import OrderList from './OrderList';
 import Duplicates from '../pages/Duplicates';
 import { getOrders,get_user_orders } from '../services/OrderService';
 import CompletedOrdersList from './Completed';
-const ADMIN_ROLES = ["admin", "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
+import { admin_roles } from './navBar';
+
 const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
   const [orders, setOrders] = useState([]);
@@ -21,7 +22,7 @@ const OrdersDashboard = ({setAuth}) => {
       setIsLoading(true);
       try {
         let data;
-        if (ADMIN_ROLES.includes(user?.role)) {
+        if (admin_roles.includes(user?.role)) {
           data = await getOrders();
         } else {
           const response = await get_user_orders(user?.email);
@@ -117,7 +118,7 @@ const OrdersDashboard = ({setAuth}) => {
       </div>
       
       {/* Duplicates Panel (takes 1/3 width on large screens) */}
-      <div className='"lg:w-1/3 mb-8"'> 
+      {admin_roles.includes(user?.role)&&<div className='"lg:w-1/3 mb-8"'> 
           <div >
             <Duplicates 
               orders={orders} 
@@ -129,7 +130,7 @@ const OrdersDashboard = ({setAuth}) => {
             orders={orders}
             itemsPerPage={itemsperpage}/>
           </div>
-      </div>
+      </div>}
       {error}
     </div>
   );
