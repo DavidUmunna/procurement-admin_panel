@@ -7,7 +7,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const {user}=useUser()
   const sidebar = [
     //{ name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
-    { name: "Inventory Management", to: "/inventorymanagement", icon: PlusSquare,visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
+    { name: "Assets Management", to: "/assetsmanagement", icon: PlusSquare,visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
     { name: "Add Supplier", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
     { name: "Supplier", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin'] },
    

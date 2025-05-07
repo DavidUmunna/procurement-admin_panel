@@ -1,18 +1,18 @@
 import React,{ useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp,  FiSearch } from 'react-icons/fi';
 import { useUser } from '../components/usercontext';
-import InventoryAnalytics from "../components/InventoryAnalytics";
-import InventoryConditionChart from './Inventoryvisuals';
+import Assetsanalysis from "../components/Assetsanalysis";
+import AssetsConditionChart from './Asssetvisuals';
 import axios from 'axios';
 
 
 const ADMIN_ROLES=['admin','global_admin','human_resources','internal_auditor']
-const InventoryManagement = ({setAuth}) => {
+const AssetManagement = ({setAuth}) => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
 
   // State
-  const [inventoryItems, setInventoryItems] = useState([]);
+  const [AssetItems, setAssetItems] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -34,28 +34,28 @@ const InventoryManagement = ({setAuth}) => {
   const [stats, setStats] = useState({});
   const [Error,setError]=useState("")
 
-  // Fetch inventory data
+  // Fetch Asset data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('authToken');
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
-        const [inventoryRes, statsRes, categoriesRes] = await Promise.all([
-          axios.get(`${API_URL}/inventory`, {
+        const [AssetRes, statsRes, categoriesRes] = await Promise.all([
+          axios.get(`${API_URL}/assets`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
-          axios.get(`${API_URL}/inventory/stats`, {
+          axios.get(`${API_URL}/assets/stats`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
-          axios.get(`${API_URL}/inventory/categories`, {
+          axios.get(`${API_URL}/assets/categories`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -64,7 +64,7 @@ const InventoryManagement = ({setAuth}) => {
           }),
         ]);
       
-        setInventoryItems(inventoryRes.data.data);
+        setAssetItems(AssetRes.data.data);
         setStats(statsRes.data.data);
         setCategories(categoriesRes.data.data);
       
@@ -86,7 +86,6 @@ const InventoryManagement = ({setAuth}) => {
 
 }, [setAuth]);
   console.log(categories)
-   
   const formatCategory = (category) => {
     const formatted = category
       .replace(/_/g, ' ') // Replace underscores with spaces
@@ -97,7 +96,7 @@ const InventoryManagement = ({setAuth}) => {
   };
 
   // Filter and sort
-  const filteredItems = inventoryItems
+  const filteredItems = AssetItems
     .filter(item => 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -120,7 +119,7 @@ const InventoryManagement = ({setAuth}) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'quantity' || name === 'value' ? parseInt(value) || 0 : value
+      [name]: name === 'quantity' || name === 'value' ? parseInt(value)  : value
     });
   };
   
@@ -133,14 +132,14 @@ const InventoryManagement = ({setAuth}) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.post(`${API_URL}/inventory`, {
+      const res = await axios.post(`${API_URL}/assets`, {
         ...formData,
         addedBy: user.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setInventoryItems([...inventoryItems, res.data.data]);
+      setAssetItems([...AssetItems, res.data.data]);
       resetForm();
       setShowForm(false);
     } catch (err) {
@@ -163,11 +162,11 @@ const InventoryManagement = ({setAuth}) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.put(`${API_URL}/inventory/${editingItem._id}`, formData, {
+      const res = await axios.put(`${API_URL}/assets/${editingItem._id}`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setInventoryItems(inventoryItems.map(item => 
+      setAssetItems(AssetItems.map(item => 
         item._id === editingItem._id ? res.data.data : item
       ));
       resetForm();
@@ -182,10 +181,10 @@ const InventoryManagement = ({setAuth}) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      await axios.delete(`${API_URL}/inventory/${id}`, {
+      await axios.delete(`${API_URL}/assets/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setInventoryItems(inventoryItems.filter(item => item._id !== id));
+      setAssetItems(AssetItems.filter(item => item._id !== id));
     } catch (err) {
       console.error('Delete failed:', err.response?.data || err.message);
     }
@@ -229,12 +228,12 @@ const InventoryManagement = ({setAuth}) => {
     setExpandedItem(expandedItem === id ? null : id);
   };
 
-  if (loading) return <div className="text-center py-8">Loading inventory...</div>;
+  if (loading) return <div className="text-center py-8">Loading Assets...</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm">
       {/* Header and Controls */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Inventory Management</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Asset Management</h1>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -242,7 +241,7 @@ const InventoryManagement = ({setAuth}) => {
             <FiSearch className="absolute left-3 top-3 text-gray-400" />
             <input
               type="text"
-              placeholder="Search inventory..."
+              placeholder="Search Assets..."
               className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -277,7 +276,7 @@ const InventoryManagement = ({setAuth}) => {
           className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105"
         >
           <FiPlus className="mr-2" />
-          Add Inventory Item
+          Add Asset Item
         </button>
       </div>
 
@@ -287,7 +286,7 @@ const InventoryManagement = ({setAuth}) => {
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300 animate-scaleIn">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {editingItem ? 'Edit Inventory Item' : 'Add New Inventory Item'}
+                {editingItem ? 'Edit Asset Item' : 'Add New Asset Item'}
               </h2>
               
               <button
@@ -429,7 +428,7 @@ const InventoryManagement = ({setAuth}) => {
         </div>
       )}
 
-      {/* Inventory Summary Cards */}
+      {/* Asset Summary Cards */}
       {stats&&(<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-sm font-medium text-gray-500">Total Items</h3>
@@ -451,7 +450,7 @@ const InventoryManagement = ({setAuth}) => {
         </div>
       </div>)}
 
-      {/* Inventory Table */}
+      {/* Assets Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
@@ -467,11 +466,11 @@ const InventoryManagement = ({setAuth}) => {
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200 ">
                   {filteredItems.length === 0 ? (
                     <tr>
                       <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                        No inventory items found
+                        No Assets items found
                       </td>
                     </tr>
                   ) : (
@@ -537,16 +536,16 @@ const InventoryManagement = ({setAuth}) => {
       </div>
 
       {/* Analytics */}
-      <div className='items-center flex justify-center'>
+      <div className='items-center flex justify-center '>
 
-        {ADMIN_ROLES.includes(user.role)&&(<div className=" mt-8  px-4 sm:px-6 lg:px-8">
-          <div className="h-64 mt-20 md:h-80 flex items-center justify-center bg-gray-50 rounded">
-            <InventoryAnalytics inventoryItems={inventoryItems} />
+        {ADMIN_ROLES.includes(user.role)&&(<div className=" mt-8 flex flex-wrap px-4 md:flex-nowrap   max-w-full">
+          <div className="h-50 mt-20 md:h-80 flex items-center justify-center bg-gray-50 rounded">
+            <Assetsanalysis AssetItems={AssetItems} />
           </div>
           
-          <div className="bg-white p-6 mt-25 rounded-lg shadow-sm bordermt-10 border-gray-200">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <InventoryConditionChart inventoryItems={inventoryItems} />
+          <div className="bg-white h-50  mt-25 rounded-lg  bordermt-10 border-gray-200">
+            <div className="grid grid-cols-1 lg:grid-cols-1">
+              <AssetsConditionChart AssetItems={AssetItems} />
             </div>
           </div>
         </div>)}
@@ -556,4 +555,4 @@ const InventoryManagement = ({setAuth}) => {
   );
 };
 
-export default InventoryManagement;
+export default AssetManagement; 
