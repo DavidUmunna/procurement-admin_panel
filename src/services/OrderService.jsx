@@ -1,17 +1,17 @@
 import axios from "axios";
-//const circuitBreaker=require("opossum")
-
 const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 
 const orders="orders"
 
 
 
-export const getOrders = async () => {
+export const getOrders = async (page , limit ) => {
   try {
     const token=localStorage.getItem("authToken")
   
-    const response = await axios.get(`${API_URL}/${orders}`,{headers:{Authorization:`Bearer ${token}`, 
+    const response = await axios.get(`${API_URL}/${orders}`,{
+      params: { page, limit },
+    headers:{Authorization:`Bearer ${token}`, 
       "ngrok-skip-browser-warning": "true"},
       withCredential:true});
     console.log("response",response)

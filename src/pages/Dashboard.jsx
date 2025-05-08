@@ -17,6 +17,7 @@ export const Dashboard=()=>{
     const [approvedOrders, setApprovedOrders] = useState([]);
     const [pendingOrders, setPendingOrders] = useState([]);
     const [rejectedOrders, setRejectedOrders] = useState([]);
+    const [completedOrders, setcompletedOrders] = useState([]);
     
     useEffect(()=>{
         const email=user?.email||"no email provided"
@@ -27,12 +28,12 @@ export const Dashboard=()=>{
             try{
                   const API_URL = `${process.env.REACT_APP_API_URL}/api`
                   const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get(`${API_URL}/orders`,{headers:{Authorization:`Bearer ${token}`, 
+                  const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
-                  
-                  if (Array.isArray(userReq.data||[])){
-                    const orders=userReq.data
+                  console.log(userReq.data.response)
+                  if (Array.isArray(userReq.data.response||[])){
+                    const orders=userReq.data.response
                     
                     setRequest(orders)
                     setorders(orders)
@@ -42,6 +43,7 @@ export const Dashboard=()=>{
                     setApprovedOrders(orders.filter((order) => order.status === "Approved"));
                     setPendingOrders(orders.filter((order) => order.status === "Pending"));
                     setRejectedOrders(orders.filter((order) => order.status === "Rejected"));
+                    setcompletedOrders(orders.filter((order) => order.status === "Completed"));
                    
                     //console.log("number approved",Approved)
                  }else{
@@ -64,9 +66,9 @@ export const Dashboard=()=>{
                   const userReq=await axios.get(`${API_URL}/orders/${email}`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
-                  
-                  if (Array.isArray(userReq.data||[])){
-                    const orders=userReq.data
+                  console.log(userReq)
+                  if (Array.isArray(userReq.response||[])){
+                    const orders=userReq.data.response
                     console.log("orders",orders)
                     setorders(orders)
                     
@@ -75,6 +77,7 @@ export const Dashboard=()=>{
                     setApprovedOrders(orders.filter((order) => order.status === "Approved"));
                     setPendingOrders(orders.filter((order) => order.status === "Pending"));
                     setRejectedOrders(orders.filter((order) => order.status === "Rejected"));
+                    setcompletedOrders(orders.filter((order) => order.status === "Completed"));
                     //console.log("number approved",Approved)
                  }else{
                     console.error("invalid data format")
@@ -114,7 +117,9 @@ export const Dashboard=()=>{
              
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
-            <UserDetails user={user}   rejectedOrders={rejectedOrders} request_amount={request_amount} approvedOrders={approvedOrders} pendingOrders={pendingOrders} />
+            <UserDetails user={user}   rejectedOrders={rejectedOrders} request_amount={request_amount} 
+            approvedOrders={approvedOrders} pendingOrders={pendingOrders} completedOrders={completedOrders}
+             />
             {admin_roles.includes(user?.role)&&<CostDashboard orders={orders}/>}
             
         </div>

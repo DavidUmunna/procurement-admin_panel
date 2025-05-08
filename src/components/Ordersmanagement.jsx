@@ -5,6 +5,8 @@ import Duplicates from '../pages/Duplicates';
 import { getOrders,get_user_orders } from '../services/OrderService';
 import CompletedOrdersList from './Completed';
 import { admin_roles } from './navBar';
+import axios from 'axios';
+import PaginationControls from "../pages/inventorymanagement/Paginationcontrols";
 
 const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
@@ -14,23 +16,43 @@ const OrdersDashboard = ({setAuth}) => {
   const [error, setError] = useState(null);
   const itemsperpage=7
   const [currentpage,setcurrentpage]=useState(1)
-
+  const [Data, setData] = useState({
+    orders: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0
+    }
+  });
   const startIndex=(currentpage-1)*itemsperpage
   const endIndex=startIndex+itemsperpage
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        let data;
-        if (admin_roles.includes(user?.role)) {
-          data = await getOrders();
-        } else {
-          const response = await get_user_orders(user?.email);
-          data = response.orders;
-        }
+  const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit) => {
+    setIsLoading(true);
+    try {
         
-        if (Array.isArray(data)) {
-          setOrders(data.reverse());
+        let response;
+        const token=localStorage.getItem("authToken")
+        const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+        if (admin_roles.includes(user?.role)) {
+          const res = await axios.get(`${API_URL}/orders`,{
+            params: { page, limit },
+          headers:{Authorization:`Bearer ${token}`, 
+            "ngrok-skip-browser-warning": "true"},
+            withCredential:true});
+            response=res.data.data
+          
+        
+          setData({
+            orders: response,
+            pagination: res.data.Pagination
+          });
+        } else {
+          const res = await get_user_orders(user?.email);
+          response = res.orders;
+        }
+        console.log(response)
+        if (Array.isArray(response)) {
+          setOrders(response.reverse());
         } else {
           throw new Error("Invalid data format");
         }
@@ -41,24 +63,25 @@ const OrdersDashboard = ({setAuth}) => {
           setAuth(false)
           window.location.href = '/adminlogin'; 
         }else{
-
+          
           console.error(err);
           setError("Failed to load orders. Please try again later.");
         }
-  
+        
         // Redirect to login page
       } finally {
         setIsLoading(false);
       }
     };
+  useEffect(() => {
     
     if (user?.email) {
       fetchData();
     }
   }, [user?.email, user?.role,setAuth]);
 
-  const paginated_orders=orders.slice(startIndex,endIndex)
-  const totalPages = Math.ceil(orders.length / itemsperpage);
+  //const paginated_orders=orders.slice(startIndex,endIndex)
+  //const totalPages = Math.ceil(orders.length / itemsperpage);
   const handleOrderSelect = (orderId) => {
     setSelectedOrderId(orderId);
     // Optional: Scroll to the selected order
@@ -67,6 +90,14 @@ const OrdersDashboard = ({setAuth}) => {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
+  const handlePageChange = (newPage) => {
+    fetchData(newPage, Data.pagination?.limit);
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    fetchData(1, newLimit); // Reset to page 1 when changing limit
+  };
+  console.log(Data.pagination)
 
   if (isLoading) {
     return <div className='flex justify-center  items-center h-screen'>
@@ -82,11 +113,23 @@ const OrdersDashboard = ({setAuth}) => {
       <div className="lg:w-2/3">
         
         <OrderList 
-          orders={paginated_orders} 
+          orders={orders} 
           selectedOrderId={selectedOrderId}
           setOrders={setOrders}
         />
-        <div className="flex items-center justify-center space-x-4">
+         <div>
+              {/* Your data display */}
+              <PaginationControls
+                currentPage={Data.pagination?.page}
+                totalPages={Data.pagination?.totalPages}
+                itemsPerPage={Data.pagination?.limit}
+                totalItems={Data.pagination?.total}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                isLoading={isLoading}
+              />
+            </div>
+        {/*<div className="flex items-center justify-center space-x-4">
               <button
                 className={`px-4 py-2 rounded text-white transition ${
                   currentpage === 1
@@ -114,7 +157,7 @@ const OrdersDashboard = ({setAuth}) => {
               >
                 Next ▶
               </button>
-        </div>
+        </div>*/}
       </div>
       
       {/* Duplicates Panel (takes 1/3 width on large screens) */}

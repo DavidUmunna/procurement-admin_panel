@@ -10,7 +10,8 @@ const UserDetails = ({
   request_amount, 
   approvedOrders = [], 
   rejectedOrders = [], 
-  pendingOrders = [] 
+  pendingOrders = [],
+  completedOrders=[]
 }) => {
   const [expandedSections, setExpandedSections] = useState({
     approved: false,
@@ -85,7 +86,13 @@ const UserDetails = ({
       color: "bg-red-400",
       icon: "❌",
       title: "Rejected Requests"
+    },
+    completed:{
+      color:"bg-blue-400",
+      icon:"🔵",
+      title:"Completed Requests"
     }
+
   };
 
   const renderOrderList = (orders, type) => (
@@ -244,7 +251,8 @@ const UserDetails = ({
                 {/* Request Status Sections */}
                 {Object.entries(statusConfig).map(([type, config]) => {
                   const orders = type === "approved" ? approvedOrders : 
-                                 type === "pending" ? pendingOrders : rejectedOrders;
+                                 type === "pending" ? pendingOrders :
+                                 type==="completed"? completedOrders: rejectedOrders;
                   return (
                     <div key={type} className="mb-6 last:mb-0">
                       <motion.button

@@ -58,10 +58,16 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
             <div key={index} className="border-b pb-2 last:border-b-0">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-medium">{activity.action} {activity.itemName}</p>
+                  <p className="font-medium">{activity.action} {activity.itemName} </p>
                   <p className="text-sm text-gray-500">
                     {new Date(activity.timestamp).toLocaleString()}
                   </p>
+                  <div className="flex">
+                      
+                      <p className="text-sm text-gray-500">
+                        {activity.category}
+                      </p>
+                  </div>
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ${
                   activity.action === 'Added' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'

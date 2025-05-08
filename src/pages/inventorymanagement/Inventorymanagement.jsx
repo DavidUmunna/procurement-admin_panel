@@ -5,7 +5,7 @@ import { useUser } from '../../components/usercontext';
 import { useNavigate } from 'react-router';
 import axios from "axios";
 import RecentActivity from './recentactivity';
-import { Plus, Minus } from "lucide-react"
+import { Plus, Minus,Trash2 } from "lucide-react"
 
 const InventoryManagement = ({ setAuth , onInventoryChange }) => {
   const navigate = useNavigate();
@@ -241,8 +241,37 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
         ...prev,
         [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
       }));
+    }finally{
+      setLoading(false)
     }
   };
+  const DeleteItem=async(itemId)=>{
+    try{
+      setLoading(true)
+      const token = localStorage.getItem('authToken');
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+      const response=await axios.delete(`${API_URL}/inventory/${itemId}`,{
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      setInventoryItems(prevItems => 
+        prevItems.map(item => 
+          item._id === itemId ? { ...item, quantity: response.data.data.quantity } : item
+        )
+      );
+
+
+
+    }catch(error){
+      console.error('Failed to Delete item:', error);
+      
+      setEditingQuantities(prev => ({
+        ...prev,
+        [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
+      }));
+
+    }
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -452,6 +481,14 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
                               title="Remove one"
                             >
                               <Minus size={18}/>
+                            </button>
+                            <button 
+                              onClick={() => DeleteItem(item._id)}
+                              className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"
+                             
+                              title="Delete"
+                            >
+                              <Trash2 size={18}/>
                             </button>
                           </div>
                         </td>

@@ -42,9 +42,9 @@ const PaginationControls = ({
   
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 ">
           Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-          {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+          {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} pages
         </div>
         
         <div className="flex items-center gap-2">
@@ -101,8 +101,8 @@ const PaginationControls = ({
           </button>
         </div>
         
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Items per page:</span>
+        <div className="flex items-center gap-2 ">
+          <span className="text-sm md:hidden">Items per page:</span>
           <select
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}

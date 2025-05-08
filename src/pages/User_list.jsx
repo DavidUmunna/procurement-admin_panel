@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { get_users, deleteUser } from "../services/userService";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
 // Animation Variants
 const containerVariants = {
@@ -28,9 +29,11 @@ const departmentColors = {
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [departments,setdepartments]=useState([])
 
   useEffect(() => {
     fetch_users();
+    getDepartment();
   }, []);
 
   const fetch_users = async () => {
@@ -45,6 +48,23 @@ export default function UserList() {
       console.error(err);
     }
   };
+  const getDepartment=async()=>{
+    try{
+      const token = localStorage.getItem('authToken');
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+      const department_data=await axios.get(`${API_URL}/department`,{
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      setdepartments(department_data.data.data)
+
+
+    }catch(error){
+      console.log(error)
+      
+
+    }
+  }
 
   const handleDelete = async (userId) => {
     await deleteUser(userId);
@@ -55,7 +75,7 @@ export default function UserList() {
     ? users 
     : users.filter(user => user.department === filter);
 
-  const departments = [...new Set(users.map(user => user.department))];
+  
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10">
@@ -79,7 +99,7 @@ export default function UserList() {
               >
                 <option value="all">All Departments</option>
                 {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
+                  <option key={dept._id} >{dept.name}</option>
                 ))}
               </select>
             </div>
