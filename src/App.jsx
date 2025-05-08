@@ -25,7 +25,7 @@ import Landingpage from "./pages/landinpage/Resourcelanding"
 import UserTasks from "./pages/Usertask";
 import Aboutus from "./pages/landinpage/Aboutus/main";
 import Layout from "./pages/landinpage/layout/Layout"
-import InventoryManagement from "./pages/inventorymanagement/Inventorymanagement";
+import InventoryManagement from "./pages/inventorymanagement/ParentComp";
 
 // Page transition animation
 const pageVariants = {

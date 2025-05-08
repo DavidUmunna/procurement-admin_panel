@@ -205,26 +205,22 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation */}
       <motion.div
-        className="fixed bottom-0 left-0 w-full bg-gray-800 p-2 flex justify-around sm:justify-between md:hidden lg:justify-between z-10 border-t border-gray-700"
+        className="fixed bottom-0 w-full  bg-gray-800 p-2 flex  justify-around items-center border-t border-gray-700 z-50 md:hidden "
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex justify-center sm:w-full md:max-w-lg">
-          {filteredNav.map((item) => (
-            <button
-              key={item.name}
-              className="w-full sm:w-auto text-left rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                navigate(item.to);
-              }}
-            >
-              <item.icon className="h-8 w-8 mx-6" />
-            </button>
-          ))}
-        </div>
+        {filteredNav.map((item) => (
+          <button
+            key={item.name}
+            className="flex flex-col items-center justify-center p-2 rounded-full hover:bg-gray-700 transition-colors duration-200"
+            onClick={() => navigate(item.to)}
+          >
+            <item.icon className="h-6 w-6 text-gray-300 hover:text-white" />
+            <span className="text-xs mt-1 text-gray-300">{item.name}</span>
+          </button>
+        ))}
       </motion.div>
-
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </>

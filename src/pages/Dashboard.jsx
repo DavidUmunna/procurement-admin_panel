@@ -30,10 +30,10 @@ export const Dashboard=()=>{
                   const userReq=await axios.get(`${API_URL}/orders`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
-                  console.log("user orders for count:",userReq)
+                  
                   if (Array.isArray(userReq.data||[])){
                     const orders=userReq.data
-                    console.log("orders",orders)
+                    
                     setRequest(orders)
                     setorders(orders)
                     
@@ -64,7 +64,7 @@ export const Dashboard=()=>{
                   const userReq=await axios.get(`${API_URL}/orders/${email}`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
-                  console.log("user orders for count:",userReq)
+                  
                   if (Array.isArray(userReq.data||[])){
                     const orders=userReq.data
                     console.log("orders",orders)
@@ -97,11 +97,7 @@ export const Dashboard=()=>{
     },[user?.role,user])
    
 
-    
-    console.log(user)
-    console.log("user orders",orders)
-    console.log(approvedOrders)
-    console.log(pendingOrders)
+   
     const request_length=(request)=>{
         return Array.isArray(request) ? request.length : 0;
     }

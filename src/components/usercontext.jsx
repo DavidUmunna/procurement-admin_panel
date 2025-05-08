@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
     useEffect(()=>{
         sessionStorage.setItem("user",JSON.stringify(user))
     },[user])
-    console.log("user",user)
+    
     return (
         <UserContext.Provider value={{ user, setUser }}>
             {children}

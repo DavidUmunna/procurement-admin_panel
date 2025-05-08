@@ -1,13 +1,23 @@
+/*eslint-disable react-hooks/exhaustive-deps */
+/*eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../components/usercontext';
 import { useNavigate } from 'react-router';
 import axios from "axios";
 import RecentActivity from './recentactivity';
-import {Plus,Minus} from "lucide-react"
+import { Plus, Minus } from "lucide-react"
 
-const InventoryManagement = ({ setAuth }) => {
-  const navigate=useNavigate()
+const InventoryManagement = ({ setAuth , onInventoryChange }) => {
+  const navigate = useNavigate();
   const { user } = useUser();
+  const [data, setData] = useState({
+    activities: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0
+    }
+  });
   const [categories, setCategories] = useState([]);
   const [formdata, setformdata] = useState({
     name: '',
@@ -15,20 +25,20 @@ const InventoryManagement = ({ setAuth }) => {
     quantity: 1,
   });
   const [inventoryItems, setInventoryItems] = useState([]);
-  const [activities, setActivities] = useState([]);
+  const [Activities, setActivities] = useState([]);
   const [Error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   
   const [showForm, setShowForm] = useState(false);
-  // eslint-disable-next-line
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
-  // eslint-disable-next-line
   const [expandedItem, setExpandedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [editingQuantities, setEditingQuantities] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
+
       try {
         const token = localStorage.getItem('authToken');
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
@@ -50,28 +60,35 @@ const InventoryManagement = ({ setAuth }) => {
         ]);
         
         setInventoryItems(inventoryRes.data.data);
-        const newData = categoriesRes.data.data.categories;
-        console.log(newData)
-        setCategories(newData);
-
-        setTimeout(()=>console.log(categories),3000)
+        setCategories(categoriesRes.data.data.categories || []);
         
+        //console.log(categoriesRes.data.data.categories)
+        console.log(categories)
+        // Initialize editing quantities
+        const initialEditingQuantities = {};
+        inventoryRes.data.data.forEach(item => {
+          initialEditingQuantities[item._id] = item.quantity;
+        });
+        setEditingQuantities(initialEditingQuantities);
         
         // Fetch recent activities
-        const activitiesRes = await axios.get(`${API_URL}/inventory`, {
+        const activitiesRes = await axios.get(`${API_URL}/inventory/activities`, {params: {
+          page: 2,
+          limit: 15
+        },
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
           },
           withCredentials: true,
-        });
-        setActivities(activitiesRes.data.data);
+        })
+        setActivities(activitiesRes.data.data || []);
         
       } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
           localStorage.removeItem('authToken');
-          navigate("/logout")
+          navigate("/logout");
           window.location.href = '/adminlogin'; 
         } else {
           console.error('Failed to fetch data:', err);
@@ -81,7 +98,7 @@ const InventoryManagement = ({ setAuth }) => {
       }
     };
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const resetForm = () => {
     setformdata({
@@ -91,63 +108,139 @@ const InventoryManagement = ({ setAuth }) => {
     });
   };
 
+  const handleQuantityInputChange = (itemId, value) => {
+    setEditingQuantities({
+      ...editingQuantities,
+      [itemId]: parseInt(value) 
+    });
+  };
+
+  const updateQuantity = async (itemId) => {
+    try {
+      const currentQuantity = inventoryItems.find(item => item._id === itemId)?.quantity || 0;
+      const newQuantity = editingQuantities[itemId] || 0;
+      const quantityDifference = newQuantity - currentQuantity;
+
+      if (quantityDifference === 0) return;
+
+      const token = localStorage.getItem('authToken');
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+      const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
+        quantity: quantityDifference,
+        userId: user?.userId
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setInventoryItems(inventoryItems.map(item => 
+        item._id === itemId ? res.data.data : item
+      ));
+      
+      // Add to activities
+      const updatedItem = inventoryItems.find(item => item._id === itemId);
+      setActivities([{
+        action: quantityDifference > 0 ? 'Added' : 'Removed',
+        name: updatedItem?.name,
+        quantity: Math.abs(quantityDifference),
+        timestamp: new Date().toISOString(),
+        user: user?.name || 'Unknown'
+      }, ...Activities]);
+      
+    } catch (err) {
+      console.error('Failed to update quantity:', err);
+      // Revert to original quantity in UI if update fails
+      setEditingQuantities({
+        ...editingQuantities,
+        [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
+      });
+    }
+  };
+
   const addQuantity = async (itemId) => {
     try {
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: 1,
-        userId: user.userId
+        userId: user?.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log("resp",res)
-      setInventoryItems(inventoryItems.map(item => 
-        item._id === itemId ? res.data.data : item
-      ));
+      
+      // Update both inventoryItems and editingQuantities
+      setInventoryItems(prevItems => 
+        prevItems.map(item => 
+          item._id === itemId ? { ...item, quantity: res.data.data.quantity } : item
+        )
+      );
+      
+      setEditingQuantities(prev => ({
+        ...prev,
+        [itemId]: res.data.data.quantity
+      }));
       
       // Add to activities
       const updatedItem = inventoryItems.find(item => item._id === itemId);
       setActivities([{
         action: 'Added',
-        name: updatedItem.name,
+        name: updatedItem?.name,
         quantity: 1,
         timestamp: new Date().toISOString(),
-        user: user.name
-      }, ...activities]);
+        user: user?.name || 'Unknown'
+      }, ...Activities]);
+      onInventoryChange()
       
     } catch (err) {
       console.error('Failed to add quantity:', err);
+      // Revert to original quantity in UI if update fails
+      setEditingQuantities(prev => ({
+        ...prev,
+        [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
+      }));
     }
   };
-
+  
   const removeQuantity = async (itemId) => {
     try {
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: -1,
-        userId: user.userId
+        userId: user?.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log("resp",res)
-      setInventoryItems(inventoryItems.map(item => 
-        item._id === itemId ? res.data.data : item
-      ));
+      
+      // Update both inventoryItems and editingQuantities
+      setInventoryItems(prevItems => 
+        prevItems.map(item => 
+          item._id === itemId ? { ...item, quantity: res.data.data.quantity } : item
+        )
+      );
+      
+      setEditingQuantities(prev => ({
+        ...prev,
+        [itemId]: res.data.data.quantity
+      }));
       
       // Add to activities
       const updatedItem = inventoryItems.find(item => item._id === itemId);
       setActivities([{
         action: 'Removed',
-        name: updatedItem.name,
+        name: updatedItem?.name,
         quantity: 1,
         timestamp: new Date().toISOString(),
-        user: user.name
-      }, ...activities]);
+        user: user?.name || 'Unknown'
+      }, ...Activities]);
+      onInventoryChange()
       
     } catch (err) {
       console.error('Failed to remove quantity:', err);
+      // Revert to original quantity in UI if update fails
+      setEditingQuantities(prev => ({
+        ...prev,
+        [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
+      }));
     }
   };
 
@@ -155,7 +248,7 @@ const InventoryManagement = ({ setAuth }) => {
     const { name, value } = e.target;
     setformdata({
       ...formdata,
-      [name]: name === 'quantity' ? parseInt(value) : value
+      [name]: name === 'quantity' ? parseInt(value)  : value
     });
   };
 
@@ -166,12 +259,16 @@ const InventoryManagement = ({ setAuth }) => {
       const token = localStorage.getItem('authToken');
       const res = await axios.post(`${API_URL}/inventory`, {
         ...formdata,
-        addedBy: user.userId
+        addedBy: user?.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setInventoryItems([...inventoryItems, res.data.data]);
+      setInventoryItems([res.data.data, ...inventoryItems]);
+      setEditingQuantities({
+        ...editingQuantities,
+        [res.data.data._id]: res.data.data.quantity
+      });
       
       // Add to activities
       setActivities([{
@@ -179,47 +276,46 @@ const InventoryManagement = ({ setAuth }) => {
         name: formdata.name,
         quantity: formdata.quantity,
         timestamp: new Date().toISOString(),
-        user: user.name
-      }, ...activities]);
+        user: user?.name || 'Unknown'
+      }, ...Activities]);
       
       resetForm();
       setShowForm(false);
+      onInventoryChange()
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         setError("Session expired. Please log in again.");
         localStorage.removeItem('authToken');
         setAuth(false);
-        window.location.href = '/adminlogin'; 
+          window.location.href = '/adminlogin'; 
       } else {
         console.error('Create failed:', err.response?.data || err.message);
       }
     }
   };
-  console.log(inventoryItems)
 
   const filteredItems = inventoryItems
-  ?.filter(item => {
-    const nameMatch = item?.name?.toLowerCase().includes(searchTerm?.toLowerCase() || '');
-    const descMatch = item?.description?.toLowerCase().includes(searchTerm?.toLowerCase() || '');
-    return nameMatch || descMatch;
-  })
-  .filter(item => {
-    return selectedCategory === 'All' || item?.category === selectedCategory;
-  })
-  .sort((a, b) => {
-    const aVal = a?.[sortConfig.key];
-    const bVal = b?.[sortConfig.key];
+    .filter(item => {
+      const nameMatch = item?.name?.toLowerCase().includes(searchTerm?.toLowerCase() || '');
+      const descMatch = item?.description?.toLowerCase().includes(searchTerm?.toLowerCase() || '');
+      return nameMatch || descMatch;
+    })
+    .filter(item => {
+      return selectedCategory === 'All' || item?.category === selectedCategory;
+    })
+    .sort((a, b) => {
+      const aVal = a?.[sortConfig.key];
+      const bVal = b?.[sortConfig.key];
 
-    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-    return 0;
-  });
-
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   return (
-    <div className="container mx-auto p-4 mt-20">
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Inventory Management (2/3 width) */}
+    
+     
+       
         <div className="lg:w-2/3">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-6">
@@ -256,7 +352,7 @@ const InventoryManagement = ({ setAuth }) => {
                       required
                     >
                       <option value="">Select Category</option>
-                      {categories?.map(category => (
+                      {categories.map(category => (
                         <option key={category._id} value={category.name}>{category.name}</option>
                       ))}
                     </select>
@@ -294,7 +390,7 @@ const InventoryManagement = ({ setAuth }) => {
                 className="p-2 border rounded"
               >
                 <option value="All">All Categories</option>
-                {categories?.map(category => (
+                {categories.map(category => (
                   <option key={category._id} value={category.name}>{category.name}</option>
                 ))}
               </select>
@@ -328,22 +424,34 @@ const InventoryManagement = ({ setAuth }) => {
                           {item.category}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {item.quantity}
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min="0"
+                              value={editingQuantities[item._id] || 0}
+                              onChange={(e) => handleQuantityInputChange(item._id, e.target.value)}
+                              onBlur={() => updateQuantity(item._id)}
+                              onKeyPress={(e) => e.key === 'Enter' && updateQuantity(item._id)}
+                              className="w-20 p-1 border rounded text-center"
+                            />
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex gap-2">
                             <button 
                               onClick={() => addQuantity(item._id)}
-                              className="text-green-600 hover:text-green-900"
+                              className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-100"
+                              title="Add one"
                             >
-                              <Plus/>
+                              <Plus size={18}/>
                             </button>
                             <button 
                               onClick={() => removeQuantity(item._id)}
-                              className="text-red-600 hover:text-red-900"
+                              className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"
                               disabled={item.quantity <= 0}
+                              title="Remove one"
                             >
-                              <Minus/>
+                              <Minus size={18}/>
                             </button>
                           </div>
                         </td>
@@ -354,15 +462,12 @@ const InventoryManagement = ({ setAuth }) => {
               </div>
             )}
           </div>
-          {Error}
+          {Error && <div className="text-red-500 mt-2">{Error}</div>}
         </div>
 
-        {/* Recent Activity (1/3 width) */}
-        <div className="lg:w-1/3">
-          <RecentActivity activities={activities} />
-        </div>
-      </div>
-    </div>
+       
+      
+    
   );
 };
 
