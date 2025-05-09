@@ -31,19 +31,19 @@ export const Dashboard=()=>{
                   const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
-                  console.log(userReq.data.response)
-                  if (Array.isArray(userReq.data.response||[])){
-                    const orders=userReq.data.response
+                  console.log(userReq.data.data)
+                  if (Array.isArray(userReq.data.data||[])){
+                    const orders=userReq.data.data  
                     
                     setRequest(orders)
                     setorders(orders)
                     
                     
                    
-                    setApprovedOrders(orders.filter((order) => order.status === "Approved"));
-                    setPendingOrders(orders.filter((order) => order.status === "Pending"));
-                    setRejectedOrders(orders.filter((order) => order.status === "Rejected"));
-                    setcompletedOrders(orders.filter((order) => order.status === "Completed"));
+                    setApprovedOrders(orders?.filter((order) => order.status === "Approved"));
+                    setPendingOrders(orders?.filter((order) => order.status === "Pending"));
+                    setRejectedOrders(orders?.filter((order) => order.status === "Rejected"));
+                    setcompletedOrders(orders?.filter((order) => order.status === "Completed"));
                    
                     //console.log("number approved",Approved)
                  }else{

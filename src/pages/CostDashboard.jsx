@@ -51,7 +51,7 @@ function CostDashboard({ orders }) {
     let totalOrders = 0;
     let totalCost = 0;
 
-    orders.forEach(order => {
+    orders?.forEach(order => {
       const orderDate = new Date(order.createdAt);
       if (orderDate < cutoffDate) return;
 
@@ -89,7 +89,7 @@ function CostDashboard({ orders }) {
     const avgCost = totalOrders > 0 ? totalCost / totalOrders : 0;
     let highest = { month: '', total: 0 };
     
-    dataArray.forEach(item => {
+    dataArray?.forEach(item => {
       if (item.total > highest.total) {
         highest = { month: item.month, total: item.total };
       }
@@ -134,7 +134,7 @@ function CostDashboard({ orders }) {
                 className="absolute right-0 mt-2 w-64 bg-white p-3 rounded-lg shadow-lg border border-gray-200 z-10"
               >
                 <p className="text-sm text-gray-700">
-                  This chart shows total procurement costs by month. Hover over bars to see details.
+                  This chart shows total Requests costs by month. Hover over bars to see details.
                   {highestMonth.month && (
                     <>
                       <br /><br />

@@ -44,7 +44,7 @@ const PaginationControls = ({
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
         <div className="text-sm text-gray-600 ">
           Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-          {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} pages
+          {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} items
         </div>
         
         <div className="flex items-center gap-2">

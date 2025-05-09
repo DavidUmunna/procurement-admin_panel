@@ -8,8 +8,8 @@ export default function Sidebar({ isOpen, onClose }) {
   const sidebar = [
     //{ name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
     { name: "Assets Management", to: "/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
-    { name: "Add Supplier", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
-    { name: "Supplier", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin'] },
+    { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
+    { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin'] },
     { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
     { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin","PVT"] }
   ];

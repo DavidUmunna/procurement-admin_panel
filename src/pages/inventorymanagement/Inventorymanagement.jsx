@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 import axios from "axios";
 import RecentActivity from './recentactivity';
 import { Plus, Minus,Trash2 } from "lucide-react"
+import PaginationControls from './Paginationcontrols';
 
 const InventoryManagement = ({ setAuth , onInventoryChange }) => {
   const navigate = useNavigate();
@@ -36,14 +37,13 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [editingQuantities, setEditingQuantities] = useState({});
 
-  useEffect(() => {
-    const fetchData = async () => {
-
-      try {
-        const token = localStorage.getItem('authToken');
-        const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-        const [inventoryRes, categoriesRes] = await Promise.all([
-          axios.get(`${API_URL}/inventory`, {
+  const fetchData = async (page=data.pagination?.page,limit=data.pagination?.limit) => {
+    
+    try {
+      const token = localStorage.getItem('authToken');
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+      const [inventoryRes, categoriesRes] = await Promise.all([
+        axios.get(`${API_URL}/inventory`, { params: { page, limit },
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -58,6 +58,10 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
             withCredentials: true,
           }),
         ]);
+        setData({
+          orders: inventoryRes.data.data,
+          pagination: inventoryRes.data.Pagination
+        });
         
         setInventoryItems(inventoryRes.data.data);
         setCategories(categoriesRes.data.data.categories || []);
@@ -76,7 +80,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
           page: 2,
           limit: 15
         },
-          headers: {
+        headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
           },
@@ -97,6 +101,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
         setLoading(false);
       }
     };
+  useEffect(() => {
     fetchData();
   }, [navigate]);
 
@@ -341,6 +346,22 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
       return 0;
     });
 
+    const handlePageChange = (newPage) => {
+      fetchData(newPage, data.pagination?.limit);
+    };
+  
+    const handleItemsPerPageChange = (newLimit) => {
+      fetchData(1, newLimit); // Reset to page 1 when changing limit
+    };
+  
+    if (loading){
+      return <div className='flex justify-center  items-center h-screen'>
+              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
+                 
+              </div>
+           </div>;
+    }
+
   return (
     
      
@@ -500,6 +521,19 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
             )}
           </div>
           {Error && <div className="text-red-500 mt-2">{Error}</div>}
+
+                  <div>
+                        {/* Your data display */}
+                        <PaginationControls
+                          currentPage={data.pagination?.page}
+                          totalPages={data.pagination?.totalPages}
+                          itemsPerPage={data.pagination?.limit}
+                          totalItems={data.pagination?.total}
+                          onPageChange={handlePageChange}
+                          onItemsPerPageChange={handleItemsPerPageChange}
+                          isLoading={loading}
+                        />
+                      </div>
         </div>
 
        

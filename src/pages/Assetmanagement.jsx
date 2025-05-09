@@ -231,7 +231,7 @@ const AssetManagement = ({setAuth}) => {
   if (loading) return <div className="text-center py-8">Loading Assets...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm">
+    <div className="max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm mt-12">
       {/* Header and Controls */}
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Asset Management</h1>
       

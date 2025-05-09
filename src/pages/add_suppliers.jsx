@@ -57,8 +57,8 @@ export default function AddSupplier() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
-      <h2 className="text-2xl font-semibold mb-4">Add Supplier</h2>
+    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg mt-20">
+      <h2 className="text-2xl font-semibold mb-4">Add Vendor</h2>
 
       {message && (
         <p className={`mb-4 ${message.includes("successfully") ? "text-green-600" : "text-red-600"}`}>

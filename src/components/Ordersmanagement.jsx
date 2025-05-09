@@ -20,12 +20,11 @@ const OrdersDashboard = ({setAuth}) => {
     orders: [],
     pagination: {
       page: 1,
-      limit: 10,
+      limit: 5,
       total: 0
     }
   });
-  const startIndex=(currentpage-1)*itemsperpage
-  const endIndex=startIndex+itemsperpage
+ 
   const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit) => {
     setIsLoading(true);
     try {
@@ -117,7 +116,7 @@ const OrdersDashboard = ({setAuth}) => {
           selectedOrderId={selectedOrderId}
           setOrders={setOrders}
         />
-         <div>
+        <div>
               {/* Your data display */}
               <PaginationControls
                 currentPage={Data.pagination?.page}
