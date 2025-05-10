@@ -1,6 +1,6 @@
 import axios from "axios";
-const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 
+const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 const orders="orders"
 
 
@@ -8,10 +8,10 @@ const orders="orders"
 export const getOrders = async (page , limit ) => {
   try {
     const token=localStorage.getItem("authToken")
-  
+    
     const response = await axios.get(`${API_URL}/${orders}`,{
       params: { page, limit },
-    headers:{Authorization:`Bearer ${token}`, 
+      headers:{Authorization:`Bearer ${token}`, 
       "ngrok-skip-browser-warning": "true"},
       withCredential:true});
     console.log("response",response)
@@ -21,6 +21,7 @@ export const getOrders = async (page , limit ) => {
     return [];
   }
 };export const get_user_orders = async ( email ) => {
+ 
   try {
     const requests = [];
 
@@ -29,8 +30,9 @@ export const getOrders = async (page , limit ) => {
       requests.push(axios.get(`${API_URL}/${orders}/${email}`,{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
       requests.push(axios.get(`${API_URL}/fileupload/${email}`, { responseType: "blob" },{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
     }
-
+    
     const results = await Promise.allSettled(requests);
+   
 
     const orderResponse = results[0].status === "fulfilled" ? results[0].value : null;
     const fileResponse = results[1].status === "fulfilled" ? results[1].value : null;

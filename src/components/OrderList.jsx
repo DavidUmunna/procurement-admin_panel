@@ -13,10 +13,11 @@ import { useUser } from "./usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { admin_roles } from "./navBar";
 
 
 
-const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin"];
+const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts"];
 
 const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
@@ -29,21 +30,23 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getOverallStatus = (approvals) => {
+  const getOverallStatus = (approvals, department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
-    if (approvals.some(a=>a.status==="Completed")) return "Completed"
-    
+    if (approvals.some(a => a.status === "Completed")) return "Completed";
+  
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
-    const REQUIRED_APPROVALS = 2; // Change this to your business logic
     
+    const REQUIRED_APPROVALS = department === "waste_management_dep" ? 3 : 2;
+  
     if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
     if (approvalCount > 0) return "Partially Approved";
-    
+  
     return "Pending";
   };
-  const getStatusExplanation = (approvals) => {
-    const status = getOverallStatus(approvals);
+  
+  const getStatusExplanation = (approvals,Department) => {
+    const status = getOverallStatus(approvals,Department);
     const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
     const REQUIRED_APPROVALS=2
     
@@ -275,7 +278,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
             Current Status: <span className="ml-2">{getOverallStatus(order.Approvals)}</span>
           </p>
           <p className="text-sm text-gray-500 mt-1">
-            {getStatusExplanation(order.Approvals)}
+            {getStatusExplanation(order.Approvals,order?.Department)}
           </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,13 +290,13 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
         </div>
         <div>
           <p className="text-gray-600"><span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
-          <p className="text-gray-600">
+          {admin_roles.includes(user?.role)&&(<p className="text-gray-600">
             <span className="font-medium">Approvals:</span>
             {console.log("order approvals",orders.map(order=>order.Approvals))} 
             {order.Approvals?.length > 0 
               ? order.Approvals.map(a => `${a.admin} (${a.status})`).join(", ")
               : "None"}
-          </p>
+          </p>)}
           <p className={`${order.urgency === "VeryUrgent" ? "text-red-600" : "text-gray-600"}`}>
             <span className="font-medium">Urgency:</span> {order.urgency}
           </p>
@@ -445,38 +448,51 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                               >
                                 <FaEllipsisV />
                               </button>
-
+                          
                               <AnimatePresence>
                                 {dropdownOpen === order._id && (
                                   <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="absolute  right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
                                   >
                                     <div className="py-1">
-                                      {["Pending", "Approved", "Rejected", "Completed"].map((statusOption) => (
-                                        <button
-                                          key={statusOption}
-                                          className={`flex items-center w-full px-4 py-2 text-sm ${
-                                            order.status === statusOption 
-                                              ? "bg-blue-50 text-blue-600" 
-                                              : "text-gray-700 hover:bg-gray-100"
-                                          }`}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleStatusChange(order._id, statusOption);
-                                          }}
-                                        >
-                                          <span className="mr-5">
-                                            {statusOption === "Approved" && <FaCheck className="text-green-500" />}
-                                            {statusOption === "Rejected" && <FaTimes className="text-red-500" />}
-                                            {statusOption === "Pending" && <FaClock className="text-yellow-500" />}
-                                            {statusOption === "Completed" && <FaCheck className="text-blue-500" />}
-                                          </span>
-                                          {statusOption}
-                                        </button>
-                                      ))}
+                                      {["Pending", "Approved", "Rejected", "Completed"]
+                                        .filter(
+                                          (statusOption) =>
+                                            statusOption !== "Completed" || user?.role === "accounts"
+                                        )
+                                        .map((statusOption) => (
+                                          <button
+                                            key={statusOption}
+                                            className={`flex items-center w-full px-4 py-2 text-sm ${
+                                              order.status === statusOption
+                                                ? "bg-blue-50 text-blue-600"
+                                                : "text-gray-700 hover:bg-gray-100"
+                                            }`}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleStatusChange(order._id, statusOption);
+                                            }}
+                                          >
+                                            <span className="mr-5">
+                                              {statusOption === "Approved" && (
+                                                <FaCheck className="text-green-500" />
+                                              )}
+                                              {statusOption === "Rejected" && (
+                                                <FaTimes className="text-red-500" />
+                                              )}
+                                              {statusOption === "Pending" && (
+                                                <FaClock className="text-yellow-500" />
+                                              )}
+                                              {statusOption === "Completed" && user?.role === "accounts" && (
+                                                <FaCheck className="text-blue-500" />
+                                              )}
+                                            </span>
+                                            {statusOption}
+                                          </button>
+                                        ))}
                                       <button
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         onClick={(e) => {
@@ -493,6 +509,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                               </AnimatePresence>
                             </div>
                           )}
+
                         </div>
                       </div>
 

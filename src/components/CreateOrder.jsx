@@ -27,7 +27,7 @@ const CreateOrder = () => {
   const [files, setFiles] = useState([]);
   const [remarks, setRemarks] = useState("");
   const [email, setEmail] = useState("");
-  const [filenames, setfilenames] = useState("");
+  const [filenames, setfilenames] = useState([]);
   const [Title, settitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 

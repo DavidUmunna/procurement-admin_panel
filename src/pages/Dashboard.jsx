@@ -18,6 +18,9 @@ export const Dashboard=()=>{
     const [pendingOrders, setPendingOrders] = useState([]);
     const [rejectedOrders, setRejectedOrders] = useState([]);
     const [completedOrders, setcompletedOrders] = useState([]);
+    const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
+      "Financial_manager"];
+    const departmental_access=["waste_management","Environmental_lab_manager","PTV_manager"]
     
     useEffect(()=>{
         const email=user?.email||"no email provided"
@@ -25,25 +28,42 @@ export const Dashboard=()=>{
         const fetchorder=async ()=>{ 
             if (!user || !user.email) return 
 
-            try{
-                  const API_URL = `${process.env.REACT_APP_API_URL}/api`
-                  const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
-                    "ngrok-skip-browser-warning": "true"},
-                    withCredential:true})
-                  console.log(userReq.data.data)
-                  if (Array.isArray(userReq.data.data||[])){
-                    const orders=userReq.data.data  
+            try{ 
+                  let response;
+                  if (general_access.includes(user?.role)){
+
+                    const API_URL = `${process.env.REACT_APP_API_URL}/api`
+                    const token=localStorage.getItem("authToken")
+                    const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
+                      "ngrok-skip-browser-warning": "true"},
+                      withCredential:true})
+                      console.log()
+                      response=userReq.data.data
+                    }else if(departmental_access.includes(user?.role)){
+                      if (!user?.Department) return;
+                      const API_URL = `${process.env.REACT_APP_API_URL}/api`
+                      const token=localStorage.getItem("authToken")
+                      const userReq=await axios.get(`${API_URL}/orders/department/all`,{params: {
+                        Department: user.Department,
+                       
+                      },headers:{Authorization:`Bearer ${token}`, 
+                      "ngrok-skip-browser-warning": "true"},
+                      withCredential:true})
+                      console.log()
+                      response=userReq.data.data
+                    }
+                    if (Array.isArray(response||[])){
+                          
                     
-                    setRequest(orders)
-                    setorders(orders)
+                    setRequest(response)
+                    setorders(response)
                     
                     
                    
-                    setApprovedOrders(orders?.filter((order) => order.status === "Approved"));
-                    setPendingOrders(orders?.filter((order) => order.status === "Pending"));
-                    setRejectedOrders(orders?.filter((order) => order.status === "Rejected"));
-                    setcompletedOrders(orders?.filter((order) => order.status === "Completed"));
+                    setApprovedOrders(response?.filter((order) => order.status === "Approved"));
+                    setPendingOrders(response?.filter((order) => order.status === "Pending"));
+                    setRejectedOrders(response?.filter((order) => order.status === "Rejected"));
+                    setcompletedOrders(response?.filter((order) => order.status === "Completed"));
                    
                     //console.log("number approved",Approved)
                  }else{

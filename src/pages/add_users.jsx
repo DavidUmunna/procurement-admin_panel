@@ -72,13 +72,18 @@ const Add_user = () => {
               </motion.div>
               <motion.div className="mb-4" whileFocus={{ scale: 1.02 }}>
                 <label className="block text-gray-700 font-bold mb-2">Department:</label>
-                <input
-                  type="text"
+                <select
                   value={Department}
                   onChange={(e) => setDepartment(e.target.value)}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                />
+                >
+                  <option value="" disabled>Select a department</option>
+                  <option value="waste_management_dep">Waste Management Department</option>
+                  <option value="PVT_dep">PVT Department</option>
+                  <option value="Environmental_lab_dep">Environmental Lab Department</option>
+                  <option value="accounts_dep">Accounts Department</option>
+                </select>
               </motion.div>
     
               <motion.div className="mb-4 relative" whileFocus={{ scale: 1.02 }}>

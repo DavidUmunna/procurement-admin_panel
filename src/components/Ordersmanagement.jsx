@@ -2,7 +2,7 @@ import { useUser } from './usercontext';
 import { useState, useEffect } from 'react';
 import OrderList from './OrderList';
 import Duplicates from '../pages/Duplicates';
-import { getOrders,get_user_orders } from '../services/OrderService';
+import { get_user_orders } from '../services/OrderService';
 import CompletedOrdersList from './Completed';
 import { admin_roles } from './navBar';
 import axios from 'axios';
@@ -14,8 +14,8 @@ const OrdersDashboard = ({setAuth}) => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const itemsperpage=7
-  const [currentpage,setcurrentpage]=useState(1)
+  //const [filteredorders,setfilteredorders]=useState([])
+
   const [Data, setData] = useState({
     orders: [],
     pagination: {
@@ -24,7 +24,10 @@ const OrdersDashboard = ({setAuth}) => {
       total: 0
     }
   });
- 
+  const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
+    "Financial_manager"];
+  const departmental_access=["waste_management","Environmental_lab_manager","PTV_manager"]
+  const only_approvals=["accounts"]
   const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit) => {
     setIsLoading(true);
     try {
@@ -32,26 +35,77 @@ const OrdersDashboard = ({setAuth}) => {
         let response;
         const token=localStorage.getItem("authToken")
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-        if (admin_roles.includes(user?.role)) {
+        if (general_access.includes(user?.role)) {
           const res = await axios.get(`${API_URL}/orders`,{
             params: { page, limit },
           headers:{Authorization:`Bearer ${token}`, 
             "ngrok-skip-browser-warning": "true"},
             withCredential:true});
-            response=res.data.data
+            response=res.data.data||[]
           
         
           setData({
             orders: response,
             pagination: res.data.Pagination
-          });
-        } else {
+          })
+
+        }else if(departmental_access.includes(user?.role)) {
+          
+            if (!user?.Department) return;
+            const token=localStorage.getItem("authToken")
+            const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+            const department_response = await axios.get(`${API_URL}/orders/department`, {
+              params: {
+                Department: user.Department,
+                page,
+                limit,
+              },headers:{Authorization:`Bearer ${token}`, 
+                "ngrok-skip-browser-warning": "true"},
+              withCredentials: true, // If you're using cookies/session
+            });
+    
+          
+            response=department_response.data.data||[]
+            
+            setData({
+              orders:response,
+              pagination:department_response.data.Pagination
+            })
+         
+
+        }else if(only_approvals.includes(user?.role)){
+            const token=localStorage.getItem("authToken")
+            const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+            const accounts_response = await axios.get(`${API_URL}/orders/accounts`, {
+              params: {
+                
+                page,
+                limit,
+              },headers:{Authorization:`Bearer ${token}`, 
+                "ngrok-skip-browser-warning": "true"},
+              withCredentials: true, // If you're using cookies/session
+            });
+    
+          
+            response=accounts_response.data.data||[]
+            
+            setData({
+              orders:response,
+              pagination:accounts_response.data.Pagination
+            })
+         
+
+
+        }
+        else {
           const res = await get_user_orders(user?.email);
-          response = res.orders;
+          response = res.orders||[];
         }
         console.log(response)
         if (Array.isArray(response)) {
-          setOrders(response.reverse());
+          setOrders(response);
+          
+          
         } else {
           throw new Error("Invalid data format");
         }
@@ -72,12 +126,14 @@ const OrdersDashboard = ({setAuth}) => {
         setIsLoading(false);
       }
     };
-  useEffect(() => {
     
-    if (user?.email) {
+  useEffect(() => {
+   
+    if (user) {
       fetchData();
+      
     }
-  }, [user?.email, user?.role,setAuth]);
+  }, [user?.role,setAuth]);
 
   //const paginated_orders=orders.slice(startIndex,endIndex)
   //const totalPages = Math.ceil(orders.length / itemsperpage);
@@ -89,6 +145,9 @@ const OrdersDashboard = ({setAuth}) => {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
+  console.log(user)
+  
+  
   const handlePageChange = (newPage) => {
     fetchData(newPage, Data.pagination?.limit);
   };
@@ -128,39 +187,11 @@ const OrdersDashboard = ({setAuth}) => {
                 isLoading={isLoading}
               />
             </div>
-        {/*<div className="flex items-center justify-center space-x-4">
-              <button
-                className={`px-4 py-2 rounded text-white transition ${
-                  currentpage === 1
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-                disabled={currentpage === 1}
-                onClick={() => setcurrentpage(prev => prev - 1)}
-              >
-                ◀ Previous
-              </button>
-      
-              <span className="text-lg font-medium">
-                Page {currentpage} of {totalPages}
-              </span>
-      
-              <button
-                className={`px-4 py-2 rounded text-white transition ${
-                  currentpage === totalPages
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-                disabled={currentpage === totalPages}
-                onClick={() => setcurrentpage(prev => prev + 1)}
-              >
-                Next ▶
-              </button>
-        </div>*/}
+        
       </div>
       
       {/* Duplicates Panel (takes 1/3 width on large screens) */}
-      {admin_roles.includes(user?.role)&&<div className='"lg:w-1/3 mb-8"'> 
+      {admin_roles.includes(user?.role)|| user?.role==="accounts"&&<div className='"lg:w-1/3 mb-8"'> 
           <div >
             <Duplicates 
               orders={orders} 
@@ -170,7 +201,7 @@ const OrdersDashboard = ({setAuth}) => {
           <div className='mt-4 overflow-x-auto'>
             <CompletedOrdersList
             orders={orders}
-            itemsPerPage={itemsperpage}/>
+            />
           </div>
       </div>}
       {error}
