@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import React,{useState,useEffect} from "react"
 import PaginationControls from "./Paginationcontrols";
 import axios from "axios";

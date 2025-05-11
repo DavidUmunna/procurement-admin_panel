@@ -250,6 +250,14 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
       setLoading(false)
     }
   };
+  const formatCategory = (category) => {
+    const formatted = category
+      .replace(/_/g, ' ') // Replace underscores with spaces
+      .replace(/(^|\s)\S/g, l => l.toUpperCase()); // Capitalize first letters
+    
+    // Special case for "PVT" to keep it uppercase
+    return category === 'PVT' ? 'PVT' : formatted;
+  };
   const DeleteItem=async(itemId)=>{
     try{
       setLoading(true)
