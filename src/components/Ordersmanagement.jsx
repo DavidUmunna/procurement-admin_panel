@@ -191,19 +191,20 @@ const OrdersDashboard = ({setAuth}) => {
       </div>
       
       {/* Duplicates Panel (takes 1/3 width on large screens) */}
-      {admin_roles.includes(user?.role)|| user?.role==="accounts"&&<div className='"lg:w-1/3 mb-8"'> 
-          <div >
+      {(admin_roles.includes(user?.role) || user?.role === "accounts") && (
+        <div className="lg:w-1/3 mb-8">
+          <div>
             <Duplicates 
               orders={orders} 
               onOrderSelect={handleOrderSelect}
             />
           </div>
-          <div className='mt-4 overflow-x-auto'>
-            <CompletedOrdersList
-            orders={orders}
-            />
+          <div className="mt-4 overflow-x-auto">
+            <CompletedOrdersList orders={orders} />
           </div>
-      </div>}
+        </div>
+      )}
+
       {error}
     </div>
   );
