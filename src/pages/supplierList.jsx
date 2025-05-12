@@ -11,7 +11,7 @@ export default function SupplierList() {
     async function fetchSuppliers() {
       try {
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
-        const res = await fetch(`${API_URL}/supplier`);
+        const res = await fetch(`${API_URL}/supplier`,{headers:{"ngrok-skip-browser-warning": "true"}});
         const data = await res.json();
         setSuppliers(data);
       } catch (err) {

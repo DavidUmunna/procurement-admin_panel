@@ -242,8 +242,9 @@ const refreshDepartments = () => {
   };
   const fetchTasks = async () => {
     try {
+      const API_URL=`${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem("authToken");
-      const response = await axios.get('/api/tasks', {
+      const response = await axios.get(`${API_URL}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true
       });
@@ -330,8 +331,9 @@ const refreshDepartments = () => {
   // Task Operations
   const assignTask = async () => {
     try {
+      const API_URL=`${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem("authToken");
-      await axios.post('/api/tasks', {
+      await axios.post(`${API_URL}/tasks`, {
         title: formData.taskTitle,
         description: formData.taskDescription,
         assignedTo: formData.assignedTo,
@@ -341,7 +343,7 @@ const refreshDepartments = () => {
         status:formData.status|| 'Pending'
        // status:
       }, { 
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"},
         withCredentials: true 
       });
       //console.log(response)
@@ -352,7 +354,13 @@ const refreshDepartments = () => {
       console.error("Task error:", err.response?.data || err.message);
     }
   };
-   
+  if (loading){
+      return <div className='flex justify-center  items-center h-screen'>
+              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
+              
+              </div>
+            </div>;
+  }
 
   // Components
   const StatsPanel = ({ department }) => (

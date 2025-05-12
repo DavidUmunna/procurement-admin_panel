@@ -17,13 +17,21 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       });
       const [activities,setactivities]=useState([])
       const [isLoading, setIsLoading] = useState(false);
+      const [categories, setCategories] = useState("");
+      const [selectedCategory, setSelectedCategory] = useState('All');
+
     
       const fetchActivities = async (page = data.pagination?.page, limit = data.pagination?.limit) => {
         setIsLoading(true);
         try {
-            const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+          const token = localStorage.getItem('authToken');
+          const params= { page, limit }
+          if (categories) params.category = categories;
+          const API_URL = `${process.env.REACT_APP_API_URL}/api`;
           const response = await axios.get(`${API_URL}/inventory/activities`, {
-            params: { page, limit }
+            params: { params }, 
+          headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
+      
           });
           setactivities(response.data.data)
           setData({
@@ -39,6 +47,30 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
           setIsLoading(false);
         }
       };
+      const fetchcategory=async()=>{
+        try{
+          const token = localStorage.getItem('authToken');
+          const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+          const response=await axios.get(`${API_URL}/inventory/categories`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            withCredentials: true,
+          })
+          console.log(response.data)
+
+          setCategories(response.data.data.categories||[])
+
+
+        }catch(error){
+
+        }
+      }
+   
+   const filteredItems = activities.filter(item => {
+      return selectedCategory === 'All' || item?.category === selectedCategory;
+    })
     
       const handlePageChange = (newPage) => {
         fetchActivities(newPage, data.pagination?.limit);
@@ -50,13 +82,37 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
     
       useEffect(() => {
         fetchActivities();
+        fetchcategory()
       }, [refreshFlag]);
+    console.log("categories",categories)
   return (
     <div className="bg-white rounded-lg shadow p-4 h-full">
       <h2 className="text-lg font-semibold mb-4">ActivityLog</h2>
       <div className="space-y-4">
-        {activities.length > 0 ? (
-          activities.map((activity, index) => (
+        <div className="mb-4">
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700">Filter by Category:</label>
+         <select
+          name="category"
+          value={selectedCategory || ""}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
+        >
+          <option value="">Select Category</option>
+          {(Array.isArray(categories) && categories.length > 0) ? (
+            categories.map((category) => (
+              <option key={category?._id || category?.name} value={category?.name || ""}>
+                {category?.name || "Unnamed Category"}
+              </option>
+            ))
+          ) : (
+            <option disabled>No categories available</option>
+          )}
+        </select>
+
+        </div>
+        {filteredItems.length > 0 ? (
+          filteredItems.map((activity, index) => (
             <div key={index} className="border-b pb-2 last:border-b-0">
               <div className="flex justify-between items-start">
                 <div>
@@ -64,8 +120,10 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
                   <p className="text-sm text-gray-500">
                     {new Date(activity.timestamp).toLocaleString()}
                   </p>
-                  <div className="flex">
-                      
+                  <div className="flex  ">
+                      <p className="text-sm text-gray-500 mr-4">
+                        Modified by:{activity.userName}
+                      </p>
                       <p className="text-sm text-gray-500">
                         {activity.category}
                       </p>

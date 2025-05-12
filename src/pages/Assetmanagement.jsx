@@ -32,12 +32,14 @@ const AssetManagement = ({setAuth}) => {
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
+ 
   const [Error,setError]=useState("")
 
   // Fetch Asset data
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
         const token = localStorage.getItem('authToken');
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
         const [AssetRes, statsRes, categoriesRes] = await Promise.all([
@@ -126,6 +128,13 @@ const AssetManagement = ({setAuth}) => {
 /*const handleExpand = (id) => {
   setExpandedItem((prev) => (prev === id ? null : id));
 };*/
+  if (loading) {
+    return <div className='flex justify-center  items-center h-screen'>
+              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
+                 
+              </div>
+           </div>;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -163,7 +172,7 @@ const AssetManagement = ({setAuth}) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
       const res = await axios.put(`${API_URL}/assets/${editingItem._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
       });
       
       setAssetItems(AssetItems.map(item => 
@@ -182,7 +191,7 @@ const AssetManagement = ({setAuth}) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
       await axios.delete(`${API_URL}/assets/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning": "true" }
       });
       setAssetItems(AssetItems.filter(item => item._id !== id));
     } catch (err) {

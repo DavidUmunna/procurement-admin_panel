@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 export default function AddSupplier() {
   const [form, setForm] = useState({
     name: "",
@@ -26,13 +26,11 @@ export default function AddSupplier() {
 
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const response = await fetch(`${API_URL}/supplier`, {
-        method: "POST",
+      const response = await axios.post(`${API_URL}/supplier`,{form}, {
+        
         headers: {
-          "Content-Type": "application/json",
-          // Include Authorization header if needed
-        },
-        body: JSON.stringify(form),
+        "ngrok-skip-browser-warning":"true"}
+        
       });
 
       if (!response.ok) {

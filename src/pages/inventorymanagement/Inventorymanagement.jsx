@@ -8,7 +8,7 @@ import RecentActivity from './recentactivity';
 import { Plus, Minus,Trash2 } from "lucide-react"
 import PaginationControls from './Paginationcontrols';
 
-const InventoryManagement = ({ setAuth , onInventoryChange }) => {
+const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const navigate = useNavigate();
   const { user } = useUser();
   const [data, setData] = useState({
@@ -28,7 +28,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [Activities, setActivities] = useState([]);
   const [Error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setloading] = useState(true);
   
   const [showForm, setShowForm] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
@@ -98,7 +98,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
           console.error('Failed to fetch data:', err);
         }
       } finally {
-        setLoading(false);
+        setloading(false);
       }
     };
   useEffect(() => {
@@ -132,9 +132,9 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: quantityDifference,
-        userId: user?.userId
+        userId: user?.name
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       });
       
       setInventoryItems(inventoryItems.map(item => 
@@ -167,9 +167,9 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: 1,
-        userId: user?.userId
+        userId: user?.name
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       });
       
       // Update both inventoryItems and editingQuantities
@@ -211,9 +211,9 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: -1,
-        userId: user?.userId
+        userId: user?.name
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       });
       
       // Update both inventoryItems and editingQuantities
@@ -247,7 +247,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
         [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
       }));
     }finally{
-      setLoading(false)
+      setloading(false)
     }
   };
   const formatCategory = (category) => {
@@ -260,7 +260,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
   };
   const DeleteItem=async(itemId)=>{
     try{
-      setLoading(true)
+      setloading(true)
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const response=await axios.delete(`${API_URL}/inventory/${itemId}`,{
@@ -301,7 +301,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
       const token = localStorage.getItem('authToken');
       const res = await axios.post(`${API_URL}/inventory`, {
         ...formdata,
-        addedBy: user?.userId
+        AddedBy: user?.name
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -317,8 +317,9 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
         action: 'Added',
         name: formdata.name,
         quantity: formdata.quantity,
+       
         timestamp: new Date().toISOString(),
-        user: user?.name || 'Unknown'
+        AddedBy: user?.name || 'Unknown'
       }, ...Activities]);
       
       resetForm();
@@ -361,14 +362,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange }) => {
     const handleItemsPerPageChange = (newLimit) => {
       fetchData(1, newLimit); // Reset to page 1 when changing limit
     };
-  
-    if (loading){
-      return <div className='flex justify-center  items-center h-screen'>
-              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
-                 
-              </div>
-           </div>;
-    }
+ 
 
   return (
     

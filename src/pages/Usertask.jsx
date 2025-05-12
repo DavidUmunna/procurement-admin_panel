@@ -30,6 +30,14 @@ const UserTasks = () => {
     fetchTasks();
   }, [user.userId]);
 
+    if (loading) {
+    return <div className='flex justify-center  items-center h-screen'>
+              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
+                 
+              </div>
+           </div>;
+  }
+
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
