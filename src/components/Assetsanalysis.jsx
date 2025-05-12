@@ -16,60 +16,55 @@ const InventoryAnalytics = ({ AssetItems }) => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
   return (
-    <div className=" px-4 mb-5 sm:px-6">
-    <div className="grid grid-cols-1 lg:grid-cols-1 ">
-      {/* Category Distribution Pie Chart */}
-      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-medium text-gray-800 mb-4">Assets by Category</h3>
-        
-        <div className="h-64 sm:h-72 md:h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="itemCount"
-                nameKey="name"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip 
-                formatter={(value, name, props) => [
-                  value, 
-                  `${props.payload.name} (${props.payload.totalQuantity} units)`
-                ]}
-              />
-              <Legend 
-                layout="horizontal"
-                verticalAlign="bottom"
-                wrapperStyle={{
-                  paddingTop: '10px'
-                }}
-                formatter={(value) => (
-                  <span className="text-xs sm:text-sm text-gray-600">
-                    {value}
-                  </span>
-                )}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+    <div className="max-w-6xl mx-auto mb-5 px-4 sm:px-6">
+      <div className="grid grid-cols-1">
+        {/* Category Distribution Pie Chart */}
+        <div className="bg-white p-9 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-medium text-gray-800 mb-4">Assets by Category</h3>
+    
+          <div className="h-64 sm:h-72 md:h-70 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="itemCount"
+                  nameKey="name"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value, name, props) => [
+                    value,
+                    `${props.payload.name} (${props.payload.totalQuantity} units)`,
+                  ]}
+                />
+                <Legend
+                  layout="horizontal"
+                  verticalAlign="bottom"
+                  wrapperStyle={{ paddingTop: '10px' }}
+                  formatter={(value) => (
+                    <span className="text-xs sm:text-sm text-gray-600">
+                      {value}
+                    </span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-  
-        <p className="text-xs sm:text-sm text-gray-500 mt-3 text-center sm:text-left">
-          Showing distribution of {AssetItems.length} items across {categories.length} categories
-        </p>
       </div>
-      
-      {/* Add your second chart here */}
     </div>
-  </div>
+
+      
+     
   );
 };
 

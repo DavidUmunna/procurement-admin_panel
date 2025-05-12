@@ -545,14 +545,15 @@ const AssetManagement = ({setAuth}) => {
       </div>
 
       {/* Analytics */}
-      <div className='items-center flex justify-center '>
+      <div className='items-center flex justify-center mb-7'>
 
         {ADMIN_ROLES.includes(user.role)&&(<div className=" mt-8 flex flex-wrap px-4 md:flex-nowrap   max-w-full">
-          <div className="h-50 mt-20 md:h-80 flex items-center justify-center bg-gray-50 rounded">
+          <div className="h-50 mt-20 p-7 md:h-60 flex items-center justify-center bg-gray-50 rounded">
             <Assetsanalysis AssetItems={AssetItems} />
           </div>
           
           <div className="bg-white h-50  mt-25 rounded-lg  bordermt-10 border-gray-200">
+            
             <div className="grid grid-cols-1 lg:grid-cols-1">
               <AssetsConditionChart AssetItems={AssetItems} />
             </div>

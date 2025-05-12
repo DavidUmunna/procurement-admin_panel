@@ -46,9 +46,9 @@ const InventoryConditionChart = ({ AssetItems }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+    <div className="bg-white p-4 rounded-lg shadow border border-gray-200 mb-12">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Inventory by Condition</h3>
+        <h3 className="text-lg font-semibold">Assets by Condition</h3>
         <div className="flex space-x-2">
           <button
             onClick={() => setDisplayMode('quantity')}
