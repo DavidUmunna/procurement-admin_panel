@@ -134,6 +134,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
                 onClick={() => toggleGroup(groupIndex)}
               >
                 <div className="flex items-center">
+                  {console.log(group)}
                   <div className="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3">
                     {group.length}
                   </div>
@@ -142,7 +143,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
                       {group[0].Title || "Untitled Request"}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      {group[0].products?.length || 0} similar items
+                      {group.length || 0} similar items
                     </p>
                   </div>
                 </div>

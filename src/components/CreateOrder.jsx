@@ -30,6 +30,7 @@ const CreateOrder = () => {
   const [filenames, setfilenames] = useState([]);
   const [Title, settitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const[Error,setError]=useState("")
 
   useEffect(() => {
     if (user) {
@@ -69,19 +70,26 @@ const CreateOrder = () => {
 
     try {
       const fileupload = await createOrder({ formData: formData, orderData: payload });
-      
-      if (files.length > 0) {
-        console.log("File uploaded:", fileupload.file);
-        console.log("Order created:", fileupload.orders);
-      }
+      console.log(fileupload)
+      if (fileupload.file.data.success){
 
-      // Reset form
-      setSupplier("Halden");
-      setProducts([{ name: "", quantity: 1, price: 0 }]);
-      setUrgency("");
-      setFiles([]);
-      setRemarks("");
-      settitle("");
+        if (files.length > 0) {
+          console.log("File uploaded:", fileupload.file);
+          console.log("Order created:", fileupload.orders);
+        }
+        
+        // Reset form
+        setSupplier("Halden");
+        setProducts([{ name: "", quantity: 1, price: 0 }]);
+        setUrgency("");
+        setFiles([]);
+        setRemarks("");
+        settitle("");
+        setError("")
+      }else{
+        setError("the file/order was not sent please reach out to IT")
+
+      }
       //alert("Order Created!");
     } catch (error) {
       console.error("Error creating order:", error);
@@ -291,6 +299,10 @@ const CreateOrder = () => {
                 "Create Request"
               )}
             </motion.button>
+            <div className=" flex  justify-center text-red-700">
+              {Error}
+
+            </div>
           </motion.form>
         </motion.div>
       </motion.div>

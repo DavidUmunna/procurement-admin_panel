@@ -440,7 +440,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                           )}
 
                           {ADMIN_ROLES.includes(user?.role) && (
-                            <div className="relative">
+                            <div className="relative z-20">
                               <button
                                 onClick={(e) => toggleDropdown(order._id, e)}
                                 className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
