@@ -1,32 +1,32 @@
 import React,{ useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp,  FiSearch } from 'react-icons/fi';
-import { useUser } from '../components/usercontext';
-import Assetsanalysis from "../components/Assetsanalysis";
-import AssetsConditionChart from './Asssetvisuals';
+import { useUser } from '../../components/usercontext';
+
 import axios from 'axios';
-import PaginationControls from './inventorymanagement/Paginationcontrols';
+import PaginationControls from '../inventorymanagement/Paginationcontrols';
 
 
 const ADMIN_ROLES=['admin','global_admin','human_resources','internal_auditor']
-const AssetManagement = ({setAuth}) => {
+const SkipsManagement = ({setAuth}) => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
    const [data, setData] = useState({
       activities: [],
       pagination: {
         page: 1,
-        limit: 10,
+        limit: 5,
         total: 0
       }
     });
   // State
-  const [AssetItems, setAssetItems] = useState([]);
+  const [SkipItems, setSkipItems] = useState([]);
   const [formData, setFormData] = useState({
-    name: '',
-    category: '',
+    skip_ID: '',
+    WasteStream: '',
     quantity: 1,
-    condition: 'New',
-    description: '',
+    
+    
+    
     
     location:'',
     
@@ -36,35 +36,35 @@ const AssetManagement = ({setAuth}) => {
   const [showForm, setShowForm] = useState(false);
   const [expandedItem, setExpandedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedWasteStream, setselectedWasteStream] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
  
   const [Error,setError]=useState("")
 
-  // Fetch Asset data
+  // Fetch skips data
   const fetchData = async (page=data.pagination?.page,limit=data.pagination?.limit) => {
     try {
       setLoading(true)
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const [AssetRes, statsRes, categoriesRes] = await Promise.all([
-        axios.get(`${API_URL}/assets`, { params:{page,limit},
+      const [skipsRes, statsRes, categoriesRes] = await Promise.any([
+        axios.get(`${API_URL}/skiptrack`, { params:{page,limit},
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
-          axios.get(`${API_URL}/assets/stats`, {
+          axios.get(`${API_URL}/skiptrack/stats`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
-          axios.get(`${API_URL}/assets/categories`, {
+          axios.get(`${API_URL}/skiptrack/categories`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -73,10 +73,11 @@ const AssetManagement = ({setAuth}) => {
           }),
         ]);
         setData({
-          orders: AssetRes.data.data,
-          pagination: AssetRes.data.Pagination
+          orders: skipsRes.data.data,
+          pagination: skipsRes.data.Pagination
         });
-        setAssetItems(AssetRes.data.data);
+        console.log(categoriesRes)
+        setSkipItems(skipsRes.data.data);
         setStats(statsRes.data.data);
         setCategories(categoriesRes.data.data);
         
@@ -109,13 +110,13 @@ const AssetManagement = ({setAuth}) => {
   };
 
   // Filter and sort
-  const filteredItems = AssetItems
+  const filteredItems = SkipItems
     .filter(item => 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(item => 
-      selectedCategory === 'All' || item.category === selectedCategory
+        selectedWasteStream === 'All' || item.category ===selectedWasteStream
     )
     .sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -160,14 +161,14 @@ const AssetManagement = ({setAuth}) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.post(`${API_URL}/assets`, {
+      const res = await axios.post(`${API_URL}/skiptrack`, {
         ...formData,
         addedBy: user.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setAssetItems([...AssetItems, res.data.data]);
+      setSkipItems([...SkipItems, res.data.data]);
       resetForm();
       setShowForm(false);
     } catch (err) {
@@ -190,11 +191,11 @@ const AssetManagement = ({setAuth}) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.put(`${API_URL}/assets/${editingItem._id}`, formData, {
+      const res = await axios.put(`${API_URL}/skiptrack/${editingItem._id}`, formData, {
         headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
       });
       
-      setAssetItems(AssetItems.map(item => 
+      setSkipItems(SkipItems.map(item => 
         item._id === editingItem._id ? res.data.data : item
       ));
       resetForm();
@@ -209,10 +210,10 @@ const AssetManagement = ({setAuth}) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      await axios.delete(`${API_URL}/assets/${id}`, {
+      await axios.delete(`${API_URL}/skiptrack/${id}`, {
         headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning": "true" }
       });
-      setAssetItems(AssetItems.filter(item => item._id !== id));
+      setSkipItems(SkipItems.filter(item => item._id !== id));
     } catch (err) {
       console.error('Delete failed:', err.response?.data || err.message);
     }
@@ -256,12 +257,12 @@ const AssetManagement = ({setAuth}) => {
     setExpandedItem(expandedItem === id ? null : id);
   };
 
-  if (loading) return <div className="text-center py-8">Loading Assets...</div>;
+  if (loading) return <div className="text-center py-8">Loading SkipsData...</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm mt-12">
       {/* Header and Controls */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Asset Management</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Skips Management</h1>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -269,7 +270,7 @@ const AssetManagement = ({setAuth}) => {
             <FiSearch className="absolute left-3 top-3 text-gray-400" />
             <input
               type="text"
-              placeholder="Search Assets..."
+              placeholder="Search Skips..."
               className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -278,8 +279,8 @@ const AssetManagement = ({setAuth}) => {
           
           <select
               className="w-full sm:w-48 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={selectedWasteStream}
+              onChange={(e) => setselectedWasteStream(e.target.value)}
             >
               <option value="All">All Categories</option>
               
@@ -304,7 +305,7 @@ const AssetManagement = ({setAuth}) => {
           className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105"
         >
           <FiPlus className="mr-2" />
-          Add Asset Item
+          Add Skip Item
         </button>
       </div>
 
@@ -314,7 +315,7 @@ const AssetManagement = ({setAuth}) => {
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300 animate-scaleIn">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {editingItem ? 'Edit Asset Item' : 'Add New Asset Item'}
+                {editingItem ? 'Edit Skip Item' : 'Add New skip Item'}
               </h2>
               
               <button
@@ -456,7 +457,7 @@ const AssetManagement = ({setAuth}) => {
         </div>
       )}
 
-      {/* Asset Summary Cards */}
+      {/* Skip Summary Cards */}
       {stats&&(<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-sm font-medium text-gray-500">Total Items</h3>
@@ -478,7 +479,7 @@ const AssetManagement = ({setAuth}) => {
         </div>
       </div>)}
 
-      {/* Assets Table */}
+      {/* skip Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
@@ -486,7 +487,7 @@ const AssetManagement = ({setAuth}) => {
                 <thead className="bg-gray-50">
                   <tr>
                     {/* Table headers */}
-                    <th onClick={() => requestSort('name')}>Item Name</th>
+                    <th onClick={() => requestSort('name')}>Skip ID</th>
                     <th onClick={() => requestSort('category')}>Category</th>
                     <th onClick={() => requestSort('quantity')}>Quantity</th>
                     <th onClick={() => requestSort('condition')}>Condition</th>
@@ -498,7 +499,7 @@ const AssetManagement = ({setAuth}) => {
                   {filteredItems.length === 0 ? (
                     <tr>
                       <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                        No Assets items found
+                        No Skip items found
                       </td>
                     </tr>
                   ) : (
@@ -579,16 +580,7 @@ const AssetManagement = ({setAuth}) => {
       <div className='items-center flex justify-center mb-7'>
 
         {ADMIN_ROLES.includes(user.role)&&(<div className=" mt-8 flex flex-wrap px-4 md:flex-nowrap   max-w-full">
-          <div className="h-50 mt-20 p-7 md:h-60 flex items-center justify-center bg-gray-50 rounded">
-            <Assetsanalysis AssetItems={AssetItems} />
-          </div>
           
-          <div className="bg-white h-50  mt-25 rounded-lg  bordermt-10 border-gray-200">
-            
-            <div className="grid grid-cols-1 lg:grid-cols-1">
-              <AssetsConditionChart AssetItems={AssetItems} />
-            </div>
-          </div>
         </div>)}
         {Error}
       </div>
@@ -596,4 +588,4 @@ const AssetManagement = ({setAuth}) => {
   );
 };
 
-export default AssetManagement; 
+export default SkipsManagement; 

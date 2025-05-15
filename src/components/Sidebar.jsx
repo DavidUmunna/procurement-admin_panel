@@ -1,4 +1,5 @@
 import {  PlusSquare, UserPlus, Truck, Building2, Briefcase } from 'lucide-react';
+import {FiFileText} from "react-icons/fi"
 import { Link } from 'react-router-dom';
 
 import { useUser } from './usercontext';
@@ -11,7 +12,8 @@ export default function Sidebar({ isOpen, onClose }) {
     { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
     { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin'] },
     { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
-    { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin","PVT"] }
+    { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin","PVT"] },
+    { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["human_resources",'admin',"global_admin","wste_management"] }
   ];
 
   return (

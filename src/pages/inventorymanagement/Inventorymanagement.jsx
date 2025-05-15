@@ -535,8 +535,8 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
                           onItemsPerPageChange={handleItemsPerPageChange}
                           isLoading={loading}
                         />
-                      </div>
-        </div>
+                  </div>
+  </div>
 
        
       
