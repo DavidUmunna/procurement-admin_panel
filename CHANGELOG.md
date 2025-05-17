@@ -41,3 +41,8 @@ there are 2 to three people involved in approving a request
 
 
 HR should see requests that were approved by the department heads and should be able to approve said requests and send them to the accounts department
+
+
+Comments made by admins should be added to orderlist 
+
+add managing director role

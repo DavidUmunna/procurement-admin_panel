@@ -80,9 +80,10 @@ const Add_user = () => {
                 >
                   <option value="" disabled>Select a department</option>
                   <option value="waste_management_dep">Waste Management Department</option>
-                  <option value="PVT_dep">PVT Department</option>
+                  <option value="PVT">PVT Department</option>
                   <option value="Environmental_lab_dep">Environmental Lab Department</option>
                   <option value="accounts_dep">Accounts Department</option>
+                  <option value="Human resources">Human Resources</option>
                 </select>
               </motion.div>
     

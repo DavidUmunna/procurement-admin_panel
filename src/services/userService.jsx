@@ -61,9 +61,11 @@ export const createUser = async (userData) => {
   };
   
 
-export const updateUser= async (userId, status) => {
+export const updateUser= async (userId, payload) => {
     try {
-      const response = await axios.put(`${API_URL}/${route}/${userId}`, { status });
+      console.log("from client",payload)
+      const response = await axios.put(`${API_URL}/${route}/${userId}/updateuser`,  payload );
+      console.log("response",response)
       return response.data;
     } catch (error) {
       console.error("Error updating user:", error);

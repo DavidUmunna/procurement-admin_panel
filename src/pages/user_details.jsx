@@ -5,6 +5,7 @@ import { motion,  } from "framer-motion";
 import requestImg from "../components/assets/quote-request.avif";
 import userImg from "../components/assets/user.avif";
 import { admin_roles } from "../components/navBar";
+import { CheckCircle, Clock, XCircle, ClipboardCheck , FileText, BarChart2, Timer} from "lucide-react";
 const UserDetails = ({ 
   user, 
   request_amount, 
@@ -73,23 +74,23 @@ const UserDetails = ({
 
   const statusConfig = {
     approved: {
-      color: "bg-green-400",
-      icon: "✅",
+      color: "bg-green-100",
+      icon: <CheckCircle className="text-green-600 w-5 h-5" />,
       title: "Approved Requests"
     },
     pending: {
-      color: "bg-yellow-300",
-      icon: "⏳",
+      color: "bg-yellow-100",
+      icon:<Clock className="text-yellow-500 w-5 h-5" />,
       title: "Pending Requests"
     },
     rejected: {
-      color: "bg-red-400",
-      icon: "❌",
+      color: "bg-red-100",
+      icon: <XCircle className="text-red-500 w-5 h-5" />,
       title: "Rejected Requests"
     },
     completed:{
-      color:"bg-blue-400",
-      icon:"🔵",
+      color:"bg-blue-100",
+      icon: <ClipboardCheck className="text-blue-600 w-5 h-5" />,
       title:"Completed Requests"
     }
 
@@ -149,7 +150,7 @@ const UserDetails = ({
               <div className="flex justify-center -mt-16">
                 <div className="relative">
                   {user?.imageurl ? (
-                    <img 
+                    <img rel="preload"
                       src={userImg} 
                       alt={user.name || "User"} 
                       className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-md"
@@ -204,9 +205,9 @@ const UserDetails = ({
                 whileHover={{ y: -5 }}
                 className="bg-white rounded-xl shadow-md p-6 text-center"
               >
-                <div className="flex justify-center">
-                  <img src={requestImg} alt="Requests" className="h-12 w-12" />
-                </div>
+                 <div className="flex justify-center">
+                    <FileText className="h-12 w-12 text-blue-600" />
+                 </div>
                 <h3 className="mt-2 text-lg font-medium text-gray-700">Total Requests</h3>
                 <p className="text-3xl font-bold text-blue-600">{stats.totalRequests}</p>
               </motion.div>
@@ -216,7 +217,7 @@ const UserDetails = ({
                 className="bg-white rounded-xl shadow-md p-6 text-center"
               >
                 <div className="flex justify-center">
-                  <span className="h-12 w-12 flex items-center justify-center text-2xl">📊</span>
+                  <BarChart2 className="h-12 w-12 text-green-600" />
                 </div>
                 <h3 className="mt-2 text-lg font-medium text-gray-700">Approval Rate</h3>
                 <p className="text-3xl font-bold text-green-600">{stats.approvalRate}%</p>
@@ -225,7 +226,7 @@ const UserDetails = ({
                 className="bg-white rounded-xl shadow-md p-6 text-center"
               >
                   <div className="flex justify-center">
-                    <span className="h-12 w-12 flex items-center justify-center text-2xl">⏱️</span>
+                    <Timer className="h-12 w-12 text-purple-600" />
                   </div>
                   <h3 className="mt-2 text-lg font-medium text-gray-700">Avg. Processing</h3>
                   <p className="text-3xl font-bold text-purple-600">
@@ -257,7 +258,7 @@ const UserDetails = ({
                     <div key={type} className="mb-6 last:mb-0">
                       <motion.button
                         whileTap={{ scale: 0.98 }}
-                        className={`w-full ${config.color} rounded-xl p-4 shadow-lg text-white flex justify-between items-center`}
+                        className={`w-full ${config.color} rounded-xl p-4 shadow-lg text-black flex justify-between items-center`}
                         onClick={() => toggleSection(type)}
                       >
                         <div className="flex items-center">

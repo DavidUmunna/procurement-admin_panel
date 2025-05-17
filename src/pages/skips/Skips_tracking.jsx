@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const ADMIN_ROLES = ['admin', 'global_admin', 'human_resources', 'internal_auditor'];
 
-const SkipsManagement = ({ setAuth }) => {
+const SkipsManagement = () => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
   const [data, setData] = useState({
@@ -23,11 +23,21 @@ const SkipsManagement = ({ setAuth }) => {
   // State
   const [SkipItems, setSkipItems] = useState([]);
   const [formData, setFormData] = useState({
-    skip_ID: '',
+    skip_id: '',
+    DeliveryWaybillNo:Number,
     WasteStream: '',
-    quantity: 1,
-    location: '',
-    value: 0
+    Quantity: {
+      value:'',
+      unit:''
+    },
+    SourceWell:"",
+    DispatchManifestNo:"",
+    DispatchTruckRegNo:'',
+    DriverName:"",
+    DeliveryOfEmptySkips:null,
+    DemobilizationOfFilledSkips:null,
+    DateFilled:null,
+
   });
   
   // Date range state
@@ -105,10 +115,10 @@ const SkipsManagement = ({ setAuth }) => {
       setCategories(categoriesRes.data.data.categories);
       
     } catch (err) {
-      if (err.response?.status === 401 || err.response?.status === 403) {
+      if (err.response?.status === 401 || err.response?.status === 402  ) {
         setError("Session expired. Please log in again.");
         localStorage.removeItem('authToken');
-        setAuth(false);
+        
         window.location.href = '/adminlogin'; 
       } else {
         console.error('Failed to fetch data:', err);
@@ -119,8 +129,9 @@ const SkipsManagement = ({ setAuth }) => {
   };
 
   useEffect(() => {
+    
     fetchData();
-  }, [setAuth,dateRange]); // Add dateRange to dependencies
+  }, [dateRange]); // Add dateRange to dependencies
 
   // Handle date range change
   const handleDateRangeChange = (dates) => {
@@ -142,6 +153,10 @@ const SkipsManagement = ({ setAuth }) => {
     return category === 'PVT' ? 'PVT' : formatted;
   };
 
+  const handleDateChange = (field, date) => {
+  setFormData({ ...formData, [field]: date });
+  };
+
   // Format date for display
   const formatDisplayDate = (date) => {
     if (!date) return '';
@@ -155,11 +170,12 @@ const SkipsManagement = ({ setAuth }) => {
   // Filter and sort
   const filteredItems = SkipItems
     .filter(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item.skip_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item?.DriverName && item?.DriverName.toLowerCase().includes(searchTerm.toLowerCase()))||
+      (item.SourceWell.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(item => 
-        selectedWasteStream === 'All' || item.category === selectedWasteStream
+        selectedWasteStream === 'All' || item.WasteStream === selectedWasteStream
     )
     .sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -170,15 +186,32 @@ const SkipsManagement = ({ setAuth }) => {
       }
       return 0;
     });
-
+  console.log(filteredItems)
   // Form handlers
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === 'quantity' || name === 'value' ? parseInt(value) || 0 : value
-    });
-  };
+ const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  // Handle the two nested quantity fields
+  if (name === 'value' || name === 'unit') {
+    setFormData(prev => ({
+      ...prev,
+      Quantity: {
+        ...prev.Quantity,
+        [name]: name === 'value' 
+          ? parseInt(value, 10) || ''  // parse to number (or empty string)
+          : value                      // keep unit as string
+      }
+    }));
+    return;
+  }
+
+  // Everything else
+  setFormData(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
+
 
   const handlePageChange = (newPage) => {
     fetchData(newPage, data.pagination?.limit);
@@ -193,8 +226,17 @@ const SkipsManagement = ({ setAuth }) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('authToken');
-      const res = await axios.post(`${API_URL}/skiptrack`, {
+      const res = await axios.post(`${API_URL}/skiptrack/create`, {
         ...formData,
+        DeliveryOfEmptySkips: formData.DeliveryOfEmptySkips
+      ? formData.DeliveryOfEmptySkips.toISOString()
+      : null,
+        DemobilizationOfFilledSkips: formData.DemobilizationOfFilledSkips
+          ? formData.DemobilizationOfFilledSkips.toISOString()
+          : null,
+        DateFilled: formData.DateFilled
+      ? formData.DateFilled.toISOString()
+      : null,
         addedBy: user.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -205,10 +247,10 @@ const SkipsManagement = ({ setAuth }) => {
       setShowForm(false);
       fetchData(); // Refresh data
     } catch (err) {
-      if (err.response?.status===401|| err.response?.status===403){
+      if (err.response?.status===401|| err.response?.status===402){
         setError("Session expired. Please log in again.");
         localStorage.removeItem('authToken');
-        setAuth(false)
+        
         window.location.href = '/adminlogin'; 
       } else {
         console.error('Create failed:', err.response?.data || err.message);
@@ -253,26 +295,40 @@ const SkipsManagement = ({ setAuth }) => {
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      category: '',
-      quantity: 1,
-      condition: 'New',
-      description: '',
-      location: '',
-      value: 0
+       skip_id: '',
+       DeliveryWaybillNo:Number,
+    WasteStream: '',
+    Quantity: {
+      value:'',
+      unit:''
+    },
+    SourceWell:"",
+    DispatchManifestNo:'',
+    DispatchTruckRegNo:'',
+    DriverName:"",
+    DeliveryOfEmptySkips:null,
+    DemobilizationOfFilledSkips:null,
+    DateFilled:null,
     });
   };
 
   const setupEdit = (item) => {
     setEditingItem(item);
     setFormData({
-      name: item.name,
-      category: item.category,
-      quantity: item.quantity,
-      condition: item.condition,
-      description: item.description || '',
-      location: item.location || '',
-      value: item.value || 0
+       skip_id: item.skip_id,
+       DeliveryWaybillNo:item.DeliveryWaybillNo,
+    WasteStream: item.WasteStream,
+    Quantity: {
+      value:item.Quantity.value,
+      unit:item.Quantity.unit
+    },
+    SourceWell:item.SourceWell,
+    DispatchManifestNo:item.DispatchManifestNo,
+    DispatchTruckNo:item.DispatchTruckRegNo,
+    DriverName:item.DriverName||"",
+    DeliveryOfEmptySkips:item.DeliveryOfEmptySkips,
+    DemobilizationOfFilledSkips:item.DemobilizationOfFilledSkips,
+    DateFilled:item.DateFilled,
     });
     setShowForm(true);
   };
@@ -334,23 +390,24 @@ const SkipsManagement = ({ setAuth }) => {
       {/* Header and Controls */}
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Skips Management</h1>
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {/* Search input */}
-          <div className="relative w-full sm:w-64">
+     <div className="flex flex-col xs:flex-row flex-wrap justify-between items-stretch gap-3 mb-6">
+        {/* Search and Filters - takes full width on mobile, auto on larger */}
+        <div className="flex-1 flex flex-row xs:flex-row gap-3 min-w-[250px]">
+          {/* Search input - full width on mobile, fixed on larger */}
+          <div className="relative flex-1 xs:flex-initial xs:w-48 sm:w-56">
             <FiSearch className="absolute left-3 top-3 text-gray-400" />
             <input
               type="text"
-              placeholder="Search Skips..."
-              className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              placeholder="Search..."
+              className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm sm:text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {console.log("categories",categories)}
-          {/* Category filter */}
+          
+          {/* Category filter - full width on mobile, auto on larger */}
           <select
-            className="w-full sm:w-48 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="flex-1 xs:flex-initial xs:w-40 sm:w-48 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm sm:text-base"
             value={selectedWasteStream}
             onChange={(e) => setselectedWasteStream(e.target.value)}
           >
@@ -362,35 +419,36 @@ const SkipsManagement = ({ setAuth }) => {
                 </option>
               ))
             ) : (
-              <option disabled>No categories available</option>
+              <option disabled>No categories</option>
             )}
           </select>
           
-          {/* Date range picker */}
-          <div className="relative w-full sm:w-64">
-            <FiCalendar className="absolute left-3 top-3 text-gray-400" />
+          {/* Date range picker - full width on mobile, auto on larger */}
+          <div className="relative flex-1 xs:flex-initial xs:w-48 sm:w-56">
+            <FiCalendar className="absolute left-3 top-3  text-gray-400" />
             <DatePicker
               selectsRange={true}
               startDate={dateRange.startDate}
               endDate={dateRange.endDate}
               onChange={handleDateRangeChange}
               isClearable={true}
-              placeholderText="Select date range"
-              className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-5"
+              placeholderText="Date range"
+              className="pl-4 pr-10 py-2 mr-5 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             />
           </div>
         </div>
-        
+      
+        {/* Add button - full width on mobile, auto on larger */}
         <button
           onClick={() => {
             setEditingItem(null);
             resetForm();
             setShowForm(true);
           }}
-          className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105"
+          className="w-full xs:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm sm:text-base"
         >
-          <FiPlus className="mr-2" />
-          Add Skip Item
+          <FiPlus className="mr-1 sm:mr-2" />
+          <span className="whitespace-nowrap">Add Skip</span>
         </button>
       </div>
 
@@ -436,7 +494,7 @@ const SkipsManagement = ({ setAuth }) => {
             <p className="text-2xl font-bold text-gray-800">{stats.totalItems || 0}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500">Total Quantity</h3>
+            <h3 className="text-sm font-medium text-gray-500">Total Quantity(tonnes)</h3>
             <p className="text-2xl font-bold text-gray-800">{stats.totalQuantity || 0}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
@@ -455,119 +513,125 @@ const SkipsManagement = ({ setAuth }) => {
       {/* Skip Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th 
-                  onClick={() => requestSort('name')}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                >
-                  Skip ID
-                </th>
-                <th 
-                  onClick={() => requestSort('category')}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                >
-                  Category
-                </th>
-                <th 
-                  onClick={() => requestSort('quantity')}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                >
-                  Quantity
-                </th>
-                <th 
-                  onClick={() => requestSort('condition')}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                >
-                  Condition
-                </th>
-                <th 
-                  onClick={() => requestSort('lastUpdated')}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                >
-                  Last Updated
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+      <thead className="bg-gray-50">
+        <tr>
+          {/* Define fixed widths for each column via w- classes */}
+          <th
+            onClick={() => requestSort('skip_id')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Skip ID</th>
+          <th
+            onClick={() => requestSort('WasteStream')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Category</th>
+          <th
+            onClick={() => requestSort('Quantity.value')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Quantity</th>
+          <th
+            onClick={() => requestSort('DeliveryWaybillNo')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Delivery Waybill No</th>
+          <th
+            onClick={() => requestSort('SourceWell')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Source Well</th>
+          <th
+            onClick={() => requestSort('DispatchManifestNo')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Dispatch Manifest No</th>
+          <th
+            onClick={() => requestSort('DispatchTruckRegNo')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Truck No</th>
+          <th
+            onClick={() => requestSort('DriverName')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Driver Name</th>
+          <th
+            onClick={() => requestSort('DeliveryOfEmptySkips')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Empty Delivery</th>
+          <th
+            onClick={() => requestSort('DemobilizationOfFilledSkips')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Demobilization</th>
+          <th
+            onClick={() => requestSort('DateFilled')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Date Filled</th>
+          <th
+            onClick={() => requestSort('lastUpdated')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Last Updated</th>
+          <th className="w-1/12 px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
+        </tr>
+      </thead>
+      <tbody className="bg-white divide-y divide-gray-200">
+        {filteredItems.length === 0 ? (
+          <tr>
+            <td colSpan="12" className="px-4 py-4 text-center text-gray-500">No skip items found</td>
+          </tr>
+        ) : (
+          filteredItems.map((item) => (
+            <React.Fragment key={item._id}>
+              <tr className="hover:bg-gray-50">
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    
+                    <div className="ml-2 text-sm font-medium text-gray-900">{item.skip_id}</div>
+                  </div>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {formatCategory(item.WasteStream)}
+                  </span>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.Quantity?.value}{item.Quantity?.unit}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DeliveryWaybillNo}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.SourceWell}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DispatchManifestNo}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DispatchTruckRegNo}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DriverName}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DeliveryOfEmptySkips?.split('T')[0]}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DemobilizationOfFilledSkips?.split('T')[0]}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DateFilled?.split('T')[0]}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.lastUpdated?.split('T')[0]}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                  <button onClick={() => setupEdit(item)} className="text-blue-600 hover:text-blue-900">
+                    <FiEdit2 />
+                  </button>
+                  <button onClick={() => deleteItem(item._id)} className="text-red-600 hover:text-red-900">
+                    <FiTrash2 />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredItems.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                    No Skip items found
-                  </td>
-                </tr>
-              ) : (
-                filteredItems.map((item) => (
-                  <React.Fragment key={item._id}>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <button onClick={() => toggleItem(item._id)}>
-                            {expandedItem === item._id ? <FiChevronUp /> : <FiChevronDown />}
-                          </button>
-                          <div className="ml-2 text-sm font-medium text-gray-900">{item.name}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {formatCategory(item.category)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.quantity}
-                      </td>
-                     
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.lastUpdated ? item.lastUpdated.split("T")[0] : ''}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
-                          onClick={() => setupEdit(item)}
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                        >
-                          <FiEdit2 />
-                        </button>
-                        <button 
-                          onClick={() => deleteItem(item._id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </td>
-                    </tr>
-                    {expandedItem === item._id && (
-                      <tr>
-                        <td colSpan="6" className="px-6 py-4 bg-gray-50">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <h4 className="font-medium text-sm">SKU:</h4>
-                              <p className="text-sm text-gray-600">{item.sku || 'Not specified'}</p>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">Description:</h4>
-                              <p className="text-sm text-gray-600">{item.description || 'No description'}</p>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">Location:</h4>
-                              <p className="text-sm text-gray-600">{item.location || 'Not specified'}</p>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">Value:</h4>
-                              <p className="text-sm text-gray-600">₦{item.value ? item.value.toLocaleString() : 0}</p>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              )}
-            </tbody>
-          </table>
+            </React.Fragment>
+          ))
+        )}
+      </tbody>
+    </table>
         </div>
       </div>
 
@@ -606,11 +670,11 @@ const SkipsManagement = ({ setAuth }) => {
             <form onSubmit={editingItem ? handleUpdate : handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Name*</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Skip ID*</label>
                   <input
                     type="text"
-                    name="name"
-                    value={formData.name}
+                    name="skip_id"
+                    value={formData.skip_id}
                     onChange={handleInputChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -620,8 +684,8 @@ const SkipsManagement = ({ setAuth }) => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
                   <select
-                    name="category"
-                    value={formData.category}
+                    name="WasteStream"
+                    value={formData.WasteStream}
                     onChange={handleInputChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
@@ -641,53 +705,125 @@ const SkipsManagement = ({ setAuth }) => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity*</label>
-                    <input
-                      type="number"
-                      name="quantity"
-                      min="1"
-                      value={formData.quantity}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        name="QuantityValue"
+                        min="1"
+                        value={formData?.Quantity?.value}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            Quantity: { ...formData.Quantity, value: e.target.value }
+                          })
+                        }
+                        required
+                        className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <select
+                        name="QuantityUnit"
+                        value={formData.Quantity.unit}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            Quantity: { ...formData.Quantity, unit: e.target.value }
+                          })
+                        }
+                        required
+                        className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">Unit</option>
+                        <option value="kg">kg</option>
+                        <option value="liters">liters</option>
+                        <option value="tonne">tons</option>
+                        {/* Add more units as needed */}
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Value (₦)</label>
-                    <input
-                      type="number"
-                      name="value"
-                      min="0"
-                      value={formData.value}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
+
                 
                
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">DeliveryWaybillNo</label>
                   <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
+                    type="number"
+                    name="DeliveryWaybillNo"
+                    value={formData.DeliveryWaybillNo}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SourceWell*</label>
+                  <input
+                    type="text"
+                    name="SourceWell"
+                    value={formData.SourceWell}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">DispatchManifestNo</label>
+                  <input
+                    type="text"
+                    name="DispatchManifestNo"
+                    value={formData.DispatchManifestNo}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">DispatchTruckRegNo</label>
+                  <input
+                    type="text"
+                    name="DispatchTruckRegNo"
+                    value={formData.DispatchTruckRegNo}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">DriverName</label>
+                  <input
+                    type="text"
+                    name="DriverName"
+                    value={formData.DriverName}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Of Empty Skips*</label>
+                  <DatePicker
+                    selected={formData.DeliveryOfEmptySkips}
+                    onChange={(date) => handleDateChange("DeliveryOfEmptySkips", date)}
+                    className='mt-5 border-4'
+                  />
+                </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Demobilization Of Filled Skips</label>
+                  <DatePicker
+                    selected={formData.DemobilizationOfFilledSkips}
+                    onChange={(date) => handleDateChange("DemobilizationOfFilledSkips", date)}
+                    className='border-4'
+                    />
+                </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Filled</label>
+                  <DatePicker
+                    selected={formData.DateFilled}
+                    onChange={(date) => handleDateChange("DateFilled", date)}
+                    className='border-4'
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows="3"
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+               
               </div>
               
               <div className="flex justify-end space-x-3 mt-6">
@@ -709,7 +845,9 @@ const SkipsManagement = ({ setAuth }) => {
                   {editingItem ? 'Update Item' : 'Save Item'}
                 </button>
               </div>
+              </div>
             </form>
+           
           </div>
         </div>
       )}

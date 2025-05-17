@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AdminImg from "../components/assets/admin.png"
 import { useUser } from "../components/usercontext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -69,11 +70,13 @@ export default function Sign_in({ setAuth }) {
       >
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <motion.img
-            src={require("../components/assets/admin.png")}
+            src={AdminImg}
             alt="Halden"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
+            loading="eager"
+            fetchPriority="high"
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">

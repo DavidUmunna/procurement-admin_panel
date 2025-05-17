@@ -27,7 +27,7 @@ const OrdersDashboard = ({setAuth}) => {
   });
   const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
     "Financial_manager"];
-  const departmental_access=["waste_management","Environmental_lab_manager","PTV_manager"]
+  const departmental_access=["waste_management","Environmental_lab_manager","PVT_manager"]
   const only_approvals=["accounts"]
   const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit) => {
     setIsLoading(true);
@@ -67,7 +67,7 @@ const OrdersDashboard = ({setAuth}) => {
     
           
             response=department_response.data.data||[]
-            
+            console.log("response",response)
             setData({
               orders:response,
               pagination:department_response.data.Pagination
@@ -99,7 +99,7 @@ const OrdersDashboard = ({setAuth}) => {
 
         }
         else {
-          const res = await get_user_orders(user?.email);
+          const res = await get_user_orders(user?.userId);
           response = res.orders||[];
         }
         console.log(response)
@@ -114,7 +114,7 @@ const OrdersDashboard = ({setAuth}) => {
         if (err.response?.status===401|| err.response?.status===403){
           setError("Session expired. Please log in again.");
           localStorage.removeItem('authToken');
-          setAuth(false)
+          
           window.location.href = '/adminlogin'; 
         }else{
           
@@ -167,48 +167,48 @@ const OrdersDashboard = ({setAuth}) => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10">
-      {/* Main Order List (takes 2/3 width on large screens) */}
-      <div className="lg:w-2/3">
-        
-        <OrderList 
-          orders={orders} 
-          selectedOrderId={selectedOrderId}
-          setOrders={setOrders}
-        />
-        <div>
-              {/* Your data display */}
-              <PaginationControls
-                currentPage={Data.pagination?.page}
-                totalPages={Data.pagination?.totalPages}
-                itemsPerPage={Data.pagination?.limit}
-                totalItems={Data.pagination?.total}
-                onPageChange={handlePageChange}
-                onItemsPerPageChange={handleItemsPerPageChange}
-                isLoading={isLoading}
-              />
-            </div>
-        
-      </div>
-      
-      {/* Duplicates Panel (takes 1/3 width on large screens) */}
-      {(admin_roles.includes(user?.role) || user?.role === "accounts") && (
-        <div className="lg:w-1/3 mb-8">
-          <div>
-            <Duplicates 
-              orders={orders} 
-              onOrderSelect={handleOrderSelect}
-            />
-          </div>
-          <div className="mt-4 overflow-x-auto">
-            <CompletedOrdersList orders={orders} />
-          </div>
+  <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10 h-[calc(100vh-5rem)]">
+  {/* Left: Order List (2/3 width on large screens) */}
+  <div className="w-full lg:w-2/3 overflow-y-auto">
+    <OrderList 
+      orders={orders} 
+      selectedOrderId={selectedOrderId}
+      setOrders={setOrders}
+    />
+    <div>
+      <PaginationControls
+        currentPage={Data.pagination?.page}
+        totalPages={Data.pagination?.totalPages}
+        itemsPerPage={Data.pagination?.limit}
+        totalItems={Data.pagination?.total}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        isLoading={isLoading}
+      />
+    </div>
+  </div>
+
+  {/* Right: Responsive column for optional components */}
+  {(admin_roles.includes(user?.role) || user?.role === "accounts") && (
+    <div className="w-full lg:w-1/3 flex flex-col justify-center ">
+      {Duplicates && (
+        <div className={`${CompletedOrdersList ? 'flex-1' : 'flex justify-center items-center h-full'}`}>
+          <Duplicates 
+            orders={orders} 
+            onOrderSelect={handleOrderSelect}
+          />
         </div>
       )}
-
-      {error}
+      {CompletedOrdersList && (
+        <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full'} overflow-y-auto`}>
+          <CompletedOrdersList orders={orders} />
+        </div>
+      )}
     </div>
-  );
+  )}
+</div>
+  )
+
 };
 
 export default OrdersDashboard;

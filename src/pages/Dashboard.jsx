@@ -20,8 +20,8 @@ export const Dashboard=()=>{
     const [rejectedOrders, setRejectedOrders] = useState([]);
     const [completedOrders, setcompletedOrders] = useState([]);
     const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-      "Financial_manager"];
-    const departmental_access=["waste_management","Environmental_lab_manager","PTV_manager"]
+      "Financial_manager",];
+    const departmental_access=["waste_management","PVT_manager","Environmental_lab_manager","PVT_manager"]
     
     useEffect(()=>{
         const email=user?.email||"no email provided"
@@ -38,7 +38,7 @@ export const Dashboard=()=>{
                     const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
                       "ngrok-skip-browser-warning": "true"},
                       withCredential:true})
-                      console.log()
+                     
                       response=userReq.data.data
                     }else if(departmental_access.includes(user?.role)){
                       if (!user?.Department) return;
@@ -50,7 +50,7 @@ export const Dashboard=()=>{
                       },headers:{Authorization:`Bearer ${token}`, 
                       "ngrok-skip-browser-warning": "true"},
                       withCredential:true})
-                      console.log()
+                      
                       response=userReq.data.data
                     }
                     if (Array.isArray(response||[])){
@@ -84,14 +84,15 @@ export const Dashboard=()=>{
             try{
                   const API_URL = `${process.env.REACT_APP_API_URL}/api`
                   const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get(`${API_URL}/orders/${email}`,{headers:{Authorization:`Bearer ${token}`, 
+                  const userReq=await axios.get(`${API_URL}/orders/${user.userId}`,{headers:{Authorization:`Bearer ${token}`, 
                     "ngrok-skip-browser-warning": "true"},
                     withCredential:true})
-                  console.log(userReq)
+                  //console.log("user requests",userReq)
                   if (Array.isArray(userReq.response||[])){
-                    const orders=userReq.data.response
-                    console.log("orders",orders)
+                    const orders=userReq.data
+                    
                     setorders(orders)
+                    setRequest(userReq.data)
                     
                     
                     
@@ -126,6 +127,8 @@ export const Dashboard=()=>{
         return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
+    
+
     
     
    

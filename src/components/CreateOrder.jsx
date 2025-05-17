@@ -22,7 +22,6 @@ const CreateOrder = () => {
   const { user } = useUser();
   const [supplier, setSupplier] = useState("Halden");
   const [products, setProducts] = useState([{ name: "", quantity: 1, price: 0 }]);
-  const [orderedBy, setOrderedBy] = useState("");
   const [urgency, setUrgency] = useState("");
   const [files, setFiles] = useState([]);
   const [remarks, setRemarks] = useState("");
@@ -31,11 +30,13 @@ const CreateOrder = () => {
   const [Title, settitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const[Error,setError]=useState("")
+  const [staff,setStaff]=useState("")
 
   useEffect(() => {
     if (user) {
-      setOrderedBy(user.name);
+    
       setEmail(user.email);
+      setStaff(user.userId)
     }
   }, [user]);
 
@@ -54,16 +55,17 @@ const CreateOrder = () => {
     const formData = new FormData();
     const payload = {
       supplier,
-      orderedBy,
       email,
       filenames,
       urgency,
       remarks,
       products,
-      Title
+      Title,
+      staff
     };
 
     formData.append("email", email);
+    formData.append("userId",user.userId)
     files.forEach((file) => {
       formData.append("files", file);
     });
@@ -178,16 +180,7 @@ const CreateOrder = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </motion.div>
-            <motion.div className="mb-4" variants={inputVariants} initial="hidden" animate="visible">
-              <label className="block text-gray-700 font-bold mb-2">Ordered By:</label>
-              <input
-                type="text"
-                value={orderedBy}
-                onChange={(e) => setOrderedBy(e.target.value)}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </motion.div>
+           
 
             <label className="block mb-2">Urgency</label>
             <select

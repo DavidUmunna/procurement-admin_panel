@@ -25,7 +25,7 @@ const Hero = () => {
 
         {/* Right: Image Section */}
         <div className="flex justify-center">
-          <img src={HeroImage} alt="Hero" className="w-full max-w-md rounded-lg" />
+          <img rel="preload" src={HeroImage} alt="Hero" className="w-full max-w-md rounded-lg" />
         </div>
       </div>
     </div>

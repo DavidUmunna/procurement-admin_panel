@@ -9,7 +9,7 @@ import { PanelLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-  "Financial_manager","waste_management","Environmental_lab_manager","PTV_manager"];
+  "Financial_manager","waste_management","Environmental_lab_manager","PVT_manager"];
 
 const navigation = [
   { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },
@@ -116,7 +116,7 @@ export default function Navbar() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items className="absolute top-4 right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                           {userNavigation.map((item) => (
                             <Menu.Item key={item.name}>
                               {({ active }) => (
@@ -182,7 +182,7 @@ export default function Navbar() {
                     <div className="text-sm font-medium text-gray-400">{user?.email}</div>
                   </div>
                 </div>
-                <div className="mt-3 space-y-1 px-2">
+                <div className="mt-3 space-y-1 px-2 ">
                 
                   {userNavigation.map((item) => (
                     <Disclosure.Button

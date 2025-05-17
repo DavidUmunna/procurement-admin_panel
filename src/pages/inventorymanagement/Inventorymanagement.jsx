@@ -167,7 +167,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: 1,
-        userId: user?.name
+        userId: user?.userId
       }, {
         headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       });
@@ -211,7 +211,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: -1,
-        userId: user?.name
+        userId: user?.userId
       }, {
         headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       });
@@ -301,7 +301,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       const token = localStorage.getItem('authToken');
       const res = await axios.post(`${API_URL}/inventory`, {
         ...formdata,
-        AddedBy: user?.name
+        AddedBy: user?.userId
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });

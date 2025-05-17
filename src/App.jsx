@@ -26,7 +26,7 @@ import UserTasks from "./pages/Usertask";
 import Aboutus from "./pages/landinpage/Aboutus/main";
 import Layout from "./pages/landinpage/layout/Layout"
 import InventoryManagement from "./pages/inventorymanagement/ParentComp";
-import SkipsManagement from "./pages/skips/Skips_tracking";
+import SkipsManagement from "./pages/skips/parent";
 
 // Page transition animation
 const pageVariants = {
@@ -139,7 +139,7 @@ const App = () => {
                 element={
                   isauthenticated ? (
                     <PageTransition>
-                      <SkipsManagement/>
+                      <SkipsManagement />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />

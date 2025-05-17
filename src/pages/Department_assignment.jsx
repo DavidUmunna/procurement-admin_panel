@@ -228,10 +228,12 @@ const refreshDepartments = () => {
 
       let response;
       if (modal.type === 'addDept') {
-        response = await axios.post('/api/department', departmentData, { headers });
+        const API_URL=`${process.env.REACT_APP_API_URL}/api`
+        response = await axios.post(`${API_URL}/department`, departmentData, { headers });
         setDepartments(prev => [...prev, response.data.data]);
       } else {
-        response = await axios.put(`/api/department/${modal.data._id}`, departmentData, { headers });
+        const API_URL=`${process.env.REACT_APP_API_URL}/api`
+        response = await axios.put(`${API_URL}/department/${modal.data._id}`, departmentData, { headers });
         setDepartments(prev => prev.map(d => d._id === modal.data._id ? response.data.data : d));
       }
       
@@ -257,7 +259,8 @@ const refreshDepartments = () => {
   const deleteDepartment = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`/api/department/${modal.data._id}`, {
+      const API_URL=`${process.env.REACT_APP_API_URL}/api`
+      await axios.delete(`${API_URL}/department/${modal.data._id}`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true
       });
@@ -272,8 +275,9 @@ const refreshDepartments = () => {
   const addUserToDepartment = async () => {
     try {
       const token = localStorage.getItem("authToken");
+      const API_URL=`${process.env.REACT_APP_API_URL}/api`
       const response = await axios.post(
-        `/api/department/${modal.data._id}/users`,
+        `${API_URL}/department/${modal.data._id}/users`,
         { userId: selectedUserId, name:users.find(u=>String(u._id)===String(selectedUserId))?.name },
         { 
           headers: { Authorization: `Bearer ${token}` },
@@ -301,8 +305,9 @@ const refreshDepartments = () => {
   const removeUserFromDepartment = async (departmentId,userId) => {
     try {
       const token = localStorage.getItem("authToken");
+      const API_URL=`${process.env.REACT_APP_API_URL}/api`
       await axios.delete(
-        `/api/department/${departmentId}/users/${userId}`,
+        `${API_URL}/department/${departmentId}/users/${userId}`,
         { 
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true 
@@ -486,7 +491,7 @@ const refreshDepartments = () => {
   if (loading) return <div className="text-center py-8">Loading departments...</div>;
 
   return (
-    <div className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-4xl xl:max-w-6xl mx-auto p-6 mt-10"
+    <div className="max-w-full sm:max-w-md md:max-w-full lg:max-w-4xl xl:max-w-6xl mx-auto p-6 mt-10"
       >
             {/* Header and Search */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 flex-wrap mt-4 md:items-center">
@@ -602,14 +607,20 @@ const refreshDepartments = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
-                  <input
-                    type="text"
-                    placeholder="Department name"
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    disabled={modalLoading}
-                  />
+                  <select
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  disabled={modalLoading}
+                >
+                  <option value="">Select Department</option>
+                  <option value="waste_management_dep">Waste Management</option>
+                  <option value="PVT">PVT</option>
+                  <option value="Environmental_lab_dep">Environmental Lab</option>
+                  <option value="accounts_dep">Accounts</option>
+                  <option value="Human resources">Human Resources</option>
+                </select>
+
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Head of Department</label>

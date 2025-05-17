@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 const orders="orders"
 
@@ -20,15 +21,15 @@ export const getOrders = async (page , limit ) => {
     console.error("Error fetching orders:", error);
     return [];
   }
-};export const get_user_orders = async ( email ) => {
+};export const get_user_orders = async ( userId ) => {
  
   try {
     const requests = [];
 
-    if (email) {
+    if (userId) {
       const token=localStorage.getItem("authToken")
-      requests.push(axios.get(`${API_URL}/${orders}/${email}`,{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
-      requests.push(axios.get(`${API_URL}/fileupload/${email}`, { responseType: "blob" },{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
+      requests.push(axios.get(`${API_URL}/${orders}/${userId}`,{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
+      requests.push(axios.get(`${API_URL}/fileupload/${userId}`, { responseType: "blob" },{headers:{Authorization:`Bearer ${token}`},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
     }
     
     const results = await Promise.allSettled(requests);

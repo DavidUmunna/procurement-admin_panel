@@ -116,13 +116,13 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
             <div key={index} className="border-b pb-2 last:border-b-0">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-medium">{activity.action} {activity.itemName} </p>
+                  <p className="font-medium">{activity.action} {activity?.itemName} </p>
                   <p className="text-sm text-gray-500">
                     {new Date(activity.timestamp).toLocaleString()}
                   </p>
                   <div className="flex  ">
                       <p className="text-sm text-gray-500 mr-4">
-                        Modified by:{activity.userName}
+                        Modified by:{activity?.userName}
                       </p>
                       <p className="text-sm text-gray-500">
                         {activity.category}

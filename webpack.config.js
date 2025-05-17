@@ -24,8 +24,11 @@ module.exports = {
         test: /\.js$/,
         enforce: 'pre',
         use: ['source-map-loader'],
-        exclude: [/node_modules\/html-entities/] // <- skip broken source maps
+        exclude: [/node_modules\/html-entities/,
+          /node_modules\/react-datepicker/
+        ] // <- skip broken source maps
       },
+
     ],
   } 
 

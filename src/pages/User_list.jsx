@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { get_users, deleteUser } from "../services/userService";
+import { get_users, deleteUser, updateUser } from "../services/userService";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import {Users} from "lucide-react"
 
 // Animation Variants
 const containerVariants = {
@@ -26,15 +27,28 @@ const departmentColors = {
   Default: "bg-gray-100 text-gray-800"
 };
 
+// Role options
+const roleOptions = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
+  "Financial_manager","waste_management","Environmental_lab_manager","PVT_manager","staff"];
+
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
-  const [departments,setdepartments]=useState([])
+  const [departments, setDepartments] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    Department: "",
+    canApprove: false,
+    role: "",
+    password: ""
+  });
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     fetch_users();
-    getDepartment();
-  }, []);
+    
+  }, [editingUser]);
 
   const fetch_users = async () => {
     try {
@@ -48,37 +62,198 @@ export default function UserList() {
       console.error(err);
     }
   };
-  const getDepartment=async()=>{
-    try{
+
+  const getDepartment = async () => {
+    try {
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      const department_data=await axios.get(`${API_URL}/department`,{
+      const department_data = await axios.get(`${API_URL}/department`, {
         headers: { Authorization: `Bearer ${token}` }
-      })
-
-      setdepartments(department_data.data.data)
-
-
-    }catch(error){
-      console.log(error)
-      
-
+      });
+      setDepartments(department_data.data.data);
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
 
   const handleDelete = async (userId) => {
     await deleteUser(userId);
     setUsers(users.filter((user) => user._id !== userId));
   };
 
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      Department: user.Department,
+      canApprove: user.canApprove || false,
+      role: user.role,
+      password: "" // Leave blank for security
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    if (!editingUser || !editingUser._id) {
+      console.error("No user selected for editing");
+      return;
+    }
+
+    console.log("Submitting edit form:", editForm);
+
+    const updatedUser = await updateUser(editingUser._id, editForm);
+
+    if (!updatedUser) {
+      console.error("No response from updateUser");
+      return;
+    }
+
+    console.log(updatedUser)
+    setUsers(prevUsers =>
+      prevUsers.map(user =>
+        user._id === editingUser._id ? updatedUser.data : user
+      )
+    );
+
+    setShowEditModal(false);
+    // Optional: Show success toast/alert
+  } catch (error) {
+    console.error("Error updating user:", error);
+    // Optional: Show error toast/alert
+  }
+};
+
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setEditForm({
+      ...editForm,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
   const filteredUsers = filter === "all" 
     ? users 
-    : users.filter(user => user.department === filter);
-
-  
+    : users.filter(user => user.Department === filter);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10">
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div 
+            className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Edit User</h3>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditSubmit}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={editForm.name}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                  <select
+                    name="Department"
+                    value={editForm.Department}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                  >
+                  <option value="">Select Department</option>
+                  <option value="waste_management_dep">Waste Management</option>
+                  <option value="PVT">PVT</option>
+                  <option value="Environmental_lab_dep">Environmental Lab</option>
+                  <option value="accounts_dep">Accounts</option>
+                  <option value="Human resources">Human Resources</option>
+
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                  <select
+                    name="role"
+                    value={editForm.role}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    required
+                  >
+                    <option value="">Select Role</option>
+                    {roleOptions.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="canApprove"
+                    checked={editForm.canApprove}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm text-gray-700">Can Approve Requests</label>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password (leave blank to keep current)
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={editForm.password}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="New password"
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Main User List */}
       <motion.div
         className="w-full max-w-6xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden"
         variants={containerVariants}
@@ -87,9 +262,9 @@ export default function UserList() {
       >
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">👥 User Management</h2>
-              <p className="text-gray-500 mt-1">{users.length} team members</p>
+            <div className="flex items-center gap-2">
+              <Users className="h-6 w-6 text-gray-800" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">User Management</h2>
             </div>
             
             <div className="flex flex-wrap gap-2">
@@ -97,10 +272,13 @@ export default function UserList() {
                 onChange={(e) => setFilter(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                <option value="all">All Departments</option>
-                {departments.map(dept => (
-                  <option key={dept._id} >{dept.name}</option>
-                ))}
+                <option value="">Select Department</option>
+                <option value="waste_management_dep">Waste Management</option>
+                <option value="PVT">PVT</option>
+                <option value="Environmental_lab_dep">Environmental Lab</option>
+                <option value="accounts_dep">Accounts</option>
+                <option value="Human resources">Human Resources</option>
+
               </select>
             </div>
           </div>
@@ -112,7 +290,7 @@ export default function UserList() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <p className="text-gray-500">No users found{filter !== "all" && ` in ${filter} department`}.</p>
+            <p className="text-gray-500">No users found{filter !== "all" && ` in ${filter} Department`}.</p>
           </motion.div>
         ) : (
           <motion.ul 
@@ -134,22 +312,25 @@ export default function UserList() {
                   <div className="flex flex-col sm:flex-row justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <motion.img
-                        alt={person.name}
-                        src={person.imageurl || "https://ui-avatars.com/api/?name="+person.name+"&background=random"}
+                        alt={person?.name}
+                        src={person?.imageurl || "https://ui-avatars.com/api/?name="+person.name+"&background=random"}
                         className="size-12 sm:size-14 flex-none rounded-full bg-gray-100 border-2 border-white shadow"
                         whileHover={{ scale: 1.1 }}
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold text-gray-900">{person.name}</p>
-                          {person.role === "Admin" && (
+                          <p className="font-semibold text-gray-900">{person?.name}</p>
+                          {person?.role === "Admin" && (
                             <span className="text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">Admin</span>
                           )}
+                          {person?.canApprove && (
+                            <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">Approver</span>
+                          )}
                         </div>
-                        <p className="text-sm text-gray-500">{person.email}</p>
+                        <p className="text-sm text-gray-500">{person?.email}</p>
                         <div className="mt-1 flex flex-wrap gap-2">
                           <span className={`text-xs px-2 py-1 rounded-full ${
-                            departmentColors[person.department] || departmentColors.Default
+                            departmentColors[person.Department] || departmentColors.Default
                           }`}>
                             {person.Department || "No Department"}
                           </span>
@@ -163,6 +344,17 @@ export default function UserList() {
                     </div>
 
                     <div className="flex items-center justify-end sm:justify-normal gap-3">
+                      <motion.button
+                        onClick={() => handleEdit(person)}
+                        className="px-3 py-1 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100 transition font-medium flex items-center gap-1"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                      </motion.button>
                       <motion.button
                         onClick={() => handleDelete(person._id)}
                         className="px-3 py-1 bg-red-50 text-red-600 text-sm rounded-lg hover:bg-red-100 transition font-medium flex items-center gap-1"

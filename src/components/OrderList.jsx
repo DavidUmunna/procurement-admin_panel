@@ -7,7 +7,7 @@ import {
   
 } from "../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaFilePdf, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock } from "react-icons/fa";
+import { FaFilePdf, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment } from "react-icons/fa";
 import { FiDownload,  } from "react-icons/fi";
 import { useUser } from "./usercontext";
 import Searchbar from "./searchbar";
@@ -17,7 +17,7 @@ import { admin_roles } from "./navBar";
 
 
 
-const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts"];
+const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts","waste_management","PVT_manager","Environmental_lab_manager"];
 
 const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
@@ -29,6 +29,10 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [comment,setcomment]=useState("")
+  const [commentsByOrder, setCommentsByOrder] = useState({});
+  const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
+
 
   const getOverallStatus = (approvals, department) => {
     if (!approvals || approvals.length === 0) return "Pending";
@@ -37,7 +41,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     
-    const REQUIRED_APPROVALS = department === "waste_management_dep" ? 3 : 2;
+    const REQUIRED_APPROVALS = department === "waste_management_dep" ? 5 : 4;
   
     if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
     if (approvalCount > 0) return "Partially Approved";
@@ -48,7 +52,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const getStatusExplanation = (approvals,Department) => {
     const status = getOverallStatus(approvals,Department);
     const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
-    const REQUIRED_APPROVALS=2
+    const REQUIRED_APPROVALS = Department === "waste_management_dep" ? 5 : 4;
     
     switch(status) {
       case "Approved":
@@ -105,6 +109,19 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
     });
   };
 
+  const handleCommentChange = (orderId) => (e) => {
+    setCommentsByOrder(prev => ({
+    ...prev,
+    [orderId]: e.target.value
+  }));
+  };
+
+ const handleCommentSubmit = (orderId) => (e) => {
+    e.preventDefault();
+    setcomment(commentsByOrder[orderId]||'')
+    setOpenCommentOrderId(null);
+  };
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       setIsLoading(true);
@@ -130,6 +147,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                     {
                       admin: user.name,
                       status: newStatus,
+                      comment:comment,
                       timestamp: new Date().toISOString()
                     }
                   ] })()
@@ -151,12 +169,12 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       // Then send specific approve/reject requests
       if (newStatus === "Approved") {
         await axios.put(`${API_URL}/orders/${orderId}/approve`, { 
-          adminName: user.name, 
+          adminName: user.name, comment:comment,
           orderId 
         }, {headers});
       } else if (newStatus === "Rejected" || newStatus === "Pending") {
         await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
-          adminName: user.name, 
+          adminName: user.name,comment:comment,
           orderId 
         }, {headers});
       }
@@ -174,7 +192,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                 ...order, 
                 status: order.status, // Revert status
                 Approvals: Array.isArray(order.Approvals)?order.Approvals?.filter(approval => 
-                  approval.admin !== user.name || approval.status !== newStatus
+                  approval.admin !== user.name || approval.status !== newStatus||approval.comment!==comment
                 ):[] // Remove the failed approval
               } 
             : order
@@ -206,7 +224,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
     e.stopPropagation();
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
-
+ 
    const handleFileDownload = async (fileName, event) => {
     event.stopPropagation();
     try {
@@ -278,29 +296,48 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
             Current Status: <span className="ml-2">{getOverallStatus(order.Approvals)}</span>
           </p>
           <p className="text-sm text-gray-500 mt-1">
-            {getStatusExplanation(order.Approvals,order?.Department)}
+            {getStatusExplanation(order.Approvals,order?.staff?.Department)}
           </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <p className="text-gray-600"><span className="font-medium">Order Number:</span> {order.orderNumber || "N/A"}</p>
-          <p className="text-gray-600"><span className="font-medium">Ordered By:</span> {order.orderedBy}</p>
-          <p className="text-gray-600"><span className="font-medium">Employee Email:</span> {order.email}</p>
-          <p className="text-gray-600"><span className="font-medium">Employee Department:</span> {order.Department}</p>
+          <p className="text-gray-600"><span className="font-medium">Ordered By:</span> {order.staff?.name}</p>
+          <p className="text-gray-600"><span className="font-medium">Employee Email:</span> {order.staff?.email}</p>
+          <p className="text-gray-600"><span className="font-medium">Employee Department:</span> {order.staff?.Department}</p>
         </div>
-        <div>
-          <p className="text-gray-600"><span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
-          {admin_roles.includes(user?.role)&&(<p className="text-gray-600">
-            <span className="font-medium">Approvals:</span>
-            {console.log("order approvals",orders.map(order=>order.Approvals))} 
-            {order.Approvals?.length > 0 
-              ? order.Approvals.map(a => `${a.admin} (${a.status})`).join(", ")
-              : "None"}
-          </p>)}
-          <p className={`${order.urgency === "VeryUrgent" ? "text-red-600" : "text-gray-600"}`}>
-            <span className="font-medium">Urgency:</span> {order.urgency}
-          </p>
-        </div>
+       <div>
+  <p className="text-gray-600">
+    <span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}
+  </p>
+
+  {admin_roles.includes(user?.role) && (
+    <div className="text-gray-600 mt-2">
+      <p className="font-medium">Approvals:</p>
+
+      {order.Approvals?.length > 0 ? (
+        <ul className="mt-1 space-y-2">
+          {order.Approvals.map((a, index) => (
+            <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-sm">
+              <p><span className="font-semibold">Admin:</span> {a.admin}</p>
+              <p><span className="font-semibold">Status:</span> {a.status}</p>
+              {a.comment && (
+                <p><span className="font-semibold">Comment:</span> {a.comment}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">No approvals yet.</p>
+      )}
+    </div>
+  )}
+
+  <p className={`${order.urgency === "VeryUrgent" ? "text-red-600" : "text-gray-600"} mt-2`}>
+    <span className="font-medium">Urgency:</span> {order.urgency}
+  </p>
+</div>
+
       </div>
 
       <div>
@@ -360,6 +397,8 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
     dateRange,
     orderedby,
   });
+
+ 
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
@@ -440,10 +479,10 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                           )}
 
                           {ADMIN_ROLES.includes(user?.role) && (
-                            <div className="relative z-20">
+                            <div className="relative ">
                               <button
                                 onClick={(e) => toggleDropdown(order._id, e)}
-                                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                                className="p-2 text-gray-500 hover:text-gray-700 transition-colors inset-0"
                                 aria-label="Order actions"
                               >
                                 <FaEllipsisV />
@@ -503,12 +542,67 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                         <FaTrash className="mr-2" />
                                         Delete
                                       </button>
+                                       <button
+                                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                        onClick={() => setOpenCommentOrderId(prev => prev === order._id ? null : order._id)}
+                                       >
+                                        <FaComment className="mr-2" />
+                                        <span>{openCommentOrderId === order._id ? 'Hide' : 'Add'} Comment</span>
+                                      </button>
                                     </div>
                                   </motion.div>
                                 )}
                               </AnimatePresence>
                             </div>
                           )}
+
+                          {openCommentOrderId===order._id && (
+                            <div key={order._id}
+                            id={`order-${order._id}`}
+
+                              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                 <div 
+                                   className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
+                                   onClick={e => e.stopPropagation()}  // prevent backdrop click
+                                 >
+                                <form onSubmit={handleCommentSubmit(order._id)} className="space-y-4" >
+                                  <div>
+                                    <label 
+                                      htmlFor={`comment-${order._id}` }
+                                      className="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                      Make your comment here
+                                    </label>
+                                    <input
+                                      
+                                      type="text"
+                                      name="comment"
+                                      value={commentsByOrder[order._id] || ''}
+                                      onChange={handleCommentChange(order._id)}
+                                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                      placeholder="Type your comment…"
+                                      />
+                                  </div>
+                                  <div className="flex space-x-2">
+                                    <button
+                                      type="submit"
+                                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                      >
+                                      Submit Comment
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>  setOpenCommentOrderId(prev => prev === order._id ? null : order._id)}
+                                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                                      >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </form>
+                                </div>
+                            </div>
+                                )
+                              }
 
                         </div>
                       </div>

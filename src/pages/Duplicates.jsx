@@ -96,7 +96,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg ">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center ">
         <h2 className="text-xl font-bold text-gray-800 flex items-center">
           <FaFlag className="text-red-500 mr-2" />
           Potential Duplicates
