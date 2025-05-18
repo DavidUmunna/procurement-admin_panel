@@ -49,7 +49,7 @@ const SkipsManagement = () => {
   
   const [editingItem, setEditingItem] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [expandedItem, setExpandedItem] = useState(null);
+  //const [expandedItem, setExpandedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWasteStream, setselectedWasteStream] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });

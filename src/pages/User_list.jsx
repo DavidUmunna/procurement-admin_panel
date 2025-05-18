@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { get_users, deleteUser, updateUser } from "../services/userService";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+
 import {Users} from "lucide-react"
 
 // Animation Variants
