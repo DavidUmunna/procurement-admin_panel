@@ -1,12 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp, FiSearch, FiCalendar } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiSearch, FiCalendar } from 'react-icons/fi';
 import { useUser } from '../../components/usercontext';
 import axios from 'axios';
 import PaginationControls from '../inventorymanagement/Paginationcontrols';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const ADMIN_ROLES = ['admin', 'global_admin', 'human_resources', 'internal_auditor'];
+//const ADMIN_ROLES = ['admin', 'global_admin', 'human_resources', 'internal_auditor'];
 
 const SkipsManagement = () => {
   const { user } = useUser();
@@ -341,9 +342,9 @@ const SkipsManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const toggleItem = (id) => {
+  /*const toggleItem = (id) => {
     setExpandedItem(expandedItem === id ? null : id);
-  };
+  };*/
 
   // Preset date range handlers
   const setTodayRange = () => {

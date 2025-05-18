@@ -34,7 +34,7 @@ const roleOptions = ["procurement_officer", "human_resources", "internal_auditor
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
-  const [departments, setDepartments] = useState([]);
+ 
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -63,7 +63,7 @@ export default function UserList() {
     }
   };
 
-  const getDepartment = async () => {
+  /*const getDepartment = async () => {
     try {
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
@@ -74,7 +74,7 @@ export default function UserList() {
     } catch (error) {
       console.log(error);
     }
-  };
+  };*/
 
   const handleDelete = async (userId) => {
     await deleteUser(userId);

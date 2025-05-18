@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import React,{ useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp,  FiSearch } from 'react-icons/fi';
 import { useUser } from '../components/usercontext';
@@ -96,8 +98,7 @@ const AssetManagement = ({setAuth}) => {
     }
   useEffect(() => {
     fetchData();
-
-}, [setAuth]);
+  }, [setAuth]);
   console.log(categories)
   const formatCategory = (category) => {
     const formatted = category
