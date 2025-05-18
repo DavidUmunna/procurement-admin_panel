@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { FiChevronDown, FiChevronUp, FiMail, FiCalendar,  } from "react-icons/fi";
 import {FaSitemap} from "react-icons/fa"
 import { motion,  } from "framer-motion";
-import requestImg from "../components/assets/quote-request.avif";
 import userImg from "../components/assets/user.avif";
 import { admin_roles } from "../components/navBar";
 import { CheckCircle, Clock, XCircle, ClipboardCheck , FileText, BarChart2, Timer} from "lucide-react";
