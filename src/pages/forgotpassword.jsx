@@ -44,14 +44,15 @@ const handleResetPassword = async () => {
   try {
     const response = await updateUserpassword(email, newPassword);
 
-    if (response.data.success === true) {
-      console.log("User password updated successfully");
+    console.log(response);
+    if (response.success === true) {
       setStep(3);
       navigate("/adminlogin");
     } else {
       setError("User password update failed");
     }
   } catch (error) {
+    console.log("forget pass",error)
     setError(error.response?.data?.message || "Something went wrong.");
   } finally {
     setLoading(false);
