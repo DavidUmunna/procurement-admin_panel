@@ -31,34 +31,33 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
+const handleResetPassword = async () => {
+  setError("");
+  
+  if (newPassword !== confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
 
-  const handleResetPassword = async () => {
-    setError("");
-    console.log(email)
-    if (newPassword !== confirmPassword) {
-      
-      setError("Passwords do not match.");
-      return;
+  setLoading(true);
+
+  try {
+    const response = await updateUserpassword(email, newPassword);
+
+    if (response.data.success === true) {
+      console.log("User password updated successfully");
+      setStep(3);
+      navigate("/adminlogin");
+    } else {
+      setError("User password update failed");
     }
+  } catch (error) {
+    setError(error.response?.data?.message || "Something went wrong.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-
-    setLoading(true);
-    try {
-      
-      const response = await updateUserpassword(email, newPassword);
-      if (response.data.success===true) {
-        console.log("User password updated successfully");
-        setStep(3);
-      } else {
-        setError("User password update failed");
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || "Something went wrong.");
-    } finally {
-      navigate("/adminlogin")
-      setLoading(false);
-    }
-  };
   const handleloginredirect=(e)=>{
     navigate("/adminlogin")
   }
@@ -122,13 +121,23 @@ export default function ForgotPassword() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full p-2 border rounded mt-2"
             />
-            <button
-              onClick={handleResetPassword}
-              disabled={loading}
-              className="mt-4 w-full bg-green-500 text-white py-2 rounded disabled:bg-gray-400"
-            >
-              {loading ? "Updating..." : "Reset Password"}
-            </button>
+            <div className="flex">
+                <button
+                onClick={handleloginredirect}
+                disabled={loading}
+                className="mt-4 w-full mx-4 bg-blue-500 text-white py-2 rounded disabled:bg-gray-400"
+                >
+                  LoginPage
+
+                </button>
+                <button
+                  onClick={handleResetPassword}
+                  disabled={loading}
+                  className="mt-4 w-full bg-green-500 text-white py-2 rounded disabled:bg-gray-400"
+                  >
+                  {loading ? "Updating..." : "Reset Password"}
+                </button>
+            </div>
             {error && <p className="text-red-500 mt-2">{error}</p>}
           </motion.div>
         )}
