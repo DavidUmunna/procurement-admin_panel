@@ -121,7 +121,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
           No duplicate requests found
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           {duplicateGroups.map((group, groupIndex) => (
             <motion.div 
               key={groupIndex}
@@ -161,7 +161,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
                     transition={{ duration: 0.3 }}
                     className="bg-white border-t border-yellow-100"
                   >
-                    <div className="p-4 space-y-4">
+                    <div className="p-4 space-y-4  max-h-72 overflow-y-auto">
                       <div className="flex justify-between items-center">
                         <h4 className="font-medium text-gray-700">
                           Similar Requests ({group.length})

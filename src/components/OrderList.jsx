@@ -316,7 +316,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       <p className="font-medium">Approvals:</p>
 
       {order.Approvals?.length > 0 ? (
-        <ul className="mt-1 space-y-2">
+        <ul className="mt-1 space-y-2 max-h-40 overflow-y-auto list-none ">
           {order.Approvals.map((a, index) => (
             <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-sm">
               <p><span className="font-semibold">Admin:</span> {a.admin}</p>

@@ -36,13 +36,15 @@ there are 2 to three people involved in approving a request
  
 
 ##inventory management  changes
--whenever you want to make use of an item, it gets subtracted
--and a record is generated showing the name of the item,date it was collected,quantity collected
+-whenever you want to make use of an item, it gets subtracted✅
+-and a record is generated showing the name of the item,date it was collected,quantity collected✅
 
 
-HR should see requests that were approved by the department heads and should be able to approve said requests and send them to the accounts department
+HR should see requests that were approved by the department heads and should be able to approve said requests and send them to the accounts department✅
 
 
-Comments made by admins should be added to orderlist 
+Comments made by admins should be added to orderlist ✅
 
 add managing director role
+
+make approvals pane scrollable 
