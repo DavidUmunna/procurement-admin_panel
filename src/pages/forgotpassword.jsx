@@ -46,7 +46,7 @@ export default function ForgotPassword() {
     try {
       
       const response = await updateUserpassword(email, newPassword);
-      if (response) {
+      if (response.data.success) {
         console.log("User password updated successfully");
         setStep(3);
       } else {
