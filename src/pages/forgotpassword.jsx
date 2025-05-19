@@ -19,8 +19,8 @@ export default function ForgotPassword() {
 
     try {
       const email_verification = await getuserbymail(email);
-      if (email_verification) {
-        console.log("Email verified");
+      console.log(email_verification);
+      if (email_verification.data.success===true) {
         setStep(2);
       } else {
         setError("Email not found. Please check again.");
