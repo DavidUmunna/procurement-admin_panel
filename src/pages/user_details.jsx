@@ -23,27 +23,39 @@ const UserDetails = ({
     approvalRate: 0,
     avgProcessingTime: 0
   });
-
+  
   useEffect(() => {
     // Calculate statistics when orders change
     const total = approvedOrders.length + rejectedOrders.length + pendingOrders.length;
     const rate = total > 0 ? Math.round((approvedOrders.length / total) * 100) : 0;
-    const calculateAvgProcessingTime = () => {
-    if (approvedOrders.length === 0) return 0;
+    const calculateAvgProcessingTime = (approvedOrders) => {
+      if (approvedOrders.length === 0) return 0;
     
-    const totalDays = approvedOrders.reduce((sum, order) => {
-      if (!order.createdAt || !order.approvedAt) return sum;
-      const created = new Date(order.createdAt);
-      const approved = new Date(order.approvedAt);
-      return sum + Math.ceil((approved - created) / (1000 * 60 * 60 * 24));
-    }, 0);
+      const totalDays = approvedOrders.reduce((sum, order) => {
+        if (!order.createdAt || !Array.isArray(order.Approvals) || order.Approvals.length === 0) {
+          return sum;
+        }
+        //console.log("order",order.Approvals[order.Approvals.length-1])
+        const created = new Date(order.createdAt);
     
-    return Math.round(totalDays / approvedOrders.length);
+        // Get the first approval timestamp (or last, depending on what you want)
+        const LastApproval = order.Approvals[order.Approvals.length-1];
+        
+        const approved = new Date(LastApproval?.timestamp); // adjust key name if it's not 'timestamp'
+    
+        return sum + Math.ceil((approved - created) / (1000 * 60 * 60 * 24)); // days
+      }, 0);
+    
+      return Math.ceil(totalDays / approvedOrders.length);
     };
+    
+    
+    
+   
     setStats({
       totalRequests: total,
       approvalRate: rate,
-      avgProcessingTime: calculateAvgProcessingTime()
+      avgProcessingTime: calculateAvgProcessingTime(approvedOrders)
     });
   }, [approvedOrders, rejectedOrders, pendingOrders]);
 
