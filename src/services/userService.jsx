@@ -23,18 +23,23 @@ export const get_users=async ()=>{
     
 }
 
-export const getuserbymail=async(email)=>{
+export const sendResetLink=async(email)=>{
   try{
-    const response=await axios.get(`${API_URL}/${route}/${email}`,{headers:{ "ngrok-skip-browser-warning": "true"}})
-    if (response){
+    const response=await axios.put(`${API_URL}/${route}/reset`,{email},{headers:{ "ngrok-skip-browser-warning": "true"}})
+    console.log(response)
+    if (response.data?.success===true){
       console.log("user email exists")
       return response
     }else{
       console.log("user doesnt exist")
+      
     }
 
   }catch(error){
-      console.error("an error occured:",error)
+    const response=error
+
+    console.error("an error occured:",error)
+    return response
   }
 }
 
@@ -50,9 +55,9 @@ export const createUser = async (userData) => {
   };
  
 
-  export const updateUserpassword = async (email, newPassword) => {
+  export const updateUserpassword = async (token, newPassword) => {
     try {
-      const response = await axios.put(`${API_URL}/${route}/${email}`, { email,newPassword });
+      const response = await axios.put(`${API_URL}/${route}/reset-password`, { token,newPassword });
       return response.data;
     } catch (error) {
       console.error("Error updating password:", error);

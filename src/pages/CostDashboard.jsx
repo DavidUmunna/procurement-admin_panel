@@ -113,7 +113,7 @@ function CostDashboard({ orders }) {
         <div>
           <h2 className="text-xl font-bold text-gray-800">Monthly Cost Analysis</h2>
           <p className="text-sm text-gray-500">
-            Visualization of procurement costs over time
+            Visualization of Request costs over time
           </p>
         </div>
         

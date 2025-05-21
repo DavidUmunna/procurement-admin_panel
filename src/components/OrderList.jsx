@@ -434,7 +434,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
           ) : displayedOrders.length === 0 ? (
             renderEmptyState()
           ) : (
-            <motion.ul className="divide-y divide-gray-200">
+            <motion.ul className="divide-y divide-gray-200 max-h-screen overflow-y-auto ">
               <AnimatePresence>
                 {displayedOrders.map((order) => (
                   <motion.li
@@ -532,7 +532,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                             {statusOption}
                                           </button>
                                         ))}
-                                      <button
+                                      {user.role==="global_admin"&&(<button
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -541,7 +541,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                       >
                                         <FaTrash className="mr-2" />
                                         Delete
-                                      </button>
+                                      </button>)}
                                        <button
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         onClick={() => setOpenCommentOrderId(prev => prev === order._id ? null : order._id)}

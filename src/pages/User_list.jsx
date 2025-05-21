@@ -34,7 +34,7 @@ const roleOptions = ["procurement_officer", "human_resources", "internal_auditor
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
- 
+  const [loading,setloading]=useState(false)
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -52,6 +52,7 @@ export default function UserList() {
 
   const fetch_users = async () => {
     try {
+      setloading(true)
       const user_data = await get_users();
       if (Array.isArray(user_data)) {
         setUsers(user_data || []);
@@ -60,6 +61,8 @@ export default function UserList() {
       }
     } catch (err) {
       console.error(err);
+    }finally{
+      setloading(false)
     }
   };
 
@@ -82,6 +85,7 @@ export default function UserList() {
   };
 
   const handleEdit = (user) => {
+
     setEditingUser(user);
     setEditForm({
       name: user.name,
@@ -138,6 +142,12 @@ export default function UserList() {
   const filteredUsers = filter === "all" 
     ? users 
     : users.filter(user => user.Department === filter);
+
+  if (loading) {
+    return <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10">

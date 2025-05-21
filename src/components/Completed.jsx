@@ -25,7 +25,7 @@ const CompletedOrdersList = ({ orders, itemsPerPage = 5 }) => {
       </h2>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-72 overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

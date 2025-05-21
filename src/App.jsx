@@ -27,6 +27,7 @@ import Aboutus from "./pages/landinpage/Aboutus/main";
 import Layout from "./pages/landinpage/layout/Layout"
 import InventoryManagement from "./pages/inventorymanagement/ParentComp";
 import SkipsManagement from "./pages/skips/parent";
+import ResetPassword from "./pages/ResetPassword";
 
 // Page transition animation
 const pageVariants = {
@@ -281,6 +282,12 @@ const App = () => {
               element={
                 <PageTransition>
                   <ForgotPassword/>
+                </PageTransition>
+              }/>
+               <Route path="/reset-password"
+              element={
+                <PageTransition>
+                  <ResetPassword/>
                 </PageTransition>
               }/>
               <Route

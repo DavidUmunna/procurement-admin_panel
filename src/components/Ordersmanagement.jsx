@@ -203,7 +203,7 @@ const OrdersDashboard = ({setAuth}) => {
         </div>
       )}
       {CompletedOrdersList && (
-        <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full'} overflow-y-auto`}>
+        <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full'} `}>
           <CompletedOrdersList orders={orders} />
         </div>
       )}

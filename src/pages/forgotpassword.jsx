@@ -1,67 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { updateUserpassword, getuserbymail } from "../services/userService";
-import {useNavigate} from "react-router-dom"
-
+import { sendResetLink, updateUserpassword } from "../services/userService"; // update these functions
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function ForgotPassword() {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [step, setStep] = useState(1);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState("");
+
+  // Get token from URL
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const tokenFromUrl = query.get("token");
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+      setStep(1); // Move to reset password step
+    }
+  }, [location]);
 
   const handleEmailSubmit = async () => {
     setError("");
     setLoading(true);
-
     try {
-      const email_verification = await getuserbymail(email);
-      console.log(email_verification);
-      if (email_verification.data.success===true) {
-        setStep(2);
+      const response = await sendResetLink(email);
+
+      console.log(response) // assume success = true if mail sent
+      if (response.data.success) {
+        setStep(2); // show email sent message
       } else {
-        setError("Email not found. Please check again.");
+        setError(response.response.data?.message);
       }
     } catch (error) {
-      setError(error.response?.data?.message || "Something went wrong.");
+      console.log("eerr",error)
+      setError(error?.response?.data.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
-const handleResetPassword = async () => {
-  setError("");
-  
-  if (newPassword !== confirmPassword) {
-    setError("Passwords do not match.");
-    return;
-  }
 
-  setLoading(true);
 
-  try {
-    const response = await updateUserpassword(email, newPassword);
 
-    console.log(response);
-    if (response.success === true) {
-      setStep(3);
-      navigate("/adminlogin");
-    } else {
-      setError("User password update failed");
-    }
-  } catch (error) {
-    console.log("forget pass",error)
-    setError(error.response?.data?.message || "Something went wrong.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleloginredirect=(e)=>{
-    navigate("/adminlogin")
-  }
+  const handleLoginRedirect = () => {
+    navigate("/adminlogin");
+  };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -71,8 +58,9 @@ const handleResetPassword = async () => {
         transition={{ duration: 0.5 }}
         className="bg-white p-8 rounded-2xl shadow-lg w-96"
       >
+        {/* Request Email Step */}
         {step === 1 && (
-          <motion.div exit={{ opacity: 0 }}>
+          <>
             <h2 className="text-xl font-bold mb-4">Forgot Password</h2>
             <p className="text-gray-600 mb-4">Enter your email to receive a reset link.</p>
             <input
@@ -82,73 +70,39 @@ const handleResetPassword = async () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 border rounded"
             />
-            <div className="flex ">
-
-                
-                <button
-                  onClick={handleEmailSubmit}
-                  disabled={loading}
-                  className="mt-4 w-full mx-2 bg-blue-500 text-white py-2  rounded disabled:bg-gray-400"
-                >
-                  {loading ? "Processing..." : "Send Reset Link"}
-                </button>
-                <button
-                onClick={handleloginredirect}
-                disabled={loading}
-                className="mt-4 w-full mx-4 bg-blue-500 text-white py-2 rounded disabled:bg-gray-400"
-                >
-                  LoginPage
-
-                </button>
-            </div>
-            {error && <p className="text-red-500 mt-2">{error}</p>}
-          </motion.div>
-        )}
-
-        {step === 2 && (
-          <motion.div exit={{ opacity: 0 }}>
-            <h2 className="text-xl font-bold mb-4">Reset Password</h2>
-            <input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-2 border rounded mt-2"
-            />
             <div className="flex">
-                <button
-                onClick={handleloginredirect}
+              <button
+                onClick={handleEmailSubmit}
                 disabled={loading}
-                className="mt-4 w-full mx-4 bg-blue-500 text-white py-2 rounded disabled:bg-gray-400"
-                >
-                  LoginPage
-
-                </button>
-                <button
-                  onClick={handleResetPassword}
-                  disabled={loading}
-                  className="mt-4 w-full bg-green-500 text-white py-2 rounded disabled:bg-gray-400"
-                  >
-                  {loading ? "Updating..." : "Reset Password"}
-                </button>
+                className="mt-4 w-full mx-2 bg-blue-500 text-white py-2 rounded disabled:bg-gray-400"
+              >
+                {loading ? "Sending..." : "Send Reset Link"}
+              </button>
+              <button
+                onClick={handleLoginRedirect}
+                className="mt-4 w-full mx-2 bg-gray-500 text-white py-2 rounded"
+              >
+                Login
+              </button>
             </div>
             {error && <p className="text-red-500 mt-2">{error}</p>}
-          </motion.div>
+          </>
         )}
 
-        {step === 3 && (
-          <motion.div exit={{ opacity: 0 }}>
-            <h2 className="text-xl font-bold mb-4">Success!</h2>
-            <p className="text-green-600">Your password has been reset successfully.</p>
+       
 
-          </motion.div>
+        {/* Reset Link Sent */}
+        {step === 2 && (
+          <>
+            <h2 className="text-xl font-bold mb-4">Email Sent</h2>
+            <p className="text-gray-600">Check your email for a reset link.</p>
+            <button
+              onClick={handleLoginRedirect}
+              className="mt-4 w-full bg-blue-500 text-white py-2 rounded"
+            >
+              Back to Login
+            </button>
+          </>
         )}
       </motion.div>
     </div>

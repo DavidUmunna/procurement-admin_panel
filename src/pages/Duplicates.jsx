@@ -134,7 +134,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
                 onClick={() => toggleGroup(groupIndex)}
               >
                 <div className="flex items-center">
-                  {console.log(group)}
+                  
                   <div className="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3">
                     {group.length}
                   </div>
