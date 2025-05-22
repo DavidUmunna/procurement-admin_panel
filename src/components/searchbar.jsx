@@ -52,7 +52,7 @@ const Searchbar = () => {
         className="max-w-2xl mx-auto bg-white shadow-md rounded-xl p-4 space-y-3 mt-4"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700">Search Orders</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Search Requests</h2>
           {hasActiveFilters() && (
             <button 
               onClick={handleClear}
