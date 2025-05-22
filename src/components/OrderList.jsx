@@ -301,8 +301,8 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <p className="text-gray-600"><span className="font-medium">Order Number:</span> {order.orderNumber || "N/A"}</p>
-          <p className="text-gray-600"><span className="font-medium">Ordered By:</span> {order.staff?.name}</p>
+          <p className="text-gray-600"><span className="font-medium">Request Number:</span> {order.orderNumber || "N/A"}</p>
+          <p className="text-gray-600"><span className="font-medium">Requested By:</span> {order.staff?.name}</p>
           <p className="text-gray-600"><span className="font-medium">Employee Email:</span> {order.staff?.email}</p>
           <p className="text-gray-600"><span className="font-medium">Employee Department:</span> {order.staff?.Department}</p>
         </div>
