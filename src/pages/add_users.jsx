@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
-  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management","PVT","lab","accounts"];
+  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager","lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager"];
+  const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [Department,setDepartment]=useState("")
@@ -18,12 +19,18 @@ const Add_user = () => {
     try{
       const user_data = await createUser({ name, email, password,Department, role });
       console.log("Submitting User data:", user_data);
-      setname("");
-      setemail("");
-      setpassword("");
-      setDepartment("")
-      setrole(roles[0]);
-      alert("User Created!");
+      if (user_data.success===true){
+
+        setname("");
+        setemail("");
+        setpassword("");
+        setDepartment("")
+        setrole(roles[0]);
+        alert("User Created!");
+      }else{
+        setError("user was not created")
+        
+      }
     }catch(error){
       console.error("user not created:",error)
 
@@ -32,7 +39,7 @@ const Add_user = () => {
   };
 
   return (
-    <div>
+    <div className="mb-8">
        
 
             <motion.div 
@@ -84,6 +91,8 @@ const Add_user = () => {
                   <option value="Environmental_lab_dep">Environmental Lab Department</option>
                   <option value="accounts_dep">Accounts Department</option>
                   <option value="Human resources">Human Resources</option>
+                  <option value="IT">Information Technology</option>
+                  <option value="Administration">Administration</option>
                 </select>
               </motion.div>
     
@@ -130,6 +139,9 @@ const Add_user = () => {
               >
                 Create User
               </motion.button>
+              {Error &&(<div>
+                {Error}
+              </div>)}
             </form>
           </motion.div>
         </motion.div>

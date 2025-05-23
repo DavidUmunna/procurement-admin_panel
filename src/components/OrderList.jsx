@@ -478,7 +478,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                             </button>
                           )}
 
-                          {ADMIN_ROLES.includes(user?.role) && (
+                          {user.canApprove && (
                             <div className="relative ">
                               <button
                                 onClick={(e) => toggleDropdown(order._id, e)}

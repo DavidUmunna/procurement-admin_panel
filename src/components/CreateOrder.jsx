@@ -71,14 +71,11 @@ const CreateOrder = () => {
     });
 
     try {
-      const fileupload = await createOrder({ formData: formData, orderData: payload });
-      console.log(fileupload)
-      if (fileupload.file.data.success){
+      const requestupload = await createOrder({ formData: formData, orderData: payload });
+      console.log(requestupload)
+      if (requestupload.order.data.success===true){
 
-        if (files.length > 0) {
-          console.log("File uploaded:", fileupload.file);
-          console.log("Order created:", fileupload.orders);
-        }
+      
         
         // Reset form
         setSupplier("Halden");
@@ -95,6 +92,7 @@ const CreateOrder = () => {
       //alert("Order Created!");
     } catch (error) {
       console.error("Error creating order:", error);
+      setError("due to no file present this error was staged your order must have gone through confirm from admins")
       //alert("Failed to create order. Please try again.");
     } finally {
       setIsSubmitting(false);

@@ -29,11 +29,11 @@ const departmentColors = {
 
 // Role options
 const roleOptions = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-  "Financial_manager","waste_management","Environmental_lab_manager","PVT_manager","staff"];
+  "Financial_manager","waste_management_manager","waste_management_supervisor","lab_supervisor","Director","Environmental_lab_manager","PVT_manager","staff"];
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("All");
   const [loading,setloading]=useState(false)
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -138,8 +138,8 @@ export default function UserList() {
       [name]: type === 'checkbox' ? checked : value
     });
   };
-
-  const filteredUsers = filter === "all" 
+  //console.log("filter:",filter)
+  const filteredUsers = filter === "All" || filter=== ""
     ? users 
     : users.filter(user => user.Department === filter);
 
@@ -197,7 +197,9 @@ export default function UserList() {
                   <option value="Environmental_lab_dep">Environmental Lab</option>
                   <option value="accounts_dep">Accounts</option>
                   <option value="Human resources">Human Resources</option>
-
+                  <option value="IT">Information Technology</option>
+                  <option value="Administration">Administration</option>
+           
                   </select>
                 </div>
                 
@@ -282,13 +284,15 @@ export default function UserList() {
                 onChange={(e) => setFilter(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                <option value="">Select Department</option>
+                <option value="All">Select Department</option>
                 <option value="waste_management_dep">Waste Management</option>
                 <option value="PVT">PVT</option>
                 <option value="Environmental_lab_dep">Environmental Lab</option>
                 <option value="accounts_dep">Accounts</option>
                 <option value="Human resources">Human Resources</option>
-
+                <option value="IT">Information Technology</option>
+                <option value="Administration">Administration</option>
+           
               </select>
             </div>
           </div>
@@ -300,7 +304,7 @@ export default function UserList() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <p className="text-gray-500">No users found{filter !== "all" && ` in ${filter} Department`}.</p>
+            <p className="text-gray-500">No users found{filter !== "All" && ` in ${filter} Department`}.</p>
           </motion.div>
         ) : (
           <motion.ul 

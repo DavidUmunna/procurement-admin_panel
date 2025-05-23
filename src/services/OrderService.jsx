@@ -51,6 +51,7 @@ export const createOrder = async ({ formData, orderData }) => {
     console.log("Order Data:", orderData);
 
     const requests = [];
+    const hasfile=false
 
     // Check if formData contains a file before uploading
     if (formData && formData.has("files")) {
@@ -60,10 +61,11 @@ export const createOrder = async ({ formData, orderData }) => {
           },
         })
       requests.push(response_fileupload    
-      );
+      );hasfile=true
+
 
     }
-
+    
     // Send the order even if no file is uploaded
     if (orderData && Object.keys(orderData).length > 0) {
       const response_orderdetails=axios.post(`${API_URL}/orders`, orderData,{headers:{ "ngrok-skip-browser-warning": "true"}})
@@ -73,14 +75,25 @@ export const createOrder = async ({ formData, orderData }) => {
       console.warn("No order data provided.");
     }
     const results = await Promise.allSettled(requests);
-    console.log(results)
-    const fileResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
-    const orderResponse = results[1]?.status === "fulfilled" ? results[1].value : results[1].reason;
+    console.log("checking file",requests.length)
+    console.log(results.length)
+    if (hasfile && results.length==2){
+
+      const fileResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
+      const orderResponse = results[1]?.status === "fulfilled" ? results[1].value : results[1].reason;
+      
+      return  { file: fileResponse, order: orderResponse };
+    }else if (!hasfile&& results.length==1){
+      const orderResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
+      return {order:orderResponse}
+
+    }else{
+      return {order:null}
+    }
+   
     
     
     
-    
-    return { file: fileResponse, order: orderResponse };
   } catch (error) {
     console.error("Error creating order:", error);
   }

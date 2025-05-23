@@ -20,8 +20,8 @@ export const Dashboard=()=>{
     const [rejectedOrders, setRejectedOrders] = useState([]);
     const [completedOrders, setcompletedOrders] = useState([]);
     const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-      "Financial_manager",];
-    const departmental_access=["waste_management","PVT_manager","Environmental_lab_manager","PVT_manager"]
+      "Financial_manager","accounts","Director",];
+    const departmental_access=["waste_management_manager","waste_management_supervisor","PVT_manager","Environmental_lab_manager","PVT_manager","lab_supervisor"]
     
     useEffect(()=>{
         const email=user?.email||"no email provided"
