@@ -15,7 +15,7 @@ export const getOrders = async (page , limit ) => {
       headers:{Authorization:`Bearer ${token}`, 
       "ngrok-skip-browser-warning": "true"},
       withCredential:true});
-    console.log("response",response)
+    //console.log("response",response)
     return response.data;
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -48,7 +48,7 @@ export const getOrders = async (page , limit ) => {
 
 export const createOrder = async ({ formData, orderData }) => {
   try {
-    console.log("Order Data:", orderData);
+    //console.log("Order Data:", orderData);
 
     const requests = [];
     const hasfile=false
@@ -75,8 +75,8 @@ export const createOrder = async ({ formData, orderData }) => {
       console.warn("No order data provided.");
     }
     const results = await Promise.allSettled(requests);
-    console.log("checking file",requests.length)
-    console.log(results.length)
+    //console.log("checking file",requests.length)
+    //console.log(results.length)
     if (hasfile && results.length==2){
 
       const fileResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;

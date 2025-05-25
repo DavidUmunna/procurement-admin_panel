@@ -67,7 +67,7 @@ const OrdersDashboard = ({setAuth}) => {
     
           
             response=department_response.data.data||[]
-            console.log("response",response)
+            
             setData({
               orders:response,
               pagination:department_response.data.Pagination
@@ -102,7 +102,7 @@ const OrdersDashboard = ({setAuth}) => {
           const res = await get_user_orders(user?.userId);
           response = res.orders||[];
         }
-        console.log(response)
+        
         if (Array.isArray(response)) {
           setOrders(response);
           
@@ -146,7 +146,7 @@ const OrdersDashboard = ({setAuth}) => {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
-  console.log(user)
+ 
   
   
   const handlePageChange = (newPage) => {
@@ -156,7 +156,7 @@ const OrdersDashboard = ({setAuth}) => {
   const handleItemsPerPageChange = (newLimit) => {
     fetchData(1, newLimit); // Reset to page 1 when changing limit
   };
-  console.log(Data.pagination)
+  
 
   if (isLoading) {
     return <div className='flex justify-center  items-center h-screen'>

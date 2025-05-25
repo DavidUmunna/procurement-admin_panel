@@ -67,7 +67,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
         setCategories(categoriesRes.data.data.categories || []);
         
         //console.log(categoriesRes.data.data.categories)
-        console.log(categories)
+      
         // Initialize editing quantities
         const initialEditingQuantities = {};
         inventoryRes.data.data.forEach(item => {

@@ -214,7 +214,7 @@ function CostDashboard({ orders }) {
 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="text-gray-500">Total Orders</p>
+              <p className="text-gray-500">Total Requests</p>
               <p className="text-xl font-semibold text-blue-600">
                 {monthlyData.reduce((sum, month) => sum + month.count, 0)}
               </p>

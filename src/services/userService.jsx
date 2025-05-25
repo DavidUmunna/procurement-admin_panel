@@ -13,7 +13,7 @@ const route="users"
 export const get_users=async ()=>{
     try{
         const response = await axios.get(`${API_URL}/${route}`,{headers:{ "ngrok-skip-browser-warning": "true",}});
-        console.log(response)
+        
         return response.data;
 
     }catch (error){
@@ -26,9 +26,9 @@ export const get_users=async ()=>{
 export const sendResetLink=async(email)=>{
   try{
     const response=await axios.put(`${API_URL}/${route}/reset`,{email},{headers:{ "ngrok-skip-browser-warning": "true"}})
-    console.log(response)
+    
     if (response.data?.success===true){
-      console.log("user email exists")
+      
       return response
     }else{
       console.log("user doesnt exist")
@@ -38,16 +38,16 @@ export const sendResetLink=async(email)=>{
   }catch(error){
     const response=error
 
-    console.error("an error occured:",error)
+    //console.error("an error occured:",error)
     return response
   }
 }
 
 export const createUser = async (userData) => {
     try {
-      console.log(userData)
+      //console.log(userData)
       const response = await axios.post(`${API_URL}/${route}`,userData);
-      console.log(response)
+      //console.log(response)
       return response.data;
     } catch (error) {
       console.error("Error creating user:", error);

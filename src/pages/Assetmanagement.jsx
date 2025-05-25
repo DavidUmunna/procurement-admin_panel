@@ -99,7 +99,7 @@ const AssetManagement = ({setAuth}) => {
   useEffect(() => {
     fetchData();
   }, [setAuth]);
-  console.log(categories)
+  
   const formatCategory = (category) => {
     const formatted = category
       .replace(/_/g, ' ') // Replace underscores with spaces
@@ -249,7 +249,7 @@ const AssetManagement = ({setAuth}) => {
     }
     setSortConfig({ key, direction });
   };
-  console.log("filtered items",filteredItems)
+  
 
   const toggleItem = (id) => {
     setExpandedItem(expandedItem === id ? null : id);
@@ -536,7 +536,7 @@ const AssetManagement = ({setAuth}) => {
                       </tr>
                       {expandedItem===item._id&&(
                     <tr>
-                     {console.log(expandedItem)}
+                     
                      <td colSpan="6" className="px-6 py-4 bg-gray-50">
                        <div className="grid grid-cols-2 gap-4">
                          <div>

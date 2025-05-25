@@ -18,7 +18,7 @@ const Add_user = () => {
     e.preventDefault();
     try{
       const user_data = await createUser({ name, email, password,Department, role });
-      console.log("Submitting User data:", user_data);
+      //console.log("Submitting User data:", user_data);
       if (user_data.success===true){
 
         setname("");

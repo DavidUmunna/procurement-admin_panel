@@ -13,14 +13,14 @@ const Hero = () => {
           <p className="mt-5 max-w-lg text-xl text-gray-500 ml-30">
                 Track Requests, manage approvals, and optimize resources in one powerful platform.
           </p>
-          <div className="mt-8 flex justify-center md:justify-start space-x-3">
+          {/*<div className="mt-8 flex justify-center md:justify-start space-x-3">
             <button className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
               Start Free Trial
             </button>
             <button className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10">
               See Demo
             </button>
-          </div>
+          </div>*/}
         </div>
 
         {/* Right: Image Section */}

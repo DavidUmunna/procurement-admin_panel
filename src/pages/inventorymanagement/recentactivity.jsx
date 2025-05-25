@@ -39,7 +39,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
             pagination: response.data.pagination
           });
 
-          console.log(response.data.pagination)
+         
           onRefreshComplete?.()
         } catch (error) {
           console.error('Error fetching activities:', error);
@@ -58,7 +58,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
             },
             withCredentials: true,
           })
-          console.log(response.data)
+      
 
           setCategories(response.data.data.categories||[])
 
