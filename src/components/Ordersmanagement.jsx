@@ -167,7 +167,7 @@ const OrdersDashboard = ({setAuth}) => {
   }
 
   return (
-  <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10 h-[calc(100vh-5rem)]">
+  <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10 h-[calc(100vh-5rem)] mb-9">
   {/* Left: Order List (2/3 width on large screens) */}
   {error&&(<div className= ' flex justify-center text-red-500'>
     {error}
@@ -203,7 +203,7 @@ const OrdersDashboard = ({setAuth}) => {
         </div>
       )}
       {CompletedOrdersList && (
-        <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full'} `}>
+        <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full mb-10'} `}>
           <CompletedOrdersList orders={orders} />
         </div>
       )}

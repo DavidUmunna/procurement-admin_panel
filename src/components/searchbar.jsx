@@ -1,8 +1,13 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setKeyword, setStatus, setDateRange, resetFilters } from '../js/reducer/rootreducer';
+import {
+  setKeyword,
+  setStatus,
+  setDateRange,
+  resetFilters,
+} from '../js/reducer/rootreducer';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { FiSearch, FiX } from 'react-icons/fi'; // Import icons
+import { FiSearch, FiX } from 'react-icons/fi';
 
 const Searchbar = () => {
   const dispatch = useDispatch();
@@ -25,7 +30,6 @@ const Searchbar = () => {
 
   const handleSearch = () => {
     console.log('Search parameters:', search);
-    // Search logic here
   };
 
   const handleClear = () => {
@@ -44,17 +48,17 @@ const Searchbar = () => {
   };
 
   return (
-    <div className="px-4 md:px-8">
+    <div className="px-4 sm:px-6 md:px-8 max-w-screen-lg mx-auto w-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="max-w-2xl mx-auto bg-white shadow-md rounded-xl p-4 space-y-3 mt-4"
+        className="bg-white shadow-md rounded-xl p-4 sm:p-6 space-y-4 mt-4"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h2 className="text-lg font-semibold text-gray-700">Search Requests</h2>
           {hasActiveFilters() && (
-            <button 
+            <button
               onClick={handleClear}
               className="text-red-500 text-sm hover:underline flex items-center gap-1"
             >
@@ -63,9 +67,9 @@ const Searchbar = () => {
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2">
           <select
-            className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 flex-grow"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 w-full md:w-auto"
             value={searchMode}
             onChange={(e) => setSearchMode(e.target.value)}
           >
@@ -77,30 +81,28 @@ const Searchbar = () => {
           {searchMode === 'keyword' && (
             <input
               placeholder="Search..."
-              className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 flex-grow"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 w-full"
               value={search.keyword}
               onChange={(e) => dispatch(setKeyword(e.target.value))}
             />
           )}
 
-          <div className="flex gap-1">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleSearch}
-              className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all flex items-center gap-1"
-            >
-              <FiSearch size={14} />
-              {isMobile ? '' : 'Search'}
-            </motion.button>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleSearch}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-1 w-full md:w-auto"
+          >
+            <FiSearch size={16} />
+            {!isMobile && 'Search'}
+          </motion.button>
         </div>
 
         {isExpanded && (
-          <div className="space-y-2 pt-2">
+          <div className="space-y-3 pt-2">
             {searchMode === 'status' && (
               <select
-                className="border border-gray-300 rounded-lg px-3 py-1 text-sm w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                 value={search.status}
                 onChange={(e) => dispatch(setStatus(e.target.value))}
               >
@@ -112,18 +114,18 @@ const Searchbar = () => {
             )}
 
             {searchMode === 'date' && (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="date"
                   name="start"
-                  className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                   value={search.dateRange.start ?? ''}
                   onChange={handleDateRangeChange}
                 />
                 <input
                   type="date"
                   name="end"
-                  className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                   value={search.dateRange.end ?? ''}
                   onChange={handleDateRangeChange}
                 />
@@ -133,7 +135,7 @@ const Searchbar = () => {
         )}
 
         {!isExpanded && (
-          <button 
+          <button
             onClick={() => setIsExpanded(true)}
             className="text-blue-600 text-xs hover:underline w-full text-left"
           >
