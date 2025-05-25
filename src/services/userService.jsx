@@ -45,9 +45,10 @@ export const sendResetLink=async(email)=>{
 
 export const createUser = async (userData) => {
     try {
-      console.log(userData)
-      const response = await axios.post(`${API_URL}/${route}`,userData);
-      console.log(response)
+      const token=localStorage.getItem("authToken")
+     
+      const response = await axios.post(`${API_URL}/${route}`,userData,{headers:{Authorization:`Bearer ${token}`}});
+     
       return response.data;
     } catch (error) {
       console.error("Error creating user:", error);

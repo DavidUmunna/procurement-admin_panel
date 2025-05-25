@@ -9,7 +9,7 @@ import { PanelLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-  "Financial_manager","waste_management_manager","waste_management_supervisor","Environmental_lab_manager","PVT_manager"];
+  "Financial_manager","waste_management_manager","accounts","waste_management_supervisor","Environmental_lab_manager","PVT_manager"];
 
 const navigation = [
   { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },
