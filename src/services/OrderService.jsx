@@ -51,7 +51,7 @@ export const createOrder = async ({ formData, orderData }) => {
     //console.log("Order Data:", orderData);
 
     const requests = [];
-    const hasfile=false
+    let hasfile=false
 
     // Check if formData contains a file before uploading
     if (formData && formData.has("files")) {
@@ -77,13 +77,13 @@ export const createOrder = async ({ formData, orderData }) => {
     const results = await Promise.allSettled(requests);
     //console.log("checking file",requests.length)
     //console.log(results.length)
-    if (hasfile && results.length==2){
+    if (hasfile && results.length===2){
 
       const fileResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
       const orderResponse = results[1]?.status === "fulfilled" ? results[1].value : results[1].reason;
       
       return  { file: fileResponse, order: orderResponse };
-    }else if (!hasfile&& results.length==1){
+    }else if (!hasfile&& results.length===1){
       const orderResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
       return {order:orderResponse}
 
