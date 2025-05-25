@@ -54,8 +54,9 @@ export default function UserList() {
     try {
       setloading(true)
       const user_data = await get_users();
-      if (Array.isArray(user_data)) {
-        setUsers(user_data || []);
+      console.log(user_data)
+      if (Array.isArray(user_data.data)) {
+        setUsers(user_data.data || []);
       } else {
         throw new Error("Invalid data format");
       }
@@ -150,7 +151,7 @@ export default function UserList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10 mb-11">
       {/* Edit User Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

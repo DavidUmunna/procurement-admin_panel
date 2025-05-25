@@ -405,7 +405,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
       
       <div className="max-w-7xl mx-auto">
         <motion.div 
-          className="mb-6"
+          className="max-w-lg mb-6 "
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -500,7 +500,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                       {["Pending", "Approved", "Rejected", "Completed"]
                                         .filter(
                                           (statusOption) =>
-                                            statusOption !== "Completed" || user?.role === "accounts"
+                                            statusOption !== "Completed" || user?.Department === "accounts_dep"
                                         )
                                         .map((statusOption) => (
                                           <button
@@ -525,9 +525,10 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                                               {statusOption === "Pending" && (
                                                 <FaClock className="text-yellow-500" />
                                               )}
-                                              {statusOption === "Completed" && user?.role === "accounts" && (
+                                              {statusOption === "Completed" && user?.Department === "accounts_dep" && (
                                                 <FaCheck className="text-blue-500" />
                                               )}
+
                                             </span>
                                             {statusOption}
                                           </button>

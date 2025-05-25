@@ -226,7 +226,7 @@ function CostDashboard({ orders }) {
               </p>
             </div>
             <div className="bg-purple-50 p-3 rounded-lg">
-              <p className="text-gray-500">Average Order</p>
+              <p className="text-gray-500">Average Request</p>
               <p className="text-xl font-semibold text-purple-600">
               ₦{Math.round(averageCost).toLocaleString()}
               </p>
