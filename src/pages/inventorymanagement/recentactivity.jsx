@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+    /* eslint-disable react-hooks/exhaustive-deps */
 
 import React,{useState,useEffect} from "react"
 import PaginationControls from "./Paginationcontrols";
@@ -11,29 +11,30 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
         activities: [],
         pagination: {
           page: 1,
-          limit: 10,
+          limit: 5,
           total: 0
         }
       });
-      const [activities,setactivities]=useState([])
+      //const [activities,setactivities]=useState([])
       const [isLoading, setIsLoading] = useState(false);
       const [categories, setCategories] = useState("");
       const [selectedCategory, setSelectedCategory] = useState('All');
 
     
-      const fetchActivities = async (page = data.pagination?.page, limit = data.pagination?.limit) => {
+      const fetchActivities = async (page , limit) => {
         setIsLoading(true);
         try {
           const token = localStorage.getItem('authToken');
-          const params= { page, limit }
-          if (categories) params.category = categories;
+          //const params= { page, limit }
+          console.log(limit)
+          //if (categories) params.category = categories;
           const API_URL = `${process.env.REACT_APP_API_URL}/api`;
           const response = await axios.get(`${API_URL}/inventory/activities`, {
-            params: { params }, 
+            params: { page, limit }, 
           headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       
           });
-          setactivities(response.data.data)
+          //setactivities(response.data.data)
           setData({
             activities: response.data.data,
             pagination: response.data.pagination
@@ -68,7 +69,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
         }
       }
    
-   const filteredItems = activities.filter(item => {
+   const filteredItems = data.activities.filter(item => {
       return selectedCategory === 'All' || item?.category === selectedCategory;
     })
     
@@ -77,14 +78,15 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       };
     
       const handleItemsPerPageChange = (newLimit) => {
+        console.log(newLimit)
         fetchActivities(1, newLimit); // Reset to page 1 when changing limit
       };
     
       useEffect(() => {
-        fetchActivities();
+        fetchActivities(data.pagination.page,data.pagination.limit);
         fetchcategory()
       }, [refreshFlag]);
-    console.log("categories",categories)
+    
   return (
     <div className="bg-white rounded-lg shadow p-4 h-full">
       <h2 className="text-lg font-semibold mb-4">ActivityLog</h2>
