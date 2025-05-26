@@ -54,9 +54,9 @@ export default function UserList() {
     try {
       setloading(true)
       const user_data = await get_users();
-      console.log(user_data)
-      if (Array.isArray(user_data.data)) {
-        setUsers(user_data.data || []);
+      console.log(Array.isArray(user_data))
+      if (Array.isArray(user_data)) {
+        setUsers(user_data || []);
       } else {
         throw new Error("Invalid data format");
       }
