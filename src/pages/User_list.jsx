@@ -48,15 +48,15 @@ export default function UserList() {
   useEffect(() => {
     fetch_users();
     
-  }, [editingUser]);
+  }, []);
 
   const fetch_users = async () => {
     try {
       setloading(true)
       const user_data = await get_users();
       console.log(Array.isArray(user_data))
-      if (Array.isArray(user_data)) {
-        setUsers(user_data || []);
+      if (Array.isArray(user_data.data)) {
+        setUsers(user_data.data || []);
       } else {
         throw new Error("Invalid data format");
       }
@@ -145,7 +145,7 @@ export default function UserList() {
     : users.filter(user => user.Department === filter);
 
   if (loading) {
-    return <div className="p-8 flex justify-center">
+    return <div className="p-8 flex justify-center items-center min-h-screen">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
   }

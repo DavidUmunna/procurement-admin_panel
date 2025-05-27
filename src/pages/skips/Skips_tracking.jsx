@@ -28,7 +28,7 @@ const SkipsManagement = () => {
     DeliveryWaybillNo:Number,
     WasteStream: '',
     Quantity: {
-      value:'',
+      value:0,
       unit:''
     },
     SourceWell:"",
@@ -167,16 +167,17 @@ const SkipsManagement = () => {
       day: 'numeric'
     });
   };
-
+  
   // Filter and sort
   const filteredItems = SkipItems
     .filter(item => 
-      (item.skip_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      
+      (item?.skip_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item?.DriverName && item?.DriverName.toLowerCase().includes(searchTerm.toLowerCase()))||
-      (item.SourceWell.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item?.SourceWell.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(item => 
-        selectedWasteStream === 'All' || item.WasteStream === selectedWasteStream
+        selectedWasteStream === 'All' || item?.WasteStream === selectedWasteStream
     )
     .sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) {
