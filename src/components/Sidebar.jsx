@@ -1,9 +1,10 @@
 import {  PlusSquare, UserPlus, Truck, Building2, Briefcase } from 'lucide-react';
 import {FiFileText} from "react-icons/fi"
 import { Link } from 'react-router-dom';
+import { forwardRef } from 'react';
 
 import { useUser } from './usercontext';
-export default function Sidebar({ isOpen, onClose }) {
+const Sidebar=forwardRef(({ isOpen, onClose },ref) =>{
   
   const {user}=useUser()
   const sidebar = [
@@ -18,6 +19,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <div
+      ref={ref} 
       className={`fixed top-16 left-0 h-[calc(100%-4rem)] w-64 bg-gray-800 text-white z-20 shadow-xl
       transform transition-all duration-300 ease-in-out
       ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
@@ -39,6 +41,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <Link
             to={item.to}
             key={item.name}
+            onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-md transition-all duration-200 hover:bg-gray-700 hover:scale-[1.02]"
           >
             <item.icon className="w-5 h-5 text-gray-300" />
@@ -48,4 +51,7 @@ export default function Sidebar({ isOpen, onClose }) {
       </nav>
     </div>
   );
-}
+});
+
+
+export default Sidebar

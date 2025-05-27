@@ -55,13 +55,12 @@ const App = () => {
 
 
   useEffect(() => {
-    //console.log("isauthenticated", isauthenticated);
-    const handleTabClose = () => {
-      // Notify the backend to end the session
-      navigator.sendBeacon(`${process.env.REACT_APP_API_URL}/api/logout`);
-    };
+    
+    
+    
     const checkAuth = async () => {
       try {
+
         const token = localStorage.getItem("authToken");
         const API = process.env.REACT_APP_API_URL;
         const response = await axios.get(`${API}/api/access`, {
@@ -78,14 +77,15 @@ const App = () => {
         console.error(error);
       }
     };
-    window.addEventListener("beforeunload", handleTabClose);
-
-    checkAuth();
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClose);
-    };
     
-  }, [isauthenticated]);
+     
+    const Timer =setInterval(()=>{
+      
+      checkAuth();
+    },15*60*1000)
+    return () => clearInterval(Timer)
+    
+  }, []);
 
   if (isauthenticated === null) {
     return (

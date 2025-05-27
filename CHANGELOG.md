@@ -45,6 +45,8 @@ HR should see requests that were approved by the department heads and should be 
 
 Comments made by admins should be added to orderlist ✅
 
-add managing director role
+add managing director role (added)
 
-make approvals pane scrollable 
+make approvals pane scrollable(implemented)
+
+add export to excel button/component(pending)

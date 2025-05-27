@@ -1,7 +1,7 @@
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon,ClipboardDocumentListIcon, PlusCircleIcon,UserIcon,UsersIcon,ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { useUser } from "./usercontext";
 import user_img from "./assets/user.png";
 import { motion } from 'framer-motion';
@@ -33,6 +33,8 @@ export default function Navbar() {
   const { user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
+  const sidebarRef=useRef(null)
+  const buttonRef=useRef(null)
   //const [isMobileMenuOpen,setIsMobileMenuOpen]=useState(true)
 
   const isActive = (path) => location.pathname === path;
@@ -41,6 +43,26 @@ export default function Navbar() {
     if (item.visibleTo) return item.visibleTo.includes(user?.role);
     return true;
   });
+
+  useEffect(()=>{
+    function Handleclickoutside(event){
+      if(sidebarRef.current && !sidebarRef.current.contains(event.target) &&
+         buttonRef.current && !buttonRef.current.contains(event.target)){
+          setIsSidebarOpen(false)
+         }}
+      if (isSidebarOpen){
+        document.addEventListener("mousedown",Handleclickoutside)
+
+      }else{
+        document.removeEventListener("mousedown",Handleclickoutside)
+      }
+
+      return ()=>{
+        document.removeEventListener("mousedown",Handleclickoutside)
+      }
+
+    
+  },[isSidebarOpen])
 
   return (
     <>
@@ -222,7 +244,7 @@ export default function Navbar() {
         ))}
       </motion.div>
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar isOpen={isSidebarOpen} ref={sidebarRef} onClose={() => setIsSidebarOpen(false)} />
     </>
   );
 }
