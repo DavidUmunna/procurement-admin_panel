@@ -219,6 +219,7 @@ const CreateOrder = () => {
               onChange={(e) => setRemarks(e.target.value)}
               className="w-full p-2 border rounded mb-4"
               placeholder="Describe your request..."
+              required
             ></textarea>
 
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Request</h3>
@@ -290,10 +291,11 @@ const CreateOrder = () => {
                 "Create Request"
               )}
             </motion.button>
-            <div className=" flex  justify-center text-red-700">
+            {Error && (
+            <div className="p-4 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200">
               {Error}
-
             </div>
+          )}
           </motion.form>
         </motion.div>
       </motion.div>

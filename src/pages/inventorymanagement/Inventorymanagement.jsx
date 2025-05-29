@@ -522,8 +522,11 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
               </div>
             )}
           </div>
-          {Error && <div className="text-red-500 mt-2">{Error}</div>}
-
+           {Error && (
+            <div className="p-4 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200">
+              {Error}
+            </div>
+            )}
                   <div>
                         {/* Your data display */}
                         <PaginationControls

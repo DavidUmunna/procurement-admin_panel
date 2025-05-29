@@ -69,7 +69,7 @@ export default function Navbar() {
       <Disclosure as="nav" className="bg-gray-800 fixed top-0 left-0 w-full z-20">
         {({ open }) => (
           <>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center">
                   {/* Sidebar toggle (only for admin) */}

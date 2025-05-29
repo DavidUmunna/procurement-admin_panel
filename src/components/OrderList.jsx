@@ -19,7 +19,7 @@ import { admin_roles } from "./navBar";
 
 const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts","waste_management","PVT_manager","Environmental_lab_manager"];
 
-const OrderList = ({orders,setOrders, selectedOrderId}) => {
+const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -28,7 +28,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  //const [error, setError] = useState(null);
   const [comment,setcomment]=useState("")
   const [commentsByOrder, setCommentsByOrder] = useState({});
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
@@ -414,18 +414,14 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
         </motion.div>
 
         <motion.div
-          className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+          className="bg-white rounded-xl shadow-sm border z-20 border-gray-200 overflow-hidden"
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
         >
           
 
-          {error && (
-            <div className="p-4 bg-red-50 text-red-600 border-l-4 border-red-500">
-              {error}
-            </div>
-          )}
+          
 
           {isLoading ? (
             <div className="p-8 flex justify-center">
@@ -444,7 +440,7 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                     id={`order-${order._id}`}
-                    className={`p-4 border rounded-lg ${selectedOrderId === order._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+                    className={`p-4 border rounded-lg z-20 ${selectedOrderId === order._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
                   >
                     <div 
                       className="p-4 sm:p-6 cursor-pointer"
@@ -618,6 +614,11 @@ const OrderList = ({orders,setOrders, selectedOrderId}) => {
             </motion.ul>
           )}
         </motion.div>
+        {error && (
+            <div className="p-4 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200">
+              {error}
+            </div>
+          )}
       </div>
     </div>
   );

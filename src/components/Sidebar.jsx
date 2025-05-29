@@ -12,9 +12,9 @@ const Sidebar=forwardRef(({ isOpen, onClose },ref) =>{
     { name: "Assets Management", to: "/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
     { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin',"PVT_manager"] },
     { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin',"internal_auditor"] },
-    { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","Environmental_lab_manager","HSE_officer"] },
+    { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","human_resources","global_admin","Environmental_lab_manager","lab_supervisor","HSE_officer"] },
     { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin","PVT_manager"] },
-    { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["human_resources",'admin',"global_admin","waste_management_dep"] }
+    { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["human_resources",'admin',"global_admin","waste_management_manager","waste_management_supervisor"] }
   ];
 
   return (

@@ -169,14 +169,14 @@ const OrdersDashboard = ({setAuth}) => {
   return (
   <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10 h-[calc(100vh-5rem)] mb-9">
   {/* Left: Order List (2/3 width on large screens) */}
-  {error&&(<div className= ' flex justify-center text-red-500'>
-    {error}
-  </div>)}
+  
   <div className="w-full lg:w-2/3 overflow-y-auto">
     <OrderList 
       orders={orders} 
       selectedOrderId={selectedOrderId}
       setOrders={setOrders}
+      error={error}
+      setError={setError}
     />
     <div>
       <PaginationControls
@@ -209,6 +209,7 @@ const OrdersDashboard = ({setAuth}) => {
       )}
     </div>
   )}
+  
 </div>
   )
 
