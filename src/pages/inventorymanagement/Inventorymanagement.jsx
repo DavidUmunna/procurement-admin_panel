@@ -274,8 +274,8 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       })
 
       setInventoryItems(prevItems => 
-        prevItems.map(item => 
-          item._id === itemId ? { ...item, quantity: response.data.data.quantity } : item
+        prevItems.filter(item => item._id!==itemId
+          
         )
       );
 
@@ -289,6 +289,8 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
         [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0
       }));
 
+    }finally{
+      setloading(false)
     }
   }
 
