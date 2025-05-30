@@ -76,7 +76,7 @@ export const Dashboard=()=>{
     
             
             }catch(err){
-                Sentry.captureException(error)
+                Sentry.captureException(err)
     
             }
           }
@@ -110,7 +110,7 @@ export const Dashboard=()=>{
     
             
             }catch(err){
-                console.error("error fetching orders",err)
+                Sentry.captureException(err)
     
             }
 
