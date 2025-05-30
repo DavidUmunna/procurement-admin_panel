@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-
+import * as Sentry from '@sentry/react'
 import CreateOrder from "./components/CreateOrder";
 import Addusers from "./pages/add_users";
 import Adminav from "./components/navBar";
@@ -74,7 +74,7 @@ const App = () => {
         setisauthenticated(response.data.authenticated);
       } catch (error) {
         setisauthenticated(false);
-        console.error(error);
+        Sentry.captureException(error)
       }
     };
     

@@ -1,5 +1,5 @@
     /* eslint-disable react-hooks/exhaustive-deps */
-
+import * as Sentry from '@sentry/react';
 import React,{useState,useEffect} from "react"
 import PaginationControls from "./Paginationcontrols";
 import axios from "axios";
@@ -28,7 +28,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
         try {
           const token = localStorage.getItem('authToken');
           //const params= { page, limit }
-          console.log(limit)
+          
           //if (categories) params.category = categories;
           const API_URL = `${process.env.REACT_APP_API_URL}/api`;
           const response = await axios.get(`${API_URL}/inventory/activities/${user.Department}`, {
@@ -45,7 +45,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
          
           onRefreshComplete?.()
         } catch (error) {
-          console.error('Error fetching activities:', error);
+          Sentry.captureException(error);
         } finally {
           setIsLoading(false);
         }
@@ -67,29 +67,29 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
 
 
         }catch(error){
+          Sentry.captureException(error)
 
         }
       }
    
    const filteredItems = data.activities.filter(item => {
-    console.log(item)
+    
      return selectedCategory === 'All'|| item?.category === selectedCategory  ;
     })
-    console.log(selectedCategory)
+   
     
       const handlePageChange = (newPage) => {
         fetchActivities(newPage, data.pagination?.limit);
       };
     
       const handleItemsPerPageChange = (newLimit) => {
-        console.log(newLimit)
+      
         fetchActivities(1, newLimit); // Reset to page 1 when changing limit
       };
     
       
 
-      console.log(user.role)
-      console.log(categories)
+  
     
   let filteredCategories = [];
   switch (user.role) {

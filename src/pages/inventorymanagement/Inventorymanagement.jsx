@@ -1,5 +1,6 @@
 /*eslint-disable react-hooks/exhaustive-deps */
 /*eslint-disable no-unused-vars */
+import * as Sentry from '@sentry/react';
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../components/usercontext';
 import { useNavigate } from 'react-router';
@@ -40,7 +41,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [editingQuantities, setEditingQuantities] = useState({});
-  console.log(user.Department)
+  
   const fetchData = async (page=data.pagination?.page,limit=data.pagination?.limit) => {
     
     try {
@@ -101,7 +102,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
           navigate("/logout");
           window.location.href = '/adminlogin'; 
         } else {
-          console.error('Failed to fetch data:', err);
+          Sentry.captureException( err);
         }
       } finally {
         setloading(false);
@@ -158,7 +159,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       }, ...Activities]);
       
     } catch (err) {
-      console.error('Failed to update quantity:', err);
+      Sentry.captureException(err);
       // Revert to original quantity in UI if update fails
       setEditingQuantities({
         ...editingQuantities,
@@ -202,7 +203,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       onInventoryChange()
       
     } catch (err) {
-      console.error('Failed to add quantity:', err);
+      Sentry.captureException(err);
       // Revert to original quantity in UI if update fails
       setEditingQuantities(prev => ({
         ...prev,
@@ -246,7 +247,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       onInventoryChange()
       
     } catch (err) {
-      console.error('Failed to remove quantity:', err);
+      Sentry.captureException(err)
       // Revert to original quantity in UI if update fails
       setEditingQuantities(prev => ({
         ...prev,
@@ -282,8 +283,8 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
 
 
     }catch(error){
-      console.error('Failed to Delete item:', error);
-      
+      Sentry.captureException(error)
+     
       setEditingQuantities(prev => ({
         ...prev,
         [itemId]: inventoryItems.find(item => item._id === itemId)?.quantity || 0

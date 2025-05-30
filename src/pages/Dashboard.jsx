@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import * as Sentry from '@sentry/react';
 import UserDetails from "./user_details"
 import React, { useState } from 'react';
 import { useUser } from "../components/usercontext";
@@ -68,13 +69,14 @@ export const Dashboard=()=>{
                    
                     //console.log("number approved",Approved)
                  }else{
-                    console.error("invalid data format")
+                  const error=new Error("invalid data format")
+                  Sentry.captureException(error)
                  }
     
     
             
             }catch(err){
-                console.error("error fetching orders",err)
+                Sentry.captureException(error)
     
             }
           }
