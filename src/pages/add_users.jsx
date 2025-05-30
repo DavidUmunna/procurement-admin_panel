@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
-  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager","lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager"];
+  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager",
+    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","HSE_officer"];
   const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
@@ -93,6 +94,8 @@ const Add_user = () => {
                   <option value="Human resources">Human Resources</option>
                   <option value="IT">Information Technology</option>
                   <option value="Administration">Administration</option>
+                  <option value="Procurement_department">Procurement Department</option>
+                  <option value="HSE_dep">HSE Department</option>
                 </select>
               </motion.div>
     

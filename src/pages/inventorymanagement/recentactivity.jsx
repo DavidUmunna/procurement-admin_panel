@@ -3,11 +3,12 @@
 import React,{useState,useEffect} from "react"
 import PaginationControls from "./Paginationcontrols";
 import axios from "axios";
-
+import { useUser } from "../../components/usercontext";
 
 // RecentActivity Component
 const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
-    const [data, setData] = useState({
+      const {user}=useUser();
+      const [data, setData] = useState({
         activities: [],
         pagination: {
           page: 1,
@@ -17,8 +18,9 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       });
       //const [activities,setactivities]=useState([])
       const [isLoading, setIsLoading] = useState(false);
-      const [categories, setCategories] = useState("");
+      const [categories, setCategories] = useState([]);
       const [selectedCategory, setSelectedCategory] = useState('All');
+      const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
 
     
       const fetchActivities = async (page , limit) => {
@@ -29,7 +31,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
           console.log(limit)
           //if (categories) params.category = categories;
           const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-          const response = await axios.get(`${API_URL}/inventory/activities`, {
+          const response = await axios.get(`${API_URL}/inventory/activities/${user.Department}`, {
             params: { page, limit }, 
           headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
       
@@ -70,8 +72,10 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       }
    
    const filteredItems = data.activities.filter(item => {
-      return selectedCategory === 'All' || item?.category === selectedCategory;
+    console.log(item)
+     return selectedCategory === 'All'|| item?.category === selectedCategory  ;
     })
+    console.log(selectedCategory)
     
       const handlePageChange = (newPage) => {
         fetchActivities(newPage, data.pagination?.limit);
@@ -82,12 +86,37 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
         fetchActivities(1, newLimit); // Reset to page 1 when changing limit
       };
     
-      useEffect(() => {
-        fetchActivities(data.pagination.page,data.pagination.limit);
-        fetchcategory()
-      }, [refreshFlag]);
+      
+
+      console.log(user.role)
+      console.log(categories)
     
-  return (
+  let filteredCategories = [];
+  switch (user.role) {
+    case "HSE_officer":
+      filteredCategories = categories?.filter(cat => cat.name === "HSE_items");
+      break;
+
+    case "Environmental_lab_manager" || "lab_supervisor":
+      filteredCategories=categories?.filter(cat => cat.name === "lab_items");
+      break;
+      
+    default:
+      filteredCategories = categories; // admins see all
+      break;
+    }
+
+
+      useEffect(() => {
+      if (filteredCategories.length === 1) {
+        fetchActivities(data.pagination.page, data.pagination.limit, filteredCategories[0]);
+      } else {
+        fetchActivities(data.pagination.page, data.pagination.limit); // fallback if no filter
+      }
+    
+      fetchcategory();
+    }, [refreshFlag]);
+    return(  
     <div className="bg-white rounded-lg shadow p-4 h-full">
       <h2 className="text-lg font-semibold mb-4">ActivityLog</h2>
       <div className="space-y-4">
@@ -100,9 +129,9 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
           className="w-full p-2 border rounded"
           required
         >
-          <option value="">Select Category</option>
-          {(Array.isArray(categories) && categories.length > 0) ? (
-            categories.map((category) => (
+            {access_free_roles.includes(user.role) &&<option value="All">All Categories</option>}  
+            {(Array.isArray(categories) && categories.length > 0) ? (
+            filteredCategories.map((category) => (
               <option key={category?._id || category?.name} value={category?.name || ""}>
                 {category?.name || "Unnamed Category"}
               </option>
@@ -133,7 +162,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ${
                   activity.action === 'Added' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
+                  }`}>
                   {activity.quantity} {activity.unit || 'units'}
                 </span>
               </div>
@@ -163,6 +192,8 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
     </div>
   );
 };
+
+
 
 
 export default RecentActivity

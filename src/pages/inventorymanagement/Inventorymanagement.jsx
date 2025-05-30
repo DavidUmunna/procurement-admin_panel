@@ -7,6 +7,8 @@ import axios from "axios";
 import RecentActivity from './recentactivity';
 import { Plus, Minus,Trash2 } from "lucide-react"
 import PaginationControls from './Paginationcontrols';
+import Categoryform from './Category_form';
+import CategorySelect from "./Category_select"
 
 const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const navigate = useNavigate();
@@ -19,6 +21,8 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       total: 0
     }
   });
+  const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
+
   const [categories, setCategories] = useState([]);
   const [formdata, setformdata] = useState({
     name: '',
@@ -36,14 +40,16 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [editingQuantities, setEditingQuantities] = useState({});
-
+  console.log(user.Department)
   const fetchData = async (page=data.pagination?.page,limit=data.pagination?.limit) => {
     
     try {
+      
       const token = localStorage.getItem('authToken');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const [inventoryRes, categoriesRes] = await Promise.all([
-        axios.get(`${API_URL}/inventory`, { params: { page, limit },
+        
+        axios.get(`${API_URL}/inventory/${user.Department}`, { params: { page, limit },
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -344,7 +350,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       return nameMatch || descMatch;
     })
     .filter(item => {
-      return selectedCategory === 'All' || item?.category === selectedCategory;
+       return selectedCategory === 'All'||item?.category === selectedCategory;
     })
     .sort((a, b) => {
       const aVal = a?.[sortConfig.key];
@@ -395,19 +401,9 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Category</label>
-                    <select
-                      name="category"
-                      value={formdata.category}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map(category => (
-                        <option key={category._id} value={category.name}>{category.name}</option>
-                      ))}
-                    </select>
+                    <Categoryform user={user} categories={categories}
+                     formdata={formdata} handleInputChange={handleInputChange}
+                    />
                   </div>
                 </div>
                 <div className="mb-4">
@@ -428,24 +424,11 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
               </form>
             )}
 
-            <div className="mb-4 flex flex-col md:flex-row gap-4">
-              <input
-                type="text"
-                placeholder="Search items..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="p-2 border rounded flex-grow"
+            <div>
+              <CategorySelect user={user} categories={categories} searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
+              
               />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="p-2 border rounded"
-              >
-                <option value="All">All Categories</option>
-                {categories.map(category => (
-                  <option key={category._id} value={category.name}>{category.name}</option>
-                ))}
-              </select>
             </div>
 
             {loading ? (
