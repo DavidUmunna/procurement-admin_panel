@@ -17,7 +17,7 @@ import { admin_roles } from "./navBar";
 
 
 
-const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts","waste_management","PVT_manager","Environmental_lab_manager"];
+//const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts","waste_management","PVT_manager","Environmental_lab_manager"];
 
 const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const { keyword, status, dateRange, orderedby } = useSelector(

@@ -1,6 +1,8 @@
+/* eslint-disable  no-unused-vars */
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { sendResetLink, updateUserpassword } from "../services/userService"; // update these functions
+import { sendResetLink, } from "../services/userService"; // update these functions
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function ForgotPassword() {
