@@ -153,14 +153,14 @@ export default function Sign_in({ setAuth }) {
               </motion.button>
               <AnimatePresence>
                 {error && (
-                  <motion.p
+                  <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="text-red-500 text-sm mt-2"
+                   className="p-3 mt-5 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200"
                   >
                     {error}
-                  </motion.p>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
