@@ -75,8 +75,8 @@ export const Dashboard=()=>{
     
     
             
-            }catch(err){
-                Sentry.captureException(err)
+            }catch(error){
+                Sentry.captureException(error)
     
             }
           }

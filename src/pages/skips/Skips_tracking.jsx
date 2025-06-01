@@ -1,4 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+
+import * as Sentry from '@sentry/react';
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiSearch, FiCalendar } from 'react-icons/fi';
 import { useUser } from '../../components/usercontext';
@@ -6,6 +8,7 @@ import axios from 'axios';
 import PaginationControls from '../inventorymanagement/Paginationcontrols';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Excelexport from './excelexport';
 
 //const ADMIN_ROLES = ['admin', 'global_admin', 'human_resources', 'internal_auditor'];
 
@@ -42,18 +45,20 @@ const SkipsManagement = () => {
   });
   
   // Date range state
+ 
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().setDate(1)), // 1st of current month
     endDate: new Date() // Today
   });
-  
+  const [openmodal,setopenmodal]=useState(false)
+  //const [closemodal,setclosemodal]=useState(false)
   const [editingItem, setEditingItem] = useState(null);
   const [showForm, setShowForm] = useState(false);
   //const [expandedItem, setExpandedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWasteStream, setselectedWasteStream] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
   const [Error, setError] = useState("");
 
@@ -122,7 +127,8 @@ const SkipsManagement = () => {
         
         window.location.href = '/adminlogin'; 
       } else {
-        console.error('Failed to fetch data:', err);
+        Sentry.captureMessage('Failed to fetch data:');
+        Sentry.captureException(err)
       }
     } finally {
       setLoading(false);
@@ -188,7 +194,7 @@ const SkipsManagement = () => {
       }
       return 0;
     });
-  console.log(filteredItems)
+ 
   // Form handlers
  const handleInputChange = (e) => {
   const { name, value } = e.target;
@@ -255,8 +261,11 @@ const SkipsManagement = () => {
         
         window.location.href = '/adminlogin'; 
       } else {
-        console.error('Create failed:', err.response?.data || err.message);
+        
+        Sentry.captureMessage('Create Failed');
+        Sentry.captureException(err.response?.data || err.message)
       }
+      
     }
   };
 
@@ -277,7 +286,8 @@ const SkipsManagement = () => {
       setShowForm(false);
       fetchData(); // Refresh data
     } catch (err) {
-      console.error('Update failed:', err.response?.data || err.message);
+        Sentry.captureMessage('Update Failed');
+        Sentry.captureException(err.response?.data || err.message)
     }
   };
 
@@ -291,7 +301,8 @@ const SkipsManagement = () => {
       setSkipItems(SkipItems.filter(item => item._id !== id));
       fetchData(); // Refresh data
     } catch (err) {
-      console.error('Delete failed:', err.response?.data || err.message);
+        Sentry.captureMessage('Delete Failed');
+        Sentry.captureException(err.response?.data || err.message)
     }
   };
 
@@ -392,10 +403,11 @@ const SkipsManagement = () => {
       {/* Header and Controls */}
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Skips Management</h1>
       
-     <div className="flex flex-col xs:flex-row flex-wrap justify-between items-stretch gap-3 mb-6">
-        {/* Search and Filters - takes full width on mobile, auto on larger */}
-        <div className="flex-1 flex flex-row xs:flex-row gap-3 min-w-[250px]">
-          {/* Search input - full width on mobile, fixed on larger */}
+    {/* Replace the existing controls container div with this */}
+      <div className="flex flex-col sm:flex-row flex-wrap justify-between gap-3 mb-6">
+        {/* Search and Filters - stays on top row */}
+        <div className="flex-1 flex flex-row flex-wrap gap-3 min-w-[250px]">
+          {/* Search input */}
           <div className="relative flex-1 xs:flex-initial xs:w-48 sm:w-56">
             <FiSearch className="absolute left-3 top-3 text-gray-400" />
             <input
@@ -407,27 +419,23 @@ const SkipsManagement = () => {
             />
           </div>
           
-          {/* Category filter - full width on mobile, auto on larger */}
+          {/* Category filter */}
           <select
             className="flex-1 xs:flex-initial xs:w-40 sm:w-48 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm sm:text-base"
             value={selectedWasteStream}
             onChange={(e) => setselectedWasteStream(e.target.value)}
           >
             <option value="All">All Categories</option>
-            {Array.isArray(categories) && categories.length > 0 ? (
-              categories.map((category) => (
-                <option key={category} value={category}>
-                  {formatCategory(category)}
-                </option>
-              ))
-            ) : (
-              <option disabled>No categories</option>
-            )}
+            {Array.isArray(categories) && categories.map((category) => (
+              <option key={category} value={category}>
+                {formatCategory(category)}
+              </option>
+            ))}
           </select>
           
-          {/* Date range picker - full width on mobile, auto on larger */}
+          {/* Date range picker */}
           <div className="relative flex-1 xs:flex-initial xs:w-48 sm:w-56">
-            <FiCalendar className="absolute left-3 top-3  text-gray-400" />
+            <FiCalendar className="absolute left-3 top-3 text-gray-400" />
             <DatePicker
               selectsRange={true}
               startDate={dateRange.startDate}
@@ -435,23 +443,37 @@ const SkipsManagement = () => {
               onChange={handleDateRangeChange}
               isClearable={true}
               placeholderText="Date range"
-              className="pl-4 pr-10 py-2 mr-5 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              className="pl-4 pr-10 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             />
           </div>
         </div>
       
-        {/* Add button - full width on mobile, auto on larger */}
-        <button
-          onClick={() => {
-            setEditingItem(null);
-            resetForm();
-            setShowForm(true);
-          }}
-          className="w-full xs:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm sm:text-base"
-        >
-          <FiPlus className="mr-1 sm:mr-2" />
-          <span className="whitespace-nowrap">Add Skip</span>
-        </button>
+        {/* Bottom row for buttons - will wrap on medium screens */}
+        <div className="flex flex-row flex-wrap gap-3 w-full sm:w-auto">
+          {/* Excel Export Button */}
+          <button
+            onClick={() => {
+              resetForm();
+              setopenmodal(true);
+            }}
+            className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm sm:text-base whitespace-nowrap"
+          >
+            Export Excel
+          </button>
+          
+          {/* Add Skip Button */}
+          <button
+            onClick={() => {
+              setEditingItem(null);
+              resetForm();
+              setShowForm(true);
+            }}
+            className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm sm:text-base"
+          >
+            <FiPlus className="mr-1 sm:mr-2" />
+            <span className="whitespace-nowrap">Add Skip</span>
+          </button>
+        </div>
       </div>
 
       {/* Date range display and presets */}
@@ -490,7 +512,7 @@ const SkipsManagement = () => {
 
       {/* Skip Summary Cards */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <h3 className="text-sm font-medium text-gray-500">Total Items</h3>
             <p className="text-2xl font-bold text-gray-800">{stats.totalItems || 0}</p>
@@ -503,12 +525,8 @@ const SkipsManagement = () => {
             <h3 className="text-sm font-medium text-gray-500">Categories</h3>
             <p className="text-2xl font-bold text-gray-800">{stats.totalCategories || 0}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500">Total Value</h3>
-            <p className="text-2xl font-bold text-gray-800">
-              ₦{stats.totalvalue ? stats.totalvalue.toLocaleString() : 0}
-            </p>
-          </div>
+          
+          
         </div>
       )}
 
@@ -720,7 +738,7 @@ const SkipsManagement = () => {
                             Quantity: { ...formData.Quantity, value: e.target.value }
                           })
                         }
-                        required
+                        
                         className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                       />
                       <select
@@ -732,7 +750,7 @@ const SkipsManagement = () => {
                             Quantity: { ...formData.Quantity, unit: e.target.value }
                           })
                         }
-                        required
+                        
                         className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Unit</option>
@@ -764,6 +782,7 @@ const SkipsManagement = () => {
                     name="SourceWell"
                     value={formData.SourceWell}
                     onChange={handleInputChange}
+                    required
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -805,6 +824,7 @@ const SkipsManagement = () => {
                   <DatePicker
                     selected={formData.DeliveryOfEmptySkips}
                     onChange={(date) => handleDateChange("DeliveryOfEmptySkips", date)}
+                    required
                     className='mt-5 border-4'
                   />
                 </div>
@@ -853,6 +873,7 @@ const SkipsManagement = () => {
           </div>
         </div>
       )}
+      {openmodal && (<Excelexport setopenmodal={setopenmodal} categories={categories} setLoading={setLoading} />)}
 
       {/* Error Display */}
       {Error && (
