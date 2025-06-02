@@ -10,10 +10,11 @@ import { Plus, Minus,Trash2 } from "lucide-react"
 import PaginationControls from './Paginationcontrols';
 import Categoryform from './Category_form';
 import CategorySelect from "./Category_select"
-
+import LoadingModal from "./Loading_modal"
 const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const [isSubmitting, setIsSubmitting]=useState(false)
   const [data, setData] = useState({
     activities: [],
     pagination: {
@@ -306,6 +307,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsSubmitting(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const token = localStorage.getItem('authToken');
       const res = await axios.post(`${API_URL}/inventory`, {
@@ -343,6 +345,8 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       } else {
         console.error('Create failed:', err.response?.data || err.message);
       }
+    }finally{
+      setIsSubmitting(false)
     }
   };
 
@@ -421,7 +425,9 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
                     required
                   />
                 </div>
-                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                <button 
+
+                type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                   Add item
                 </button>
               </form>
@@ -507,12 +513,20 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
                 </table>
               </div>
             )}
-          </div>
+            </div>
            {Error && (
             <div className="p-4 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200">
               {Error}
             </div>
+
             )}
+            {isSubmitting &&(
+              <div>
+                <LoadingModal/>
+              </div>
+            ) 
+
+            }
                   <div>
                         {/* Your data display */}
                         <PaginationControls

@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useUser } from './usercontext';
+import { useUser } from '../../components/usercontext';
 import { useState, useEffect } from 'react';
 import OrderList from './OrderList';
-import Duplicates from '../pages/Duplicates';
-import { get_user_orders } from '../services/OrderService';
+import Duplicates from './Duplicates';
+import { get_user_orders } from '../../services/OrderService';
 import CompletedOrdersList from './Completed';
-import { admin_roles } from './navBar';
+import { admin_roles } from '../../components/navBar';
 import axios from 'axios';
-import PaginationControls from "../pages/inventorymanagement/Paginationcontrols";
+import PaginationControls from "../inventorymanagement/Paginationcontrols";
 
 const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
@@ -16,7 +16,7 @@ const OrdersDashboard = ({setAuth}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   //const [filteredorders,setfilteredorders]=useState([])
-
+  
   const [Data, setData] = useState({
     orders: [],
     pagination: {
@@ -25,6 +25,7 @@ const OrdersDashboard = ({setAuth}) => {
       total: 0
     }
   });
+  let currentPage=Data.pagination.page
   const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
     "Financial_manager","Director"];
   const departmental_access=["waste_management_manager","Environmental_lab_manager","PVT_manager","waste_management_supervisor","lab_supervisor"]

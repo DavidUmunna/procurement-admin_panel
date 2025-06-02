@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import * as Sentry from '@sentry/react'
-import CreateOrder from "./components/CreateOrder";
+import CreateOrder from "./pages/CreateOrder";
 import Addusers from "./pages/add_users";
 import Adminav from "./components/navBar";
 import { UserProvider } from "./components/usercontext";
@@ -19,7 +19,7 @@ import AddSupplier from "./pages/add_suppliers";
 import SupplierList from "./pages/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
 import AssetsManagement from "./pages/Assetmanagement";
-import OrdersDashboard from "./components/Ordersmanagement";
+import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import UnauthorizedPage from "./pages/Unauthorized";
 import Landingpage from "./pages/landinpage/Resourcelanding" 
 import UserTasks from "./pages/Usertask";

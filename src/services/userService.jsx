@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react"
 import axios from "axios";
 //import User from "../../../procurement-users-panel/src/components/user-navbar";
 
@@ -17,7 +18,9 @@ export const get_users=async ()=>{
         return response.data;
 
     }catch (error){
-        console.error("Error fetching users:", error);
+      Sentry.captureMessage("Error fetching users")
+      Sentry.captureException(error)
+        
         return [];
     }
     
@@ -31,7 +34,8 @@ export const sendResetLink=async(email)=>{
       
       return response
     }else{
-      console.log("user doesnt exist")
+      Sentry.captureMessage("user does not exist")
+      
       
     }
 
@@ -51,7 +55,9 @@ export const createUser = async (userData) => {
      
       return response.data;
     } catch (error) {
-      console.error("Error creating user:", error);
+       Sentry.captureMessage("Error Creating users")
+      Sentry.captureException(error)
+      
     }
   };
  
@@ -61,7 +67,9 @@ export const createUser = async (userData) => {
       const response = await axios.put(`${API_URL}/${route}/reset-password`, { token,newPassword });
       return response.data;
     } catch (error) {
-      console.error("Error updating password:", error);
+      Sentry.captureMessage("Error updating password users")
+      Sentry.captureException(error)
+
       throw error; // Rethrow error for proper handling in calling function
     }
   };
@@ -71,10 +79,12 @@ export const updateUser= async (userId, payload) => {
     try {
       console.log("from client",payload)
       const response = await axios.put(`${API_URL}/${route}/${userId}/updateuser`,  payload );
-      console.log("response",response)
+     
       return response.data;
     } catch (error) {
-      console.error("Error updating user:", error);
+      Sentry.captureMessage("Error updatng user")
+      Sentry.captureException(error)
+
     }
   };
 
@@ -82,6 +92,8 @@ export const deleteUser = async (userId) => {
     try {
       await axios.delete(`${API_URL}/${route}/${userId}`);
     } catch (error) {
-      console.error("Error deleting user:", error);
+       Sentry.captureMessage("Error Deleting user")
+       Sentry.captureException(error)
+      
     }
   };

@@ -1,4 +1,5 @@
 import "./components/sentry"
+import * as Sentry from '@sentry/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -9,13 +10,15 @@ import {Provider,} from "react-redux"
 import store from "./js/store/store"
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={store}>
+  <Sentry.ErrorBoundary fallback={<p>something went wrong</p>}>
+  <Provider store={store} >
 
       <BrowserRouter>
           
             <App />
       </BrowserRouter>
   </Provider>
+  </Sentry.ErrorBoundary>
       
   
 );

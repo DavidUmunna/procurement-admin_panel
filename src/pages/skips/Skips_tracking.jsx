@@ -138,7 +138,7 @@ const SkipsManagement = () => {
   useEffect(() => {
     
     fetchData();
-  }, [dateRange]); // Add dateRange to dependencies
+  }, []); // Add dateRange to dependencies
 
   // Handle date range change
   const handleDateRangeChange = (dates) => {
@@ -147,6 +147,9 @@ const SkipsManagement = () => {
       startDate: start,
       endDate: end 
     });
+    if (start && end){
+      fetchData()
+    }
   };
 
   // Format category name for display

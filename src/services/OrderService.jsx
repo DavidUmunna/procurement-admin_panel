@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react"
 import axios from "axios";
 
 
@@ -18,7 +19,9 @@ export const getOrders = async (page , limit ) => {
     //console.log("response",response)
     return response.data;
   } catch (error) {
-    console.error("Error fetching orders:", error);
+     Sentry.captureMessage("Error fetching orders")
+      Sentry.captureException(error)
+
     return [];
   }
 };export const get_user_orders = async ( userId ) => {
@@ -40,7 +43,9 @@ export const getOrders = async (page , limit ) => {
 
     return { orders: orderResponse?.data, file: fileResponse };
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    Sentry.captureMessage("Error fetching orders")
+    Sentry.captureException(error)
+
     return {};
   }
 };
@@ -71,8 +76,8 @@ export const createOrder = async ({ formData, orderData }) => {
       const response_orderdetails=axios.post(`${API_URL}/orders`, orderData,{headers:{ "ngrok-skip-browser-warning": "true"}})
       requests.push(response_orderdetails);
     } else {
-      
-      console.warn("No order data provided.");
+      Sentry.captureMessage("No order data provided")
+
     }
     const results = await Promise.allSettled(requests);
     //console.log("checking file",requests.length)
@@ -95,6 +100,8 @@ export const createOrder = async ({ formData, orderData }) => {
     
     
   } catch (error) {
+     Sentry.captureMessage("Error creating users")
+          Sentry.captureException(error)
     console.error("Error creating order:", error);
   }
 };
@@ -114,7 +121,8 @@ export const downloadFile = async (fileId) => {
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {
-    console.error({ err });
+    Sentry.captureException(err)
+    
   }
 };
 
@@ -122,7 +130,9 @@ export const deleteOrder = async (orderId) => {
   try {
     await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{ "ngrok-skip-browser-warning": "true"}});
   } catch (error) {
-    console.error("Error deleting order:", error);
+     Sentry.captureMessage("Error deleting  orders")
+          Sentry.captureException(error)
+    
   }
 };
 

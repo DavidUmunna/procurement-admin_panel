@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react"
 import { useEffect, useState } from "react";
 import { get_users, deleteUser, updateUser } from "../services/userService";
 import { motion, AnimatePresence } from "framer-motion";
@@ -54,14 +55,15 @@ export default function UserList() {
     try {
       setloading(true)
       const user_data = await get_users();
-      console.log(Array.isArray(user_data))
+    
       if (Array.isArray(user_data.data)) {
         setUsers(user_data.data || []);
       } else {
         throw new Error("Invalid data format");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      Sentry.captureException(error)
+      
     }finally{
       setloading(false)
     }
@@ -126,7 +128,9 @@ export default function UserList() {
     setShowEditModal(false);
     // Optional: Show success toast/alert
   } catch (error) {
-    console.error("Error updating user:", error);
+    Sentry.captureMessage("Error updating user")
+    Sentry.captureException(error)
+    
     // Optional: Show error toast/alert
   }
 };

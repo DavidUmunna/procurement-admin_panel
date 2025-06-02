@@ -3,7 +3,7 @@
 function CategorySelect({ user, categories,selectedCategory, setSearchTerm, searchTerm,setSelectedCategory }) {
     // Filter categories based on user role
     let filteredCategories = [];
-    console.log(selectedCategory)
+   
     const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
   switch (user.role) {
     case "HSE_officer":
