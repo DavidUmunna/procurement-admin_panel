@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { createUser } from "../services/userService";
 import { Eye, EyeOff } from "react-feather";
-import { motion } from "framer-motion";
+import { motion,AnimatePresence } from "framer-motion";
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
   const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager",
-    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","HSE_officer"];
+    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","HSE_officer","Contracts_manager"];
   const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
@@ -34,14 +34,36 @@ const Add_user = () => {
       }
     }catch(error){
       console.error("user not created:",error)
+      if (error.response?.status===401 || error.response?.status===403){
+        setError("Session Expired. please Refresh page")
+        localStorage.removeItem("authToken")
 
+        window.location.href='/adminlogin'
+      }else{
+        setError("failed operation")
+        setTimeout(()=>setError(null),3000  )
+      }
+
+    }finally{
+      setError(" ")
     }
     
   };
 
   return (
     <div className="mb-8">
-       
+         <AnimatePresence>
+                        {Error && (
+                          <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="p-3 mt-16 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200"
+                          >
+                            {Error}
+                          </motion.div>
+                        )}
+          </AnimatePresence>
 
             <motion.div 
           className="min-h-screen bg-gray-100 flex justify-center items-center p-6"
@@ -84,7 +106,7 @@ const Add_user = () => {
                   value={Department}
                   onChange={(e) => setDepartment(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all overflow-y-auto  "
                 >
                   <option value="" disabled>Select a department</option>
                   <option value="waste_management_dep">Waste Management Department</option>
@@ -96,6 +118,7 @@ const Add_user = () => {
                   <option value="Administration">Administration</option>
                   <option value="Procurement_department">Procurement Department</option>
                   <option value="HSE_dep">HSE Department</option>
+                  <option value="Contracts_Department">Contracts Department</option>
                 </select>
               </motion.div>
     
@@ -142,12 +165,11 @@ const Add_user = () => {
               >
                 Create User
               </motion.button>
-              {Error &&(<div>
-                {Error}
-              </div>)}
+              
             </form>
           </motion.div>
-        </motion.div>
+          </motion.div>
+          
     </div>
     
   );

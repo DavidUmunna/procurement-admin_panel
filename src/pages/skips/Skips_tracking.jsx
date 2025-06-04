@@ -315,7 +315,7 @@ const SkipsManagement = () => {
        DeliveryWaybillNo:Number,
     WasteStream: '',
     Quantity: {
-      value:'',
+      value:0,
       unit:''
     },
     SourceWell:"",
@@ -836,7 +836,7 @@ const SkipsManagement = () => {
                   <DatePicker
                     selected={formData.DemobilizationOfFilledSkips}
                     onChange={(date) => handleDateChange("DemobilizationOfFilledSkips", date)}
-                    className='border-4'
+                    className='mt-5 border-4'
                     />
                 </div>
                  <div>
