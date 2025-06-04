@@ -30,7 +30,8 @@ const departmentColors = {
 
 // Role options
 const roleOptions = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-  "Financial_manager","waste_management_manager","waste_management_supervisor","lab_supervisor","Director","Environmental_lab_manager","PVT_manager","staff"];
+  "Financial_manager","waste_management_manager","waste_management_supervisor","lab_supervisor","Director","Environmental_lab_manager","PVT_manager","staff",
+  "Contracts_manager","Documentation_officer","Engineering_manager"];
 
 export default function UserList() {
   const [users, setUsers] = useState([]);

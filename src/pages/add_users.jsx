@@ -6,7 +6,7 @@ import { motion,AnimatePresence } from "framer-motion";
 
 const Add_user = () => {
   const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager",
-    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","HSE_officer","Contracts_manager"];
+    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","HSE_officer","Contracts_manager","Engineering_manager"];
   const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
@@ -52,18 +52,7 @@ const Add_user = () => {
 
   return (
     <div className="mb-8">
-         <AnimatePresence>
-                        {Error && (
-                          <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="p-3 mt-16 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200"
-                          >
-                            {Error}
-                          </motion.div>
-                        )}
-          </AnimatePresence>
+       
 
             <motion.div 
           className="min-h-screen bg-gray-100 flex justify-center items-center p-6"
@@ -119,6 +108,7 @@ const Add_user = () => {
                   <option value="Procurement_department">Procurement Department</option>
                   <option value="HSE_dep">HSE Department</option>
                   <option value="Contracts_Department">Contracts Department</option>
+                  <option value="Engineering_Department">Engineering Department</option>
                 </select>
               </motion.div>
     
@@ -167,6 +157,18 @@ const Add_user = () => {
               </motion.button>
               
             </form>
+              <AnimatePresence>
+                        {Error && (
+                          <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="p-3 mt-16 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200"
+                          >
+                            {Error}
+                          </motion.div>
+                        )}
+          </AnimatePresence>
           </motion.div>
           </motion.div>
           
