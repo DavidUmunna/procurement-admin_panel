@@ -12,7 +12,8 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
         endDate: new Date(),
         stream: 'All',
         fileName: 'skips_report',
-        fileFormat: 'xlsx'
+        fileFormat: 'xlsx',
+        SourceWell:''
     });
 
     const [validationErrors, setValidationErrors] = useState({});
@@ -33,7 +34,8 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
             endDate: new Date(),
             stream: 'All',
             fileName: 'skips_report',
-            fileFormat: 'xlsx'
+            fileFormat: 'xlsx',
+            SourceWell:''
         });
         setValidationErrors({});
     };
@@ -257,7 +259,22 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
                                 <option value="pdf">PDF (.pdf)</option>
                             </select>
                         </div>
-                    </div>
+                        <div className="col-span-2 sm:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                SourceWell
+                            </label>
+                            <input
+                                type="text"
+                                name="SourceWell"
+                                value={formData.SourceWell}
+                                onChange={handleInputChange}
+                                className="w-full p-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            />
+                            {validationErrors.SourceWell && (
+                                <p className="text-red-500 text-xs mt-1">{validationErrors.SourceWell}</p>
+                            )}
+                        </div>
 
                     {/* Waste Stream */}
                     <div>
@@ -277,6 +294,7 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
                                 </option>
                             ))}
                         </select>
+                    </div>
                     </div>
 
                     {/* Date Range */}
