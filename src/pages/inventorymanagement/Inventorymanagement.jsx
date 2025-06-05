@@ -100,7 +100,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
           localStorage.removeItem('authToken');
-          navigate("/logout");
+          
           window.location.href = '/adminlogin'; 
         } else {
           Sentry.captureException( err);

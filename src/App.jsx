@@ -28,7 +28,7 @@ import Layout from "./pages/landinpage/layout/Layout"
 import InventoryManagement from "./pages/inventorymanagement/ParentComp";
 import SkipsManagement from "./pages/skips/parent";
 import ResetPassword from "./pages/ResetPassword";
-
+import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -141,6 +141,18 @@ const App = () => {
                   isauthenticated ? (
                     <PageTransition>
                       <SkipsManagement />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+               <Route
+                path="/inventorylogs"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                      <InventoryLogs />
                     </PageTransition>
                   ) : (
                     <Navigate to="/adminlogin" />

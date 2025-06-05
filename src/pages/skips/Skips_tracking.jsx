@@ -395,11 +395,8 @@ const SkipsManagement = () => {
     });
   };
 
-  if (loading) {
-    return <div className="p-8 flex justify-center items-center min-h-screen">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-  }
+  
+  
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm mt-12">

@@ -1,4 +1,4 @@
-import {  PlusSquare, UserPlus, Truck, Building2, Briefcase } from 'lucide-react';
+import {  PlusSquare,History, UserPlus, Truck, Building2, Briefcase } from 'lucide-react';
 import {FiFileText} from "react-icons/fi"
 import { Link } from 'react-router-dom';
 import { forwardRef } from 'react';
@@ -13,6 +13,7 @@ const Sidebar=forwardRef(({ isOpen, onClose },ref) =>{
     { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
     { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin',"internal_auditor"] },
     { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","human_resources","global_admin","Environmental_lab_manager","lab_supervisor","HSE_officer"] },
+    { name:"Inventory logs" ,to:"/inventorylogs", icon:History, visibleTo: ["global_admin"] },
     { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin"] },
     { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["human_resources",'admin',"global_admin","waste_management_manager","waste_management_supervisor"] }
   ];
