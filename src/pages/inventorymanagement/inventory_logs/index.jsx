@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useMemo } from 'react';
 import { format } from 'date-fns';
 import axios from "axios"
 import { useUser } from '../../../components/usercontext';
 import PaginationControls from '../Paginationcontrols';
 import { FiPlus } from 'react-icons/fi';
-
+import PrintReport from './PrintReport';
 const InventoryLogs = () => {
   // Form state
   const [formData, setFormData] = useState({
@@ -32,6 +32,7 @@ const InventoryLogs = () => {
     });
   const [ShowForm, setShowForm]=useState(false) 
   // Filter state
+  const [ShowReport, setShowReport]=useState(false)
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   //const [Inventorylogitem, setInventorylogitem] =useState(null)
@@ -48,7 +49,7 @@ const InventoryLogs = () => {
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         const [inventoryRes] = await Promise.all([
         
-        axios.get(`${API_URL}/inventory/inventorylogs/${user.Department}`, { params: { page, limit },
+        axios.get(`${API_URL}/inventorylogs`, { params: { page, limit },
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
@@ -62,7 +63,8 @@ const InventoryLogs = () => {
           pagination: inventoryRes.data.Pagination
         });
         
-        setLogs(inventoryRes.data.data); 
+        setLogs(Array.isArray(inventoryRes.data.data) ? inventoryRes.data.data : []);
+
    
         
       } catch (err) {
@@ -91,11 +93,14 @@ const InventoryLogs = () => {
         setloading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         const token = localStorage.getItem('authToken');
-        const response=await axios.post(`${API_URL}/inventory/inventorylogs/create`,
+        const response=await axios.post(`${API_URL}/inventorylogs/create`,
             {...formData},
         {headers:{Authorization:`Bearer ${token}`}})
 
         setLogs([response.data.data,...logs])
+        fetchData()
+        resetForm();
+        setShowForm(false);
 
         //const updatedItem=Inventorylogitem.find(item=>item._id===itemId)
 
@@ -108,11 +113,11 @@ const InventoryLogs = () => {
     };
 
     const handleInputChange=(e)=>{
-        const {value}=e.target;
-        setFormData({
+        const {name,value}=e.target;
+        setFormData((prev)=>({
             ...formData,
-            value
-        })
+            [name]:value
+        }))
     }
 
     const handleDelete=async(itemId)=>{
@@ -120,15 +125,18 @@ const InventoryLogs = () => {
             setloading(true)
             const token = localStorage.getItem('authToken');
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-            const response=await axios.delete(`${API_URL}/inventory/inventorylogs/${itemId}`,{
+            const response=await axios.delete(`${API_URL}/inventorylogs/${itemId}`,{
                     headers: { Authorization: `Bearer ${token}` }
             })
 
             setLogs(prevItem=>prevItem.filter(item=>item._id!==itemId))
+            fetchData()
 
         }catch(error){
             Sentry.captureMessage("failed to create entry")
             Sentry.captureException(error)
+        }finally{
+            setloading(false)
         }
     }
    
@@ -148,26 +156,31 @@ const InventoryLogs = () => {
   const setupEdit=(item)=>{
     setEditingItem(item);
     setFormData({
-        Staff_Name:item.staff_name,
+        Staff_Name:item.Staff_Name,
         inventory_item:item.inventory_item,
         quantity:item.quantity,
         purpose:item.purpose,
         status:item.status
-    })
+    });
+    setShowForm(true)
   }
 
   const handleUpdate = async (e) => {
       e.preventDefault();
       try {
+        setloading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
         const token = localStorage.getItem('authToken');
-        const res = await axios.put(`${API_URL}/inventory/inventorylogs/${editingItem._id}`, formData, {
+        const res = await axios.put(`${API_URL}/inventorylogs/${editingItem._id}`, formData, {
           headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
         });
         
-        setLogs(logs.map(item => 
-          item._id === editingItem._id ? res.data.data : item
-        ));
+        setLogs(prevLogs =>
+          prevLogs.map(({ _id, ...rest }) =>
+            _id === editingItem._id ? res.data.data : { _id, ...rest }
+          )
+        );
+
         resetForm();
         setEditingItem(null);
         setShowForm(false);
@@ -175,6 +188,8 @@ const InventoryLogs = () => {
       } catch (err) {
           Sentry.captureMessage('Update Failed');
           Sentry.captureException(err.response?.data || err.message)
+      }finally{
+        setloading(false)
       }
     };
   
@@ -184,16 +199,24 @@ const InventoryLogs = () => {
   
 
   // Filter logs based on search term and status
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = 
-      log.Staff_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.inventory_item.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.purpose.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  }).sort((a, b) => {
+  const filteredLogs = useMemo(() => {
+  if (!logs ) return [];
+  console.log(logs)
+  return logs
+    .filter(log => {
+      if (!log || typeof log !== 'object') return false;
+      const search = searchTerm.toLowerCase();
+      const matchesSearch =
+        log.Staff_Name?.toLowerCase().includes(search) ||
+        log.inventory_item?.toLowerCase().includes(search) ||
+        log.purpose?.toLowerCase().includes(search) ||
+        log.status?.toLowerCase().includes(search);
+
+      const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
       const aVal = a?.[sortConfig.key];
       const bVal = b?.[sortConfig.key];
 
@@ -201,6 +224,8 @@ const InventoryLogs = () => {
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
+}, [logs, searchTerm, statusFilter, sortConfig]);
+
 
    const handlePageChange = (newPage) => {
       fetchData(newPage, data.pagination?.limit);
@@ -212,6 +237,7 @@ const InventoryLogs = () => {
 
   // Pagination
   
+  {console.log("filteredlogs",filteredLogs)}
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -239,7 +265,7 @@ const InventoryLogs = () => {
           <h2 className="text-xl font-semibold text-gray-700 mb-4">
             {editingItem ? 'Edit Inventory Record' : 'New Inventory Withdrawal'}
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={editingItem? handleUpdate:handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -319,14 +345,9 @@ const InventoryLogs = () => {
                 <button
                   type="button"
                   onClick={() => {
+                    setShowForm(false)
                     setEditingItem(null);
-                    setFormData({
-                      personName: '',
-                      itemName: '',
-                      quantity: '',
-                      purpose: '',
-                      status: 'pending'
-                    });
+                   
                   }}
                   className="mr-2 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
@@ -374,7 +395,10 @@ const InventoryLogs = () => {
                 Export to CSV
               </button>
           
-              <button className="h-11 px-4 min-w-[150px] bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+              <button 
+              onClick={()=>setShowReport(!ShowReport)}
+              
+              className="h-11 px-4 min-w-[150px] bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                 Print Report
               </button>
           
@@ -387,7 +411,7 @@ const InventoryLogs = () => {
                 className="h-11 px-4 min-w-[150px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm"
               >
                 <FiPlus className="mr-1" />
-                <span className="whitespace-nowrap">Add Log</span>
+                <span className="whitespace-nowrap">{ShowForm? "close":"add log"}</span>
               </button>
             </div>
           </div>
@@ -434,7 +458,7 @@ const InventoryLogs = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => handleInputChange(log)}
+                            onClick={() => setupEdit(log)}
                             className="text-blue-600 hover:text-blue-900"
                           >
                             Edit
@@ -460,7 +484,7 @@ const InventoryLogs = () => {
             </table>
           </div>
         </div>
-        
+        {ShowReport && (<PrintReport filteredLogs={filteredLogs}/>)}
         {/* Pagination */}
         <div>
                                 {/* Your data display */}
