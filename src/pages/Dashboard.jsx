@@ -23,7 +23,7 @@ export const Dashboard=()=>{
     const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
       "Financial_manager","accounts","Director",];
     const departmental_access=["waste_management_manager","waste_management_supervisor","PVT_manager","Environmental_lab_manager","PVT_manager","lab_supervisor","HSE_officer",
-      "Contracts_manager","Engineering_manager"]
+      "Contracts_manager","Engineering_manager","Administration"]
     
     useEffect(()=>{
         const email=user?.email||"no email provided"

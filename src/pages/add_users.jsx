@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createUser } from "../services/userService";
 import { Eye, EyeOff } from "react-feather";
 import { motion,AnimatePresence } from "framer-motion";
@@ -14,10 +14,20 @@ const Add_user = () => {
   const [password, setpassword] = useState("");
   const [role, setrole] = useState(roles[0]);
   const [showPassword, setShowPassword] = useState(false);
+  const [isVisible, setisVisible]=useState(false)
+  const [loading, setloading]=useState(false)
+  useEffect(()=>{
+    setisVisible(true)
+    const timer=setTimeout(()=>{
+      setisVisible(false)
+    },3000)
 
+    return ()=> clearTimeout(timer)
+  },[Error])
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
+      setloading(true)
       const user_data = await createUser({ name, email, password,Department, role });
       //console.log("Submitting User data:", user_data);
       if (user_data.success===true){
@@ -27,7 +37,7 @@ const Add_user = () => {
         setpassword("");
         setDepartment("")
         setrole(roles[0]);
-        alert("User Created!");
+       
       }else{
         setError("user was not created")
         
@@ -41,14 +51,23 @@ const Add_user = () => {
         window.location.href='/adminlogin'
       }else{
         setError("failed operation")
-        setTimeout(()=>setError(null),3000  )
+        
       }
 
     }finally{
-      setError(" ")
+      setloading(false)
+      
     }
     
   };
+
+  if (loading) {
+    return <div className='flex justify-center  items-center h-screen'>
+              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
+                 
+              </div>
+           </div>;
+  }
 
   return (
     <div className="mb-8">
@@ -157,20 +176,20 @@ const Add_user = () => {
               </motion.button>
               
             </form>
-              <AnimatePresence>
-                        {Error && (
+          </motion.div>
+          </motion.div>
+          <AnimatePresence>
+                        {isVisible&& (
                           <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
-                          className="p-3 mt-16 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200"
+                          className="p-3 mt-10 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200"
                           >
                             {Error}
                           </motion.div>
                         )}
           </AnimatePresence>
-          </motion.div>
-          </motion.div>
           
     </div>
     
