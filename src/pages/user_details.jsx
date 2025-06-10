@@ -26,7 +26,7 @@ const UserDetails = ({
   
   useEffect(() => {
     // Calculate statistics when orders change
-    const total = approvedOrders.length + rejectedOrders.length + pendingOrders.length;
+    const total = approvedOrders.length + rejectedOrders.length + pendingOrders.length+completedOrders.length;
     const rate = total > 0 ? Math.round((approvedOrders.length / total) * 100) : 0;
     const calculateAvgProcessingTime = (approvedOrders) => {
       if (approvedOrders.length === 0) return 0;
@@ -42,6 +42,8 @@ const UserDetails = ({
         const LastApproval = order.Approvals[order.Approvals.length-1];
         
         const approved = new Date(LastApproval?.timestamp); // adjust key name if it's not 'timestamp'
+
+        
     
         return sum + Math.ceil((approved - created) / (1000 * 60 * 60 * 24)); // days
       }, 0);

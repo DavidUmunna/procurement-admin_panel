@@ -30,7 +30,7 @@ const CompletedOrdersList = ({ orders, itemsPerPage = 5 }) => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product Details</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -46,7 +46,7 @@ const CompletedOrdersList = ({ orders, itemsPerPage = 5 }) => {
                     onClick={() => toggleExpand(order._id)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{order.orderNumber}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.orderedBy}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.Title}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(order.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -84,7 +84,7 @@ const CompletedOrdersList = ({ orders, itemsPerPage = 5 }) => {
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                               <p className="text-gray-500">Name:</p>
-                              <p className="font-medium">{order.orderedBy}</p>
+                              <p className="font-medium">{order.staff.name}</p>
                             </div>
                             <div>
                               <p className="text-gray-500">Order Date:</p>

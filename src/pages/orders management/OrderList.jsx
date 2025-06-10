@@ -1,5 +1,5 @@
 
-import React, {  useState } from "react";
+import React, {  useState,useEffect } from "react";
 import {
 
   updateOrderStatus,
@@ -15,6 +15,7 @@ import Searchbar from "../../components/searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { admin_roles } from "../../components/navBar";
+import { Timer } from "lucide-react";
 
 
 
@@ -33,7 +34,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const [comment,setcomment]=useState("")
   const [commentsByOrder, setCommentsByOrder] = useState({});
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
-
+  const [isVisible, setIsVisible]=useState(false)
 
   const getOverallStatus = (approvals, department) => {
     if (!approvals || approvals.length === 0) return "Pending";
@@ -110,6 +111,17 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
     });
   };
 
+  useEffect(()=>{
+    if (error){
+      setIsVisible(true)
+      const Timer=setTimeout(()=>{
+        setIsVisible(false)
+      },3000)
+    }
+    return ()=>clearTimeout(Timer)
+
+  },[error])
+
   const handleCommentChange = (orderId) => (e) => {
     setCommentsByOrder(prev => ({
     ...prev,
@@ -178,6 +190,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
           adminName: user.name,comment:comment,
           orderId 
         }, {headers});
+      }else if (newStatus==="Completed"){
+        await axios.put(`${API_URL}/orders/${orderId}/completed`,
+         orderId,{headers} 
+        )
       }
       
   
@@ -249,7 +265,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
   const getStatusBadge = (order) => {
     let bgColor, textColor, icon;
-    const status = getOverallStatus(order.Approvals);
+    const status = order.status==="Completed"?order.status:getOverallStatus(order.Approvals);
     switch (status) {
       case "Approved":
         bgColor = "bg-green-100";
@@ -294,7 +310,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       
       <div className="p-3 bg-gray-50 rounded-lg">
           <p className="font-semibold text-gray-700">
-            Current Status: <span className="ml-2">{getOverallStatus(order.Approvals)}</span>
+            Current Status: <span className="ml-2">{order.status==="Completed"?order.status:getOverallStatus(order.Approvals)}</span>
           </p>
           <p className="text-sm text-gray-500 mt-1">
             {getStatusExplanation(order.Approvals,order?.staff?.Department)}
@@ -615,7 +631,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
             </motion.ul>
           )}
         </motion.div>
-        {error && (
+        {isVisible && (
             <div className="p-4 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200">
               {error}
             </div>

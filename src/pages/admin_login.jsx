@@ -17,15 +17,15 @@ export default function Sign_in({ setAuth }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
-
+    
     try {
+      setLoading(true);
       const API_URL = process.env.REACT_APP_API_URL;
       const response = await axios.post(
         `${API_URL}/api/admin-user/login`,
         { username, password },
-        { withCredentials: true,"ngrok-skip-browser-warning": "true"
+        { withCredentials:true,"ngrok-skip-browser-warning": "true"
 
          }
       );
