@@ -61,7 +61,7 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
         const formatted = category
             .replace(/_/g, ' ')
             .replace(/(^|\s)\S/g, l => l.toUpperCase());
-        return category === 'PVT' ? 'PVT' : formatted;
+        return category ===formatted;
     };
 
     const validateForm = () => {

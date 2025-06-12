@@ -426,8 +426,8 @@ const SkipsManagement = () => {
             onChange={(e) => setselectedWasteStream(e.target.value)}
           >
             <option value="All">All Categories</option>
-            {Array.isArray(categories) && categories.map((category) => (
-              <option key={category} value={category}>
+            {Array.isArray(categories) && categories.map((category,index) => (
+              <option key={category._id || index} value={category}>
                 {formatCategory(category)}
               </option>
             ))}
@@ -712,8 +712,8 @@ const SkipsManagement = () => {
                   >
                     <option value="">Select a category</option>
                     {Array.isArray(categories) && categories.length > 0 ? (
-                      categories.map((category) => (
-                        <option key={category} value={category}>
+                      categories.map((category,index) => (
+                        <option key={category._id || index} value={category}>
                           {formatCategory(category)}
                         </option>
                       ))

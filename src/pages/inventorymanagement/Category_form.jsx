@@ -1,6 +1,6 @@
 
 
-function CategorySelect({ user, categories, formdata, handleInputChange }) {
+function CategoryForm({ user, categories, formdata, handleInputChange }) {
   // Filter categories based on user role
   let filteredCategories = [];
 
@@ -29,8 +29,8 @@ function CategorySelect({ user, categories, formdata, handleInputChange }) {
         required
       >
         <option value="">Select Category</option>
-        {filteredCategories.map(category => (
-          <option key={category._id} value={category.name}>
+        {filteredCategories.map((category,index) => (
+          <option key={category._id || index} value={category.name}>
             {category.name}
           </option>
         ))}
@@ -39,4 +39,4 @@ function CategorySelect({ user, categories, formdata, handleInputChange }) {
   );
 }
 
-export default CategorySelect;
+export default CategoryForm;

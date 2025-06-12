@@ -45,25 +45,7 @@ export default function Navbar() {
     return true;
   });
 
-  useEffect(()=>{
-    function Handleclickoutside(event){
-      if(sidebarRef.current && !sidebarRef.current.contains(event.target) &&
-         buttonRef.current && !buttonRef.current.contains(event.target)){
-          setIsSidebarOpen(false)
-         }}
-      if (isSidebarOpen){
-        document.addEventListener("mousedown",Handleclickoutside)
-
-      }else{
-        document.removeEventListener("mousedown",Handleclickoutside)
-      }
-
-      return ()=>{
-        document.removeEventListener("mousedown",Handleclickoutside)
-      }
-
-    
-  },[isSidebarOpen])
+ 
 
   return (
     <>

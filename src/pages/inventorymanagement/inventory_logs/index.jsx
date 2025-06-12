@@ -6,6 +6,9 @@ import { useUser } from '../../../components/usercontext';
 import PaginationControls from '../Paginationcontrols';
 import { FiPlus } from 'react-icons/fi';
 import PrintReport from './PrintReport';
+import CategoryForm from '../Category_form';
+import CategorySelect from '../Category_select';
+import ExcelExport from './Excelexport';
 const InventoryLogs = () => {
   // Form state
   const [formData, setFormData] = useState({
@@ -13,15 +16,17 @@ const InventoryLogs = () => {
     inventory_item: '',
     quantity: '',
     purpose: '',
-    status: 'pending'
+    status: 'pending',
+    category:""
   });
+  const [selectedCategory,setSelectedCategory]=useState("All")
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
   const {user}=useUser()
   // Logs state
   const [Error, setError]=useState("")
   const [logs, setLogs] = useState([]);
-
-  const [loading,setloading]=useState(false)
+  const [showmodal,setshowmodal]=useState(false)
+  const [loading,setLoading]=useState(false)
   const [data, setData] = useState({
       activities: [],
       pagination: {
@@ -37,7 +42,7 @@ const InventoryLogs = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   //const [Inventorylogitem, setInventorylogitem] =useState(null)
   const [editingItem, setEditingItem]=useState(null) 
-
+  const [categories,setcategories]=useState([])
 
   // Load sample data on first render
 
@@ -47,15 +52,20 @@ const InventoryLogs = () => {
       
         const token = localStorage.getItem('authToken');
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-        const [inventoryRes] = await Promise.all([
+        const [inventoryRes,categoryRes] = await Promise.all([
         
-        axios.get(`${API_URL}/inventorylogs`, { params: { page, limit },
+        axios.get(`${API_URL}/inventorylogs/${user.Department}`, { params: { page, limit },
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
           }),
+
+        axios.get(`${API_URL}/inventorylogs/categories`,{headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },withCredentials:true})
           
         ]);
         setData({
@@ -64,7 +74,7 @@ const InventoryLogs = () => {
         });
         
         setLogs(Array.isArray(inventoryRes.data.data) ? inventoryRes.data.data : []);
-
+        setcategories(categoryRes.data.data.categories)
    
         
       } catch (err) {
@@ -77,11 +87,14 @@ const InventoryLogs = () => {
           Sentry.captureException( err);
         }
       } finally {
-        setloading(false);
+        setLoading(false);
       }
     };
+
+  
   useEffect(() => {
     fetchData()
+
   
   }, []);
 
@@ -90,7 +103,7 @@ const InventoryLogs = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     try{
-        setloading(true)
+        setLoading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         const token = localStorage.getItem('authToken');
         const response=await axios.post(`${API_URL}/inventorylogs/create`,
@@ -108,7 +121,7 @@ const InventoryLogs = () => {
         Sentry.captureMessage("failed to create entry")
         Sentry.captureException(error)
     }finally{
-        setloading(false)
+        setLoading(false)
     }
     };
 
@@ -122,7 +135,7 @@ const InventoryLogs = () => {
 
     const handleDelete=async(itemId)=>{
         try{
-            setloading(true)
+            setLoading(true)
             const token = localStorage.getItem('authToken');
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
             const response=await axios.delete(`${API_URL}/inventorylogs/${itemId}`,{
@@ -136,7 +149,7 @@ const InventoryLogs = () => {
             Sentry.captureMessage("failed to create entry")
             Sentry.captureException(error)
         }finally{
-            setloading(false)
+            setLoading(false)
         }
     }
    
@@ -149,7 +162,8 @@ const InventoryLogs = () => {
       inventory_item: '',
       quantity: '',
       purpose: '',
-      status: 'pending'
+      status: 'pending',
+      category:""
     });
   };
 
@@ -160,7 +174,8 @@ const InventoryLogs = () => {
         inventory_item:item.inventory_item,
         quantity:item.quantity,
         purpose:item.purpose,
-        status:item.status
+        status:item.status,
+        category:item.category
     });
     setShowForm(true)
   }
@@ -168,7 +183,7 @@ const InventoryLogs = () => {
   const handleUpdate = async (e) => {
       e.preventDefault();
       try {
-        setloading(true)
+        setLoading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
         const token = localStorage.getItem('authToken');
         const res = await axios.put(`${API_URL}/inventorylogs/${editingItem._id}`, formData, {
@@ -189,7 +204,7 @@ const InventoryLogs = () => {
           Sentry.captureMessage('Update Failed');
           Sentry.captureException(err.response?.data || err.message)
       }finally{
-        setloading(false)
+        setLoading(false)
       }
     };
   
@@ -201,7 +216,7 @@ const InventoryLogs = () => {
   // Filter logs based on search term and status
   const filteredLogs = useMemo(() => {
   if (!logs ) return [];
-  console.log(logs)
+ 
   return logs
     .filter(log => {
       if (!log || typeof log !== 'object') return false;
@@ -210,11 +225,16 @@ const InventoryLogs = () => {
         log.Staff_Name?.toLowerCase().includes(search) ||
         log.inventory_item?.toLowerCase().includes(search) ||
         log.purpose?.toLowerCase().includes(search) ||
+        log.category?.toLowerCase().includes(search)||  
         log.status?.toLowerCase().includes(search);
+
 
       const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
 
       return matchesSearch && matchesStatus;
+    })
+    .filter(item => {
+       return selectedCategory === 'All'||item?.category === selectedCategory;
     })
     .sort((a, b) => {
       const aVal = a?.[sortConfig.key];
@@ -224,7 +244,7 @@ const InventoryLogs = () => {
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-}, [logs, searchTerm, statusFilter, sortConfig]);
+}, [logs, searchTerm,selectedCategory, statusFilter, sortConfig]);
 
 
    const handlePageChange = (newPage) => {
@@ -237,7 +257,7 @@ const InventoryLogs = () => {
 
   // Pagination
   
-  {console.log("filteredlogs",filteredLogs)}
+
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -247,6 +267,15 @@ const InventoryLogs = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+     const formatCategory = (category) => {
+        if (!category) return '';
+        const formatted = category
+            .replace(/_/g, ' ')
+            .replace(/(^|\s)\S/g, l => l.toUpperCase());
+        return category ===formatted;
+    };
+
 
   if (loading) {
     return <div className="p-8 flex justify-center items-center min-h-screen">
@@ -280,7 +309,7 @@ const InventoryLogs = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Item Name <span className="text-red-500">*</span>
@@ -325,6 +354,12 @@ const InventoryLogs = () => {
                   <option value="returned">Returned</option>
                 </select>
               </div>
+              <div>
+                <CategoryForm user={user} categories={categories}
+                 formdata={formData} handleInputChange={handleInputChange}
+                />
+              </div>
+               
             </div>
             
             <div>
@@ -372,13 +407,13 @@ const InventoryLogs = () => {
             {/* Search and Filter */}
             <div className="mt-6 flex justify-end">
             <div className="flex flex-wrap md:flex-row gap-3 md:w-auto">
-              <input
+              {/*<input
                 type="text"
                 placeholder="Search logs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="h-11 min-w-[150px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
+              />*/}
           
               <select
                 value={statusFilter}
@@ -390,8 +425,16 @@ const InventoryLogs = () => {
                 <option value="completed">Completed</option>
                 <option value="returned">Returned</option>
               </select>
+              <div>
+                 <CategorySelect user={user} categories={categories} searchTerm={searchTerm}
+                 setSearchTerm={setSearchTerm} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
+                 
+                 />
+              </div>
           
-              <button className="h-11 px-4 min-w-[150px] bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+              <button 
+              onClick={()=>setshowmodal(!showmodal)}
+              className="h-11 px-4 min-w-[150px] bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
                 Export to CSV
               </button>
           
@@ -427,14 +470,15 @@ const InventoryLogs = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>                  
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>                  
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredLogs.length > 0 ? (
                    filteredLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50">
+                    <tr key={log._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {format(log.createdAt, 'MMM dd, yyyy HH:mm')}
                       </td>
@@ -452,7 +496,12 @@ const InventoryLogs = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(log.status)}`}>
-                          {log.status.charAt(0).toUpperCase() + log.status.slice(1)}
+                          {log.status.charAt(0).toUpperCase() + log?.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(log.status)}`}>
+                          { log?.category}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -485,6 +534,7 @@ const InventoryLogs = () => {
           </div>
         </div>
         {ShowReport && (<PrintReport filteredLogs={filteredLogs}/>)}
+        {showmodal && (<ExcelExport setopenmodal={setshowmodal} setLoading={setLoading} categories={categories}/>)}
         {/* Pagination */}
         <div>
                                 {/* Your data display */}

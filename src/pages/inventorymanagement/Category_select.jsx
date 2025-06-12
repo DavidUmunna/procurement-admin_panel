@@ -7,11 +7,11 @@ function CategorySelect({ user, categories,selectedCategory, setSearchTerm, sear
     const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
   switch (user.role) {
     case "HSE_officer":
-      filteredCategories = categories.filter(cat => cat.name === "HSE_items");
+      filteredCategories = categories?.filter(cat => cat.name === "HSE_items");
       break;
 
     case "Environmental_lab_manager" || "lab_supervisor":
-      filteredCategories=categories.filter(cat => cat.name === "lab_items");
+      filteredCategories=categories?.filter(cat => cat.name === "lab_items");
       break;
       
     default:
@@ -35,8 +35,8 @@ function CategorySelect({ user, categories,selectedCategory, setSearchTerm, sear
               >
                 {access_free_roles.includes(user.role) &&<option value="All">All Categories</option>}
                 {(Array.isArray(categories) && categories.length > 0) ? (
-                filteredCategories.map((category) => (
-                    <option key={category?._id || category?.name} value={category?.name || ""}>
+                filteredCategories?.map((category,index) => (
+                    <option key={category?._id || index} value={category?.name || ""}>
                 {category?.name || "Unnamed Category"}
               </option>
             ))

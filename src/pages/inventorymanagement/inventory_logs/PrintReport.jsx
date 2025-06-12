@@ -41,7 +41,7 @@ const PrintReport = ({filteredLogs}) => {
             <tbody>
             ${
                 filteredLogs.map(log => `
-                  ${console.log("filteredlogs print:",filteredLogs)} 
+                  
                 <tr>
                   <td>${format(new Date(log.createdAt), 'MMM dd, yyyy HH:mm')}</td>
                   <td>${log.Staff_Name}</td>
