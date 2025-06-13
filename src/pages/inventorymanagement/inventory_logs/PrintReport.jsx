@@ -36,6 +36,7 @@ const PrintReport = ({filteredLogs}) => {
                 <th>Quantity</th>
                 <th>Purpose</th>
                 <th>Status</th>
+                <th>category</th>
               </tr>
             </thead>
             <tbody>
@@ -51,6 +52,7 @@ const PrintReport = ({filteredLogs}) => {
                   <td class="status-${log.status}">
                     ${log.status.charAt(0).toUpperCase() + log.status.slice(1)}
                   </td>
+                  <td>${log.category || 'N/A'}</td>
                 </tr>
               `).join('')}
             </tbody>

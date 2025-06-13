@@ -9,13 +9,13 @@ const Sidebar=forwardRef(({ isOpen, onClose },ref) =>{
   const {user}=useUser()
   const sidebar = [
     //{ name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
-    { name: "Assets Management", to: "/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","admin","waste_management","human_resources","global_admin","PVT"] },
-    { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin','admin'] },
-    { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin','admin',"internal_auditor"] },
+    { name: "Assets Management", to: "/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","waste_management","human_resources","global_admin","PVT"] },
+    { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin'] },
+    { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin',"internal_auditor"] },
     { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","human_resources","global_admin","Environmental_lab_manager","lab_supervisor","HSE_officer"] },
     { name:"Inventory logs" ,to:"/inventorylogs", icon:History, visibleTo: ["global_admin","admin","HSE_officer","lab_supervisor","procurement_officer"] },
-    { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources",'admin',"global_admin"] },
-    { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["human_resources",'admin',"global_admin","waste_management_manager","waste_management_supervisor"] }
+    { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources","global_admin"] },
+    { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["human_resources","global_admin","waste_management_manager","waste_management_supervisor"] }
   ];
 
   return (

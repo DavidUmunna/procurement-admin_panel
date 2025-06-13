@@ -20,7 +20,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       const [isLoading, setIsLoading] = useState(false);
       const [categories, setCategories] = useState([]);
       const [selectedCategory, setSelectedCategory] = useState('All');
-      const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
+      const access_free_roles=["procurement_officer","human_resources","global_admin"]
 
     
       const fetchActivities = async (page , limit) => {
@@ -100,6 +100,9 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
     case "Environmental_lab_manager":
     case "lab_supervisor":
       filteredCategories=categories?.filter(cat => cat.name === "lab_items");
+      break;
+    case "admin":
+      filteredCategories=categories?.filter(cat=>cat.name==="Office_items")
       break;
       
     default:

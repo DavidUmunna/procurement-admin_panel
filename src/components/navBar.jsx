@@ -15,8 +15,8 @@ export const admin_roles = ["procurement_officer", "human_resources", "internal_
 const navigation = [
   { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },
   { name: 'Create', to: '/createorder', icon: PlusCircleIcon },
-  { name: 'Add Users', to: '/addusers', icon: UserIcon, visibleTo: ['admin', 'global_admin'] },
-  { name: 'Users', to: '/users', icon: UsersIcon, visibleTo: ['admin', 'global_admin'] },
+  { name: 'Add Users', to: '/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
+  { name: 'Users', to: '/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
   {name:'Tasks', to:'/usertasks', icon: ClipboardDocumentCheckIcon }
 ];
 

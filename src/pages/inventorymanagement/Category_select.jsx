@@ -4,7 +4,7 @@ function CategorySelect({ user, categories,selectedCategory, setSearchTerm, sear
     // Filter categories based on user role
     let filteredCategories = [];
    
-    const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
+    const access_free_roles=["procurement_officer","human_resources","global_admin"]
   switch (user.role) {
     case "HSE_officer":
       filteredCategories = categories?.filter(cat => cat.name === "HSE_items");
@@ -14,7 +14,9 @@ function CategorySelect({ user, categories,selectedCategory, setSearchTerm, sear
     case  "lab_supervisor":
       filteredCategories=categories?.filter(cat => cat.name === "lab_items");
       break;
-      
+    case "admin":
+      filteredCategories=categories?.filter(cat=>cat.name==="Office_items")
+      break;
     default:
       filteredCategories = categories; // admins see all
       break;

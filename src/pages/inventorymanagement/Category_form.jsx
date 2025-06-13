@@ -9,8 +9,12 @@ function CategoryForm({ user, categories, formdata, handleInputChange }) {
       filteredCategories = categories.filter(cat => cat.name === "HSE_items");
       break;
 
-    case "Environmental_lab_manager" || "lab_supervisor":
+    case "Environmental_lab_manager":
+    case "lab_supervisor":
       filteredCategories=categories.filter(cat => cat.name === "lab_items");
+      break;
+    case "admin":
+      filteredCategories=categories?.filter(cat=>cat.name==="Office_items")
       break;
       
     default:
