@@ -401,67 +401,66 @@ const InventoryLogs = () => {
         </div>)}
         
         {/* Inventory Logs Table */}
-        <div className="mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-            <h2 className="text-xl font-semibold text-gray-700">Inventory Logs</h2>
-            
-            {/* Search and Filter */}
-            <div className="mt-6 flex justify-end">
-            <div className="flex flex-wrap md:flex-row gap-3 md:w-auto">
-              {/*<input
-                type="text"
-                placeholder="Search logs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-11 min-w-[150px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />*/}
-          
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-11 min-w-[150px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              >
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="returned">Returned</option>
-              </select>
-              <div>
-                 <CategorySelect user={user} categories={categories} searchTerm={searchTerm}
-                 setSearchTerm={setSearchTerm} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
-                 
+         <div className="mb-6">
+           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+             <h2 className="text-xl font-semibold text-gray-700">Inventory Logs</h2>
+         
+             {/* Search and Filter */}
+             <div className="w-full md:w-auto flex flex-col sm:flex-row flex-wrap gap-3">
+               <select
+                 value={statusFilter}
+                 onChange={(e) => setStatusFilter(e.target.value)}
+                 className="h-11 w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+               >
+                 <option value="all">All Statuses</option>
+                 <option value="pending">Pending</option>
+                 <option value="completed">Completed</option>
+                 <option value="returned">Returned</option>
+               </select>
+         
+               <div className="w-full sm:w-auto">
+                 <CategorySelect
+                   user={user}
+                   categories={categories}
+                   searchTerm={searchTerm}
+                   setSearchTerm={setSearchTerm}
+                   selectedCategory={selectedCategory}
+                   setSelectedCategory={setSelectedCategory}
                  />
-              </div>
-          
-              <button 
-              onClick={()=>setshowmodal(!showmodal)}
-              className="h-11 px-4 min-w-[150px] bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
-                Export to CSV
-              </button>
-          
-              <button 
-              onClick={()=>setShowReport(!ShowReport)}
-              
-              className="h-11 px-4 min-w-[150px] bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                Print Report
-              </button>
-          
-              <button
-                onClick={() => {
-                  setEditingItem(null);
-                  resetForm();
-                  setShowForm(!ShowForm);
-                }}
-                className="h-11 px-4 min-w-[150px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm"
-              >
-                <FiPlus className="mr-1" />
-                <span className="whitespace-nowrap">{ShowForm? "close":"add log"}</span>
-              </button>
-            </div>
-          </div>
-
-          </div>
-          
+               </div>
+         
+               <button
+                 onClick={() => setshowmodal(!showmodal)}
+                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+               >
+                 Export to CSV
+               </button>
+         
+               <button
+                 onClick={() => setShowReport(!ShowReport)}
+                 className="h-11 w-full sm:w-auto px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+               >
+                 Print Report
+               </button>
+         
+               <button
+                 onClick={() => {
+                   setEditingItem(null);
+                   resetForm();
+                   setShowForm(!ShowForm);
+                 }}
+                 className="h-11 w-full sm:w-auto px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-[1.02] text-sm"
+               >
+                 <FiPlus className="mr-1" />
+                 <span className="whitespace-nowrap">{ShowForm ? "close" : "add log"}</span>
+               </button>
+             </div>
+           </div>
+         
+             
+         
+                 
+                   
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -559,6 +558,7 @@ const InventoryLogs = () => {
           {Error}
         </div>
       )}
+      
     </div>
   );
 
