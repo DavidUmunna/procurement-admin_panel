@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/react';
 import React, { useState, useEffect,useMemo } from 'react';
 import { format } from 'date-fns';
 import axios from "axios"
+import {FaEdit, faEdit,FaTrash} from "react-icons/fa"
 import { useUser } from '../../../components/usercontext';
 import PaginationControls from '../Paginationcontrols';
 import { FiPlus } from 'react-icons/fi';
@@ -510,13 +511,13 @@ const InventoryLogs = () => {
                             onClick={() => setupEdit(log)}
                             className="text-blue-600 hover:text-blue-900"
                           >
-                            Edit
+                            <FaEdit/>
                           </button>
                           <button
                             onClick={() => handleDelete(log._id)}
                             className="text-red-600 hover:text-red-900"
                           >
-                            Delete
+                            <FaTrash/>
                           </button>
                         </div>
                       </td>
