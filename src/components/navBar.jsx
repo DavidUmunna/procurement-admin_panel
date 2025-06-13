@@ -10,7 +10,7 @@ import Sidebar from './Sidebar';
 
 export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin","lab_supervisor",
   "Financial_manager","waste_management_manager","accounts","waste_management_supervisor","Environmental_lab_manager","PVT_manager",
-  "HSE_officer","Contracts_manager","Engineering_manager","admin"];
+  "QHSE_coordinator","Contracts_manager","Engineering_manager","admin"];
 
 const navigation = [
   { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },

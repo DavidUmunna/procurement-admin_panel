@@ -93,8 +93,8 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
     
   let filteredCategories = [];
   switch (user.role) {
-    case "HSE_officer":
-      filteredCategories = categories?.filter(cat => cat.name === "HSE_items");
+    case "QHSE_coordinator":
+      filteredCategories = categories?.filter(cat => cat.name === "HSE_materials");
       break;
 
     case "Environmental_lab_manager":
