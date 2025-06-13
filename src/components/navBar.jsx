@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { PanelLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
 
-export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
+export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin","lab_supervisor",
   "Financial_manager","waste_management_manager","accounts","waste_management_supervisor","Environmental_lab_manager","PVT_manager",
   "HSE_officer","Contracts_manager","Engineering_manager","admin"];
 
