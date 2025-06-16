@@ -401,9 +401,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
         <FaFile className="h-5 w-5 text-gray-400" />
       </div>
-      <h3 className="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
+      <h3 className="mt-2 text-sm font-medium text-gray-900">No Requests found</h3>
       <p className="mt-1 text-sm text-gray-500">
-        Try adjusting your search filters or create a new order
+        Try adjusting your search filters or create a new Request
       </p>
     </div>
   );
