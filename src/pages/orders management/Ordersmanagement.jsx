@@ -167,53 +167,56 @@ const OrdersDashboard = ({setAuth}) => {
               </div>
            </div>;
   }
+const shouldShowRightColumn =
+  (admin_roles.includes(user?.role) || user?.role === "accounts") &&
+  (Duplicates || CompletedOrdersList);
 
-  return (
-  <div className="flex flex-col lg:flex-row gap-6 p-4 mt-10 h-[calc(100vh-5rem)] mb-9">
-  {/* Left: Order List (2/3 width on large screens) */}
-  
-  <div className="w-full lg:w-2/3 overflow-y-auto">
-    <OrderList 
-      orders={orders} 
-      selectedOrderId={selectedOrderId}
-      setOrders={setOrders}
-      error={error}
-      setError={setError}
-    />
-    <div>
-      <PaginationControls
-        currentPage={Data.pagination?.page}
-        totalPages={Data.pagination?.totalPages}
-        itemsPerPage={Data.pagination?.limit}
-        totalItems={Data.pagination?.total}
-        onPageChange={handlePageChange}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        isLoading={isLoading}
+return (
+  <div
+    className={`flex flex-col lg:flex-row gap-6 p-4 mt-10 h-[calc(100vh-5rem)] mb-9 ${
+      !shouldShowRightColumn ? 'justify-center' : ''
+    }`}
+  >
+    <div className={`overflow-y-auto ${
+      shouldShowRightColumn ? 'w-full lg:w-2/3' : 'w-full lg:w-2/3'
+    }`}>
+      <OrderList
+        orders={orders}
+        selectedOrderId={selectedOrderId}
+        setOrders={setOrders}
+        error={error}
+        setError={setError}
       />
+      <div>
+        <PaginationControls
+          currentPage={Data.pagination?.page}
+          totalPages={Data.pagination?.totalPages}
+          itemsPerPage={Data.pagination?.limit}
+          totalItems={Data.pagination?.total}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          isLoading={isLoading}
+        />
+      </div>
     </div>
-  </div>
 
-  {/* Right: Responsive column for optional components */}
-  {(admin_roles.includes(user?.role) || user?.role === "accounts") && (
-    <div className="w-full lg:w-1/3 flex flex-col justify-center ">
-      {Duplicates && (
-        <div className={`${CompletedOrdersList ? 'flex-1' : 'flex justify-center items-center h-full'}`}>
-          <Duplicates 
-            orders={orders} 
-            onOrderSelect={handleOrderSelect}
-          />
-        </div>
-      )}
-      {CompletedOrdersList && (
-        <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full mb-10'} `}>
-          <CompletedOrdersList orders={orders} />
-        </div>
-      )}
-    </div>
-  )}
-  
-</div>
-  )
+    {shouldShowRightColumn && (
+      <div className="w-full lg:w-1/3 flex flex-col justify-center">
+        {Duplicates && (
+          <div className={`${CompletedOrdersList ? 'flex-1' : 'flex justify-center items-center h-full'}`}>
+            <Duplicates orders={orders} onOrderSelect={handleOrderSelect} />
+          </div>
+        )}
+        {CompletedOrdersList && (
+          <div className={`${Duplicates ? 'flex-1' : 'flex justify-center items-center h-full mb-10'}`}>
+            <CompletedOrdersList orders={orders} />
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+);
+
 
 };
 
