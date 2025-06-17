@@ -43,7 +43,19 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     
-    const REQUIRED_APPROVALS = department === "waste_management_dep" ? 5 : 4;
+   let REQUIRED_APPROVALS;
+
+    switch (department) {
+      case "waste_management_dep":
+        REQUIRED_APPROVALS = 5;
+        break;
+      case "Environmental_lab_dep":
+        REQUIRED_APPROVALS = 4;
+        break;
+      default:
+        REQUIRED_APPROVALS = 3;
+    }
+
   
     if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
     if (approvalCount > 0) return "Partially Approved";
@@ -54,7 +66,22 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const getStatusExplanation = (approvals,Department) => {
     const status = getOverallStatus(approvals,Department);
     const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
-    const REQUIRED_APPROVALS = Department === "waste_management_dep" ? 5 : 4;
+
+
+    let REQUIRED_APPROVALS;
+
+    switch(Department){
+      case "waste_management_dep":
+        REQUIRED_APPROVALS=5;
+        break
+      case  "Environmental_lab_dep":
+        REQUIRED_APPROVALS=4;
+        break;
+      default:
+        REQUIRED_APPROVALS=3;
+
+        
+    }
     
     switch(status) {
       case "Approved":
