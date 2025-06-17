@@ -31,10 +31,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   //const [error, setError] = useState(null);
-  const [comment,setcomment]=useState("")
   const [commentsByOrder, setCommentsByOrder] = useState({});
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
   const [isVisible, setIsVisible]=useState(false)
+  const [toast, setToast] = useState({ show: false, message: '' });
+
 
   const getOverallStatus = (approvals, department) => {
     if (!approvals || approvals.length === 0) return "Pending";
@@ -145,9 +146,20 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
         setIsVisible(false)
       },3000)
     }
+   
     return ()=>clearTimeout(Timer)
 
+
   },[error])
+
+ useEffect(() => {
+  if (selectedOrderId) {
+    setCommentsByOrder(prev => ({
+      ...prev,
+      [selectedOrderId]: "" // Clear comment for this specific order
+    }));
+  }
+}, [selectedOrderId]);
 
   const handleCommentChange = (orderId) => (e) => {
     setCommentsByOrder(prev => ({
@@ -158,94 +170,103 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
  const handleCommentSubmit = (orderId) => (e) => {
     e.preventDefault();
-    setcomment(commentsByOrder[orderId]||'')
+  
     setOpenCommentOrderId(null);
-  };
+    setToast({ show: true, message: 'Comment saved successfully!' });
+    setTimeout(() => setToast({ show: false, message: '' }), 3000);
 
+  };
+ 
+  
   const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      setIsLoading(true);
-      const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem("authToken");
-      const headers = { 
-        Authorization: `Bearer ${token}`,
-        withCredentials: true,"ngrok-skip-browser-warning": "true"
-      };
-      // Optimistic update - immediately update both status and approvals
-      setOrders(prevOrders => {
-        const updatedOrders=prevOrders.map(order => 
-          order._id === orderId 
-            ? { 
-                ...order, 
-                status: newStatus,
-                Approvals: (()=>{
-                  const existingApprovals= Array.isArray(order.Approvals) ? order.Approvals : [];
-                  const filteredApprovals=existingApprovals.filter(a=>a.admin!==user.name)
+  try {
+    setIsLoading(true);
+    const API_URL = `${process.env.REACT_APP_API_URL}/api`
+    const token = localStorage.getItem("authToken");
+    const headers = { 
+      Authorization: `Bearer ${token}`,
+      withCredentials: true,"ngrok-skip-browser-warning": "true"
+    };
+    
+    // Get the comment for this specific order
+    const orderComment = commentsByOrder[orderId] || '';
+    
+    // Optimistic update
+    setOrders(prevOrders => {
+      const updatedOrders = prevOrders.map(order => 
+        order._id === orderId 
+          ? { 
+              ...order, 
+              status: newStatus,
+              Approvals: (() => {
+                const existingApprovals = Array.isArray(order.Approvals) ? order.Approvals : [];
+                const filteredApprovals = existingApprovals.filter(a => a.admin !== user.name);
 
-                  return  [
-                    ...filteredApprovals, 
-                    {
-                      admin: user.name,
-                      status: newStatus,
-                      comment:comment,
-                      timestamp: new Date().toISOString()
-                    }
-                  ] })()
-                
-              } 
-            : order
-        )
-        return updatedOrders.sort((a,b)=>{
-          if (a.status === "Completed" && b.status !== "Completed") return 1;
-          if (a.status !== "Completed" && b.status === "Completed") return -1;
-          return 0;
-        })
+                return [
+                  ...filteredApprovals, 
+                  {
+                    admin: user.name,
+                    status: newStatus,
+                    comment: orderComment, // Use the specific order comment
+                    timestamp: new Date().toISOString()
+                  }
+                ]
+              })()
+            } 
+          : order
+      )
+      return updatedOrders.sort((a,b) => {
+        if (a.status === "Completed" && b.status !== "Completed") return 1;
+        if (a.status !== "Completed" && b.status === "Completed") return -1;
+        return 0;
+      })
     });
-  
-  
-      // First update the general status
-      await updateOrderStatus(orderId, newStatus);
-      
-      // Then send specific approve/reject requests
-      if (newStatus === "Approved") {
-        await axios.put(`${API_URL}/orders/${orderId}/approve`, { 
-          adminName: user.name, comment:comment,
-          orderId 
-        }, {headers});
-      } else if (newStatus === "Rejected" || newStatus === "Pending") {
-        await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
-          adminName: user.name,comment:comment,
-          orderId 
-        }, {headers});
-      }else if (newStatus==="Completed"){
-        await axios.put(`${API_URL}/orders/${orderId}/completed`,
-         orderId,{headers} 
-        )
-      }
-      
-  
-    } catch (error) {
-      console.error("Error updating status:", error);
-      setError("Failed to update order status");
-      
-      // Revert changes if API call fails
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order._id === orderId 
-            ? { 
-                ...order, 
-                status: order.status, // Revert status
-                Approvals: Array.isArray(order.Approvals)?order.Approvals?.filter(approval => 
-                  approval.admin !== user.name || approval.status !== newStatus||approval.comment!==comment
-                ):[] // Remove the failed approval
-              } 
-            : order
-        )
-      );   } finally {
-      setIsLoading(false);
-      setDropdownOpen(null);
+
+    // First update the general status
+    await updateOrderStatus(orderId, newStatus);
+    
+    // Then send specific approve/reject requests
+    if (newStatus === "Approved") {
+      await axios.put(`${API_URL}/orders/${orderId}/approve`, { 
+        adminName: user.name, 
+        comment: orderComment, // Use the specific order comment
+        orderId 
+      }, {headers});
+    } else if (newStatus === "Rejected" || newStatus === "Pending") {
+      await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
+        adminName: user.name,
+        comment: orderComment, // Use the specific order comment
+        orderId 
+      }, {headers});
+    } else if (newStatus === "Completed") {
+      await axios.put(`${API_URL}/orders/${orderId}/completed`,
+        orderId, {headers} 
+      )
     }
-  };
+    
+  } catch (error) {
+    console.error("Error updating status:", error);
+    setError("Failed to update order status");
+    const orderComment = commentsByOrder[orderId] || '';
+    // Revert changes if API call fails
+    setOrders(prevOrders => 
+      prevOrders.map(order => 
+        order._id === orderId 
+          ? { 
+              ...order, 
+              status: order.status,
+              Approvals: Array.isArray(order.Approvals) ? order.Approvals?.filter(approval => 
+                approval.admin !== user.name || approval.status !== newStatus || approval.comment !== orderComment
+              ) : []
+            } 
+          : order
+      )
+    );
+  } finally {
+    setIsLoading(false);
+    setDropdownOpen(null);
+  }
+};
 
   const handleDelete = async (orderId) => {
     try {
@@ -618,7 +639,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
                                       
                                       type="text"
                                       name="comment"
-                                      value={commentsByOrder[order._id] || ''}
+                                      value={commentsByOrder[order._id] || ""}
                                       onChange={handleCommentChange(order._id)}
                                       className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                       placeholder="Type your comment…"
@@ -661,6 +682,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
         {isVisible && (
             <div className="p-4 flex  justify-center items-center  text-red-600 border-l-4 border-red-500 bg-red-200">
               {error}
+            </div>
+          )}
+          {toast.show && (
+            <div className="fixed bottom-4 right-4 p-4 bg-green-500 text-white rounded-lg shadow-lg">
+              {toast.message}
             </div>
           )}
       </div>
