@@ -53,58 +53,49 @@ export const getOrders = async (page , limit ) => {
 
 export const createOrder = async ({ formData, orderData }) => {
   try {
-    //console.log("Order Data:", orderData);
+    let uploadedFileIds = [];
 
-    const requests = [];
-    let hasfile=false
-
-    // Check if formData contains a file before uploading
+    // STEP 1: Upload files if present
     if (formData && formData.has("files")) {
-      const response_fileupload=axios.post(`${API_URL}/fileupload`, formData, {
-          headers: { "Content-Type": "multipart/form-data" 
-            ,"ngrok-skip-browser-warning": "true",
-          },
-        })
-      requests.push(response_fileupload    
-      );hasfile=true
+      const fileResponse = await axios.post(`${API_URL}/fileupload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "ngrok-skip-browser-warning": "true",
+        },
+      });
 
-
+      // Extract file IDs from response
+      uploadedFileIds = fileResponse?.data?.files?._id;
     }
-    
-    // Send the order even if no file is uploaded
-    if (orderData && Object.keys(orderData).length > 0) {
-      const response_orderdetails=axios.post(`${API_URL}/orders`, orderData,{headers:{ "ngrok-skip-browser-warning": "true"}})
-      requests.push(response_orderdetails);
-    } else {
-      Sentry.captureMessage("No order data provided")
 
+    // STEP 2: Attach file IDs if available
+    if (uploadedFileIds.length > 0) {
+      orderData.fileRefs = uploadedFileIds;
     }
-    const results = await Promise.allSettled(requests);
-    //console.log("checking file",requests.length)
-    //console.log(results.length)
-    if (hasfile && results.length===2){
 
-      const fileResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
-      const orderResponse = results[1]?.status === "fulfilled" ? results[1].value : results[1].reason;
-      
-      return  { file: fileResponse, order: orderResponse };
-    }else if (!hasfile&& results.length===1){
-      const orderResponse = results[0]?.status === "fulfilled" ? results[0].value : results[0].reason;
-      return {order:orderResponse}
+    // ✅ STEP 3: Always send order
+    const orderResponse = await axios.post(`${API_URL}/orders`, orderData, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
 
-    }else{
-      return {order:null}
-    }
-   
-    
-    
-    
+    return {
+      file: uploadedFileIds,
+      order: orderResponse,
+    };
   } catch (error) {
-     Sentry.captureMessage("Error creating users")
-          Sentry.captureException(error)
     console.error("Error creating order:", error);
+    Sentry.captureMessage("Error creating order");
+    Sentry.captureException(error);
+    return {
+      file: null,
+      order: null,
+      error,
+    };
   }
 };
+
 
 
 export const updateOrderStatus = async (orderId, status) => {
@@ -115,9 +106,10 @@ export const updateOrderStatus = async (orderId, status) => {
     console.error("Error updating order:", error);
   }
 };
-export const downloadFile = async (fileId) => {
+export const downloadFile = async (fileId,filename) => {
   try {
-    const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileId}`, { responseType: "blob" ,
+    console.log("filename",filename)
+    const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileId}/${filename}`,{responseType: "blob" ,
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {

@@ -72,7 +72,7 @@ const CreateOrder = () => {
 
     try {
       const requestupload = await createOrder({ formData: formData, orderData: payload });
-      //console.log(requestupload)
+      console.log(requestupload)
       if (requestupload.order.data.success===true){
 
       

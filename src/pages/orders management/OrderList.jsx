@@ -290,15 +290,15 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
  
-   const handleFileDownload = async (fileName, event) => {
+   const handleFileDownload = async (fileId,filename, event) => {
     event.stopPropagation();
     try {
       setIsLoading(true);
-      const fileData = await downloadFile(fileName);
+      const fileData = await downloadFile(fileId,filename);
       const url = window.URL.createObjectURL(new Blob([fileData]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", fileName);
+      link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
@@ -422,7 +422,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
           order.filenames.map((filename, index) => (
             <button
               key={index}
-              onClick={(e) => handleFileDownload(filename, e)}
+              onClick={(e) => handleFileDownload(order.fileRefs,filename, e)}
               className="flex items-center text-blue-600 hover:text-blue-800"
             >
               <FaFilePdf className="mr-1" /> {filename}
