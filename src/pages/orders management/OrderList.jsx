@@ -11,11 +11,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaFilePdf, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment } from "react-icons/fa";
 import { FiDownload,  } from "react-icons/fi";
 import { useUser } from "../../components/usercontext";
-import Searchbar from "../../components/searchbar";
+import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { admin_roles } from "../../components/navBar";
-import { Timer } from "lucide-react";
+
+
 
 
 
@@ -140,9 +141,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   };
 
   useEffect(()=>{
+    let Timer;
     if (error){
       setIsVisible(true)
-      const Timer=setTimeout(()=>{
+      Timer=setTimeout(()=>{
         setIsVisible(false)
       },3000)
     }
@@ -468,14 +470,20 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto ">
         <motion.div 
-          className=" mb-6 "
+          className=" mb-6  "
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
+            <div className="w-full md:w-auto flex flex-col sm:flex-row flex-wrap gap-3">
+
           <Searchbar />
+        
+          </div>
+
+
         </motion.div>
 
         <motion.div
@@ -689,6 +697,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
               {toast.message}
             </div>
           )}
+
       </div>
     </div>
   );

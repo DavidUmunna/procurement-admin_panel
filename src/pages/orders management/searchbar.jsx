@@ -4,18 +4,23 @@ import {
   setStatus,
   setDateRange,
   resetFilters,
-} from '../js/reducer/rootreducer';
+} from '../../js/reducer/rootreducer';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
-
+import Orderexport from "./Orderexport";
+import { useUser } from '../../components/usercontext';
 const Searchbar = () => {
   const dispatch = useDispatch();
+  const {user}=useUser()
   const search = useSelector((state) => state.search);
   const [isMobile, setIsMobile] = useState(false);
   const [searchMode, setSearchMode] = useState('keyword');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showmodal,setshowmodal]=useState(false)
+  const [loading,setLoading]=useState(false)
 
+  const export_departments=["accounts_dep","Administration","IT"]
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -37,6 +42,13 @@ const Searchbar = () => {
     setSearchMode('keyword');
     setIsExpanded(false);
   };
+
+  if (loading){
+      return <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+
+  }
 
   const hasActiveFilters = () => {
     return (
@@ -96,6 +108,14 @@ const Searchbar = () => {
             <FiSearch size={16} />
             {!isMobile && 'Search'}
           </motion.button>
+          {export_departments.includes(user.Department)&&<button
+                 onClick={() => setshowmodal(!showmodal)}
+                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                 >
+                 Export to excel
+          </button>
+                }
+
         </div>
 
         {isExpanded && (
@@ -143,6 +163,7 @@ const Searchbar = () => {
           </button>
         )}
       </motion.div>
+            {showmodal && (<Orderexport setopenmodal={setshowmodal} setLoading={setLoading} />)}
     </div>
   );
 };

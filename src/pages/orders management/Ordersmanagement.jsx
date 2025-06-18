@@ -25,7 +25,7 @@ const OrdersDashboard = ({setAuth}) => {
       total: 0
     }
   });
-  let currentPage=Data.pagination.page
+ 
   const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin",
     "Financial_manager","Director"];
   const departmental_access=["waste_management_manager","Environmental_lab_manager","PVT_manager","waste_management_supervisor","lab_supervisor",
@@ -161,11 +161,9 @@ const OrdersDashboard = ({setAuth}) => {
   
 
   if (isLoading) {
-    return <div className='flex justify-center  items-center h-screen'>
-              <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-transparent'>
-                 
-              </div>
-           </div>;
+    return   <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
   }
 const shouldShowRightColumn =
   (admin_roles.includes(user?.role) || user?.role === "accounts") &&
