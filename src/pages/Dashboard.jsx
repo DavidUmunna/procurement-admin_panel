@@ -62,11 +62,12 @@ export const Dashboard=()=>{
                       const userReq= await get_user_orders(user?.userId)
                       response=userReq.orders
                     }
-                    if (Array.isArray(response||[])){
+                    if (Array.isArray(response)){
                           
                     console.log("its an array",response)
                     setRequest(response)
                     setorders(response)
+
                     
                     
                    
@@ -77,6 +78,7 @@ export const Dashboard=()=>{
                    
                     //console.log("number approved",Approved)
                  }else{
+                  
                     Sentry.captureMessage("invalid format")
                  
                 }
@@ -84,6 +86,7 @@ export const Dashboard=()=>{
     
             
             }catch(error){
+            
                 Sentry.captureException(error)
     
             }
@@ -116,8 +119,8 @@ export const Dashboard=()=>{
              
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
-            <UserDetails user={user}   rejectedOrders={rejectedOrders} request_amount={request_amount} 
-            approvedOrders={approvedOrders} pendingOrders={pendingOrders} completedOrders={completedOrders}
+            <UserDetails user={user}   rejectedOrders={rejectedOrders||[]} request_amount={request_amount} 
+            approvedOrders={approvedOrders||[]} pendingOrders={pendingOrders||[]} completedOrders={completedOrders||[]}
              />
             {admin_roles.includes(user?.role)&&<CostDashboard orders={orders}/>}
             
