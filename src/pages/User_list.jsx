@@ -43,7 +43,8 @@ export default function UserList() {
     Department: "",
     canApprove: false,
     role: "",
-    password: ""
+    password: "",
+    email:""
   });
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -96,7 +97,8 @@ export default function UserList() {
       Department: user.Department,
       canApprove: user.canApprove || false,
       role: user.role,
-      password: "" // Leave blank for security
+      password: "",
+      email:user.email // Leave blank for security
     });
     setShowEditModal(true);
   };
@@ -183,6 +185,17 @@ export default function UserList() {
                     type="text"
                     name="name"
                     value={editForm.name}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="text"
+                    name="email"
+                    value={editForm.email}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg"
                     required
