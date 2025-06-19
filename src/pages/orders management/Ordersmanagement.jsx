@@ -29,7 +29,7 @@ const OrdersDashboard = ({setAuth}) => {
   const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin",
     "Financial_manager","Director"];
   const departmental_access=["waste_management_manager","Environmental_lab_manager","PVT_manager","waste_management_supervisor","lab_supervisor",
-    "Contracts_manager","Engineering_manager","Administration"]
+    "Contracts_manager","Engineering_manager",]
   const only_approvals=["accounts_dep"]
   const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit) => {
     setIsLoading(true);
