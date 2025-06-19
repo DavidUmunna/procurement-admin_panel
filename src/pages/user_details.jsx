@@ -59,7 +59,7 @@ const UserDetails = ({
       approvalRate: rate,
       avgProcessingTime: calculateAvgProcessingTime(approvedOrders)
     });
-  }, [approvedOrders, rejectedOrders, pendingOrders]);
+  }, [approvedOrders,rejectedOrders,pendingOrders,completedOrders]);
 
   
 

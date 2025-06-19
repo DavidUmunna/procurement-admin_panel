@@ -5,8 +5,9 @@ import React, { useState } from 'react';
 import { useUser } from "../components/usercontext";
 import { useEffect } from "react";
 import axios from "axios"
-import { admin_roles } from "../components/navBar";
+
 import CostDashboard from "./CostDashboard";
+import { get_user_orders } from '../services/OrderService';
 
 
 
@@ -23,11 +24,14 @@ export const Dashboard=()=>{
     const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin",
       "Financial_manager","accounts","Director",];
     const departmental_access=["waste_management_manager","waste_management_supervisor","PVT_manager","Environmental_lab_manager","PVT_manager","lab_supervisor","QHSE_coordinator",
-      "Contracts_manager","Engineering_manager","Administration"]
-    
+      "Contracts_manager","Engineering_manager"]
+    const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","lab_supervisor",
+       "Financial_manager","waste_management_manager","accounts","waste_management_supervisor","Environmental_lab_manager","PVT_manager",
+       "QHSE_coordinator","Contracts_manager","Engineering_manager"];
+
     useEffect(()=>{
         const email=user?.email||"no email provided"
-        //const admin_roles=["admin","procurement_officer","human_resources","internal_auditor","global_admin"]
+
         const fetchorder=async ()=>{ 
             if (!user || !user.email) return 
 
@@ -39,7 +43,7 @@ export const Dashboard=()=>{
                     const token=localStorage.getItem("authToken")
                     const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
                       "ngrok-skip-browser-warning": "true"},
-                      withCredential:true})
+                      withCredentials:true})
                      
                       response=userReq.data.data
                     }else if(departmental_access.includes(user?.role)){
@@ -51,13 +55,16 @@ export const Dashboard=()=>{
                        
                       },headers:{Authorization:`Bearer ${token}`, 
                       "ngrok-skip-browser-warning": "true"},
-                      withCredential:true})
+                      withCredentials:true})
                       
                       response=userReq.data.data
+                    }else{
+                      const userReq= await get_user_orders(user?.userId)
+                      response=userReq.orders
                     }
                     if (Array.isArray(response||[])){
                           
-                    
+                    console.log("its an array",response)
                     setRequest(response)
                     setorders(response)
                     
@@ -70,9 +77,9 @@ export const Dashboard=()=>{
                    
                     //console.log("number approved",Approved)
                  }else{
-                  const error=new Error("invalid data format")
-                  Sentry.captureException(error)
-                 }
+                    Sentry.captureMessage("invalid format")
+                 
+                }
     
     
             
@@ -81,55 +88,20 @@ export const Dashboard=()=>{
     
             }
           }
-          const fetchuserOrder=async ()=>{
-            if (!user || !user.email) return 
-            
-            try{
-                  const API_URL = `${process.env.REACT_APP_API_URL}/api`
-                  const token=localStorage.getItem("authToken")
-                  const userReq=await axios.get(`${API_URL}/orders/${user.userId}`,{headers:{Authorization:`Bearer ${token}`, 
-                    "ngrok-skip-browser-warning": "true"},
-                    withCredential:true})
-                  //console.log("user requests",userReq)
-                  if (Array.isArray(userReq.response||[])){
-                    const orders=userReq.data
-                    
-                    setorders(orders)
-                    setRequest(userReq.data)
-                    
-                    
-                    
-                    setApprovedOrders(orders.filter((order) => order.status === "Approved"));
-                    setPendingOrders(orders.filter((order) => order.status === "Pending"));
-                    setRejectedOrders(orders.filter((order) => order.status === "Rejected"));
-                    setcompletedOrders(orders.filter((order) => order.status === "Completed"));
-                    //console.log("number approved",Approved)
-                 }else{
-                    console.error("invalid data format")
-                 }
-    
-    
-            
-            }catch(err){
-                Sentry.captureException(err)
-    
-            }
+          
+          
 
-          }
-        if (admin_roles.includes(user?.role)){
             fetchorder();
 
-        }else{
-            fetchuserOrder(email)
-        }
-    },[user?.role,user])
+    },[user])
    
 
    
     const request_length=(request)=>{
-        return Array.isArray(request) ? request.length : 0;
+      return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
+    console.log("request",request_amount)
     
 
     
