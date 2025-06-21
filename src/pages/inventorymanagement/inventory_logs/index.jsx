@@ -19,7 +19,8 @@ const InventoryLogs = () => {
     quantity: '',
     purpose: '',
     status: 'pending',
-    category:""
+    category:"",
+    Department:""
   });
   const [selectedCategory,setSelectedCategory]=useState("All")
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
@@ -165,7 +166,8 @@ const InventoryLogs = () => {
       quantity: '',
       purpose: '',
       status: 'pending',
-      category:""
+      category:"",
+      Department:""
     });
   };
 
@@ -177,7 +179,8 @@ const InventoryLogs = () => {
         quantity:item.quantity,
         purpose:item.purpose,
         status:item.status,
-        category:item.category
+        category:item.category,
+        Department:item.Department
     });
     setShowForm(true)
   }
@@ -228,8 +231,8 @@ const InventoryLogs = () => {
         log.inventory_item?.toLowerCase().includes(search) ||
         log.purpose?.toLowerCase().includes(search) ||
         log.category?.toLowerCase().includes(search)||  
-        log.status?.toLowerCase().includes(search);
-
+        log.status?.toLowerCase().includes(search)||
+        log.Department?.toLowerCase().includes(search);
 
       const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
 
@@ -350,6 +353,32 @@ const InventoryLogs = () => {
                   <option value="returned">Returned</option>
                 </select>
               </div>
+               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Department
+                </label>
+                <select
+                  name="Department"
+                  value={formData.Department}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                   <option value="">Select Department</option>
+                  <option value="waste_management_dep">Waste Management</option>
+                  <option value="PVT">PVT</option>
+                  <option value="Environmental_lab_dep">Environmental Lab</option>
+                  <option value="accounts_dep">Accounts</option>
+                  <option value="Human resources">Human Resources</option>
+                  <option value="IT">Information Technology</option>
+                  <option value="Administration">Administration</option>
+                  <option value="Procurement_department">Procurement Department</option>
+                  <option value="HSE_dep">HSE Department</option>
+                  <option value="Contracts_Department">Contracts Department</option>
+                  <option value="BD_Department">Business Development Department</option>
+                  <option value="Engineering_Department">Engineering Department</option>
+                 </select>
+              </div>
+            
               <div>
                 <CategoryForm user={user} categories={categories}
                  formdata={formData} handleInputChange={handleInputChange}
@@ -461,7 +490,8 @@ const InventoryLogs = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Person</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Person</th>                  
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>                  
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
@@ -479,6 +509,9 @@ const InventoryLogs = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {log.Staff_Name}
+                      </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {log.Department}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {log.inventory_item}
