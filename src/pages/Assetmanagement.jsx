@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
+import * as Sentry from "@sentry/react"
 import React,{ useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp,  FiSearch } from 'react-icons/fi';
 import { useUser } from '../components/usercontext';
@@ -9,7 +9,6 @@ import axios from 'axios';
 import PaginationControls from './inventorymanagement/Paginationcontrols';
 
 
-const ADMIN_ROLES=['admin','global_admin','human_resources','internal_auditor']
 const AssetManagement = ({setAuth}) => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
@@ -42,7 +41,8 @@ const AssetManagement = ({setAuth}) => {
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
- 
+
+  const [ADMIN_ROLES_ASSET_MANAGEMENT,set_ADMIN_ROLES_ASSET_MANAGEMENT]=useState([])
   const [Error,setError]=useState("")
 
   // Fetch Asset data
@@ -89,17 +89,41 @@ const AssetManagement = ({setAuth}) => {
           setAuth(false);
           window.location.href = '/adminlogin'; 
         } else {
-          console.error('Failed to fetch data:', err);
+          Sentry.captureMessage('Failed to fetch data:');
+          Sentry.captureException(err)
         }
       } finally {
         setLoading(false);
       }
       
     }
+  const fetch_RBAC=async ()=>{
+    try{
+        setLoading(true)
+        const token = localStorage.getItem('authToken');
+        const API_URL = `${process.env.REACT_APP_API_URL}/api`
+        const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_ASSET_MANAGEMENT:true},{headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            withCredentials: true,
+          })
+      console.log(rbacRes)
+      set_ADMIN_ROLES_ASSET_MANAGEMENT(rbacRes.data.data.ADMIN_ROLES_ASSET_MANAGEMENT)
+    }catch(error){
+      Sentry.captureException(error)
+
+    }finally{
+      setLoading(false)
+    }
+  }
+  console.log(ADMIN_ROLES_ASSET_MANAGEMENT)
   useEffect(() => {
+    fetch_RBAC()
     fetchData();
+    
   }, [setAuth]);
-  
+  console.log(ADMIN_ROLES_ASSET_MANAGEMENT)
   const formatCategory = (category) => {
     const formatted = category
       .replace(/_/g, ' ') // Replace underscores with spaces
@@ -383,6 +407,7 @@ const AssetManagement = ({setAuth}) => {
                       type="number"
                       name="value"
                       min="1"
+                      placeholder='Price'
                       value={formData.value}
                       onChange={handleInputChange}
                       required
@@ -577,7 +602,7 @@ const AssetManagement = ({setAuth}) => {
       {/* Analytics */}
       <div className='items-center flex justify-center mb-7'>
 
-        {ADMIN_ROLES.includes(user.role)&&(<div className=" mt-8 flex flex-wrap px-4 md:flex-nowrap   max-w-full">
+        {ADMIN_ROLES_ASSET_MANAGEMENT.includes(user.role)&&(<div className=" mt-8 flex flex-wrap px-4 md:flex-nowrap   max-w-full">
           <div className="h-50 mt-20 p-7 md:h-60 flex items-center justify-center bg-gray-50 rounded">
             <Assetsanalysis AssetItems={AssetItems} />
           </div>

@@ -5,9 +5,9 @@ import React, { useState } from 'react';
 import { useUser } from "../components/usercontext";
 import { useEffect } from "react";
 import axios from "axios"
-
 import CostDashboard from "./CostDashboard";
 import { get_user_orders } from '../services/OrderService';
+import { fetch_RBAC_DASH } from '../services/rbac_service';
 
 
 
@@ -21,24 +21,33 @@ export const Dashboard=()=>{
     const [pendingOrders, setPendingOrders] = useState([]);
     const [rejectedOrders, setRejectedOrders] = useState([]);
     const [completedOrders, setcompletedOrders] = useState([]);
-    const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin",
-      "Financial_manager","accounts","Director",];
-    const departmental_access=["waste_management_manager","waste_management_supervisor","PVT_manager","Environmental_lab_manager","PVT_manager","lab_supervisor","QHSE_coordinator",
-      "Contracts_manager","Engineering_manager"]
-    const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","lab_supervisor",
-       "Financial_manager","waste_management_manager","accounts","waste_management_supervisor","Environmental_lab_manager","PVT_manager",
-       "QHSE_coordinator","Contracts_manager","Engineering_manager"];
 
+    const [ADMIN_ROLES_DASHBOARD,set_ADMIN_ROLES_DASHBOARD]=useState([])
+
+    
+
+    const rbac_=async()=>{
+      try{
+        const response=await fetch_RBAC_DASH()
+        const data=response.data.data
+
+        set_ADMIN_ROLES_DASHBOARD(data.ADMIN_ROLES_DASHBOARD)
+        return data
+      }catch(error){
+        Sentry.captureException(error)
+      }
+    }
     useEffect(()=>{
-        const email=user?.email||"no email provided"
 
-        const fetchorder=async ()=>{ 
+
+        const fetchorder=async (rbacData={})=>{ 
             if (!user || !user.email) return 
 
             try{ 
                   let response;
-                  if (general_access.includes(user?.role)){
-
+                  const {GENERAL_ACCESS=[],DEPARTMENTAL_ACCESS=[]}=rbacData
+                  if (GENERAL_ACCESS.includes(user?.role)){
+                
                     const API_URL = `${process.env.REACT_APP_API_URL}/api`
                     const token=localStorage.getItem("authToken")
                     const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
@@ -46,7 +55,7 @@ export const Dashboard=()=>{
                       withCredentials:true})
                      
                       response=userReq.data.data
-                    }else if(departmental_access.includes(user?.role)){
+                    }else if(DEPARTMENTAL_ACCESS.includes(user?.role)){
                       if (!user?.Department) return;
                       const API_URL = `${process.env.REACT_APP_API_URL}/api`
                       const token=localStorage.getItem("authToken")
@@ -64,7 +73,7 @@ export const Dashboard=()=>{
                     }
                     if (Array.isArray(response)){
                           
-                    console.log("its an array",response)
+
                     setRequest(response)
                     setorders(response)
 
@@ -76,7 +85,7 @@ export const Dashboard=()=>{
                     setRejectedOrders(response?.filter((order) => order.status === "Rejected"));
                     setcompletedOrders(response?.filter((order) => order.status === "Completed"));
                    
-                    //console.log("number approved",Approved)
+
                  }else{
                   
                     Sentry.captureMessage("invalid format")
@@ -93,8 +102,16 @@ export const Dashboard=()=>{
           }
           
           
+      const init=async()=>{
+        const rbacData=await rbac_()
+        if (rbacData){
 
-            fetchorder();
+          fetchorder(rbacData);
+        }
+      }
+
+      init();
+            
 
     },[user])
    
@@ -104,7 +121,7 @@ export const Dashboard=()=>{
       return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
-    console.log("request",request_amount)
+
     
 
     
@@ -122,7 +139,7 @@ export const Dashboard=()=>{
             <UserDetails user={user}   rejectedOrders={rejectedOrders||[]} request_amount={request_amount} 
             approvedOrders={approvedOrders||[]} pendingOrders={pendingOrders||[]} completedOrders={completedOrders||[]}
              />
-            {admin_roles.includes(user?.role)&&<CostDashboard orders={orders}/>}
+            {ADMIN_ROLES_DASHBOARD.includes(user?.role)&&<CostDashboard orders={orders}/>}
             
         </div>
     )

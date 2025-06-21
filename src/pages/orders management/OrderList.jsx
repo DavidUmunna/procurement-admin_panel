@@ -1,4 +1,4 @@
-
+import * as Sentry from "@sentry/react"
 import React, {  useState,useEffect } from "react";
 import {
 
@@ -14,13 +14,11 @@ import { useUser } from "../../components/usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { admin_roles } from "../../components/navBar";
 
 
 
 
 
-//const ADMIN_ROLES = [ "procurement_officer", "human_resources", "internal_auditor", "global_admin","accounts","waste_management","PVT_manager","Environmental_lab_manager"];
 
 const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
@@ -36,6 +34,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
   const [isVisible, setIsVisible]=useState(false)
   const [toast, setToast] = useState({ show: false, message: '' });
+
 
 
   const getOverallStatus = (approvals, department) => {
@@ -154,6 +153,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
   },[error])
 
+ 
+
  useEffect(() => {
   if (selectedOrderId) {
     setCommentsByOrder(prev => ({
@@ -161,6 +162,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       [selectedOrderId]: "" // Clear comment for this specific order
     }));
   }
+  
 }, [selectedOrderId]);
 
   const handleCommentChange = (orderId) => (e) => {
@@ -247,7 +249,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
     }
     
   } catch (error) {
-    console.error("Error updating status:", error);
+    
+    Sentry.captureMessage("Error updating status")
+    Sentry.captureException(error)
+
     setError("Failed to update order status");
     const orderComment = commentsByOrder[orderId] || '';
     // Revert changes if API call fails
@@ -276,7 +281,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       await deleteOrder(orderId);
       setOrders(orders.filter(order => order._id !== orderId))
     } catch (error) {
-      console.error("Error deleting order:", error);
+      Sentry.captureMessage("Error updating status")
+      Sentry.captureException(error)
       setError("Failed to delete order");
     } finally {
       setIsLoading(false);
@@ -306,7 +312,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Error downloading file:", error);
+      Sentry.captureMessage("Error updating status")
+      Sentry.captureException(error)
       setError("Failed to download file");
     } finally {
       setIsLoading(false);
@@ -378,7 +385,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
     <span className="font-medium">Date Created:</span> {new Date(order.createdAt).toLocaleDateString()}
   </p>
 
-  {admin_roles.includes(user?.role) && (
+  {(
     <div className="text-gray-600 mt-2">
       <p className="font-medium">Approvals:</p>
 

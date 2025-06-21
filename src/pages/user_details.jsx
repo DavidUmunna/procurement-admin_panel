@@ -1,9 +1,10 @@
+import * as Sentry from "@sentry/react"
 import React, { useState, useEffect } from "react";
 import { FiChevronDown, FiChevronUp, FiMail, FiCalendar,  } from "react-icons/fi";
 import {FaSitemap} from "react-icons/fa"
 import { motion,  } from "framer-motion";
 import userImg from "../components/assets/user.avif";
-import { admin_roles } from "../components/navBar";
+import { fetch_RBAC } from "../services/rbac_service";
 import { CheckCircle, Clock, XCircle, ClipboardCheck , FileText, BarChart2, Timer} from "lucide-react";
 const UserDetails = ({ 
   user, 
@@ -23,8 +24,23 @@ const UserDetails = ({
     approvalRate: 0,
     avgProcessingTime: 0
   });
-  
+  const [ADMIN_ROLES, set_ADMIN_ROLES]=useState([])
+  const rbac_=async()=>{
+    try{
+      const response=await fetch_RBAC()
+      const data=response.data.data
+
+      set_ADMIN_ROLES(data.ADMIN_ROLES_GENERAL)
+      
+    }catch(error){
+      Sentry.captureException(error)
+    }
+  }
+  useEffect(()=>{
+    rbac_()
+  },[])
   useEffect(() => {
+    
     // Calculate statistics when orders change
     const total = approvedOrders.length + rejectedOrders.length + pendingOrders.length+completedOrders.length;
     const rate = total > 0 ? Math.round((approvedOrders.length / total) * 100) : 0;
@@ -225,7 +241,7 @@ const UserDetails = ({
                 <p className="text-3xl font-bold text-blue-600">{stats.totalRequests}</p>
               </motion.div>
               
-              {admin_roles.includes(user?.role)&&(<><motion.div
+              {ADMIN_ROLES.includes(user?.role)&&(<><motion.div
                 whileHover={{ y: -5 }}
                 className="bg-white rounded-xl shadow-md p-6 text-center"
               >

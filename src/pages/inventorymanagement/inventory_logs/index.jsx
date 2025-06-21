@@ -1,8 +1,9 @@
+/*eslint-disable react-hooks/exhaustive-deps */
 import * as Sentry from '@sentry/react';
 import React, { useState, useEffect,useMemo } from 'react';
 import { format } from 'date-fns';
 import axios from "axios"
-import {FaEdit, faEdit,FaTrash} from "react-icons/fa"
+import {FaEdit, FaTrash} from "react-icons/fa"
 import { useUser } from '../../../components/usercontext';
 import PaginationControls from '../Paginationcontrols';
 import { FiPlus } from 'react-icons/fi';
@@ -139,7 +140,7 @@ const InventoryLogs = () => {
             setLoading(true)
             const token = localStorage.getItem('authToken');
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-            const response=await axios.delete(`${API_URL}/inventorylogs/${itemId}`,{
+            await axios.delete(`${API_URL}/inventorylogs/${itemId}`,{
                     headers: { Authorization: `Bearer ${token}` }
             })
 
@@ -269,13 +270,7 @@ const InventoryLogs = () => {
     }
   };
 
-     const formatCategory = (category) => {
-        if (!category) return '';
-        const formatted = category
-            .replace(/_/g, ' ')
-            .replace(/(^|\s)\S/g, l => l.toUpperCase());
-        return category ===formatted;
-    };
+   
 
 
   if (loading) {

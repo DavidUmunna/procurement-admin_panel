@@ -7,10 +7,8 @@ import user_img from "./assets/user.png";
 import { motion } from 'framer-motion';
 import { PanelLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
-
-export const admin_roles = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin","lab_supervisor",
-  "Financial_manager","waste_management_manager","accounts","waste_management_supervisor","Environmental_lab_manager","PVT_manager",
-  "QHSE_coordinator","Contracts_manager","Engineering_manager","admin"];
+import {fetch_RBAC} from "../services/rbac_service"
+import * as Sentry from "@sentry/react"
 
 const navigation = [
   { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },
@@ -34,8 +32,10 @@ export default function Navbar() {
   const { user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
-  const sidebarRef=useRef(null)
-  const buttonRef=useRef(null)
+  const sidebarRef=useRef(null);
+  const [ADMIN_ROLES_GENERAL,set_ADMIN_ROLES_GENERAL]=useState([])
+
+
   //const [isMobileMenuOpen,setIsMobileMenuOpen]=useState(true)
 
   const isActive = (path) => location.pathname === path;
@@ -44,8 +44,28 @@ export default function Navbar() {
     if (item.visibleTo) return item.visibleTo.includes(user?.role);
     return true;
   });
+  
+    useEffect(()=>{
+        const rbac_=async()=>{
+          try{
 
- 
+            const response=await fetch_RBAC()
+           
+             if (Array.isArray(response.data.data.ADMIN_ROLES_GENERAL)) {
+          set_ADMIN_ROLES_GENERAL(response.data.data.ADMIN_ROLES_GENERAL);
+          } else {
+
+          set_ADMIN_ROLES_GENERAL([]);
+        }
+          }catch(error){
+
+            Sentry.captureException(error)
+          }
+        }
+        rbac_()
+
+    },[user])
+    
 
   return (
     <>
@@ -56,7 +76,7 @@ export default function Navbar() {
               <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center">
                   {/* Sidebar toggle (only for admin) */}
-                  {admin_roles.includes(user?.role) && (
+                  {ADMIN_ROLES_GENERAL.includes(user?.role) && (
                     <button
                       onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                       className="p-2 text-gray-400 hover:text-white mr-2"

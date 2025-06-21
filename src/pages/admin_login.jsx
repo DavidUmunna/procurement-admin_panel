@@ -76,7 +76,7 @@ export default function Sign_in({ setAuth }) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             loading="eager"
-            fetchPriority="high"
+            fetchpriority="high"
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">

@@ -10,7 +10,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Excelexport from './excelexport';
 
-//const ADMIN_ROLES = ['admin', 'global_admin', 'human_resources', 'internal_auditor'];
+
 
 const SkipsManagement = () => {
   const { user } = useUser();

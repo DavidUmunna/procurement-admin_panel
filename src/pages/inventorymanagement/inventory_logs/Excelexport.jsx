@@ -55,13 +55,7 @@ const ExcelExport=({setopenmodal,setLoading,categories})=>{
         }
     };
 
-    const formatCategory = (category) => {
-        if (!category) return '';
-        const formatted = category
-            .replace(/_/g, ' ')
-            .replace(/(^|\s)\S/g, l => l.toUpperCase());
-        return category ===formatted;
-    };
+ 
 
     const validateForm=()=>{
         const errors={};

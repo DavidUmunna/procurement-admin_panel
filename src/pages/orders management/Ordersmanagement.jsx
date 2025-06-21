@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import * as Sentry from "@sentry/react"
 import { useUser } from '../../components/usercontext';
 import { useState, useEffect } from 'react';
 import OrderList from './OrderList';
 import Duplicates from './Duplicates';
 import { get_user_orders } from '../../services/OrderService';
 import CompletedOrdersList from './Completed';
-import { admin_roles } from '../../components/navBar';
 import axios from 'axios';
 import PaginationControls from "../inventorymanagement/Paginationcontrols";
+import { fetch_RBAC_ordermanagement } from '../../services/rbac_service';
 
 const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
@@ -16,7 +17,7 @@ const OrdersDashboard = ({setAuth}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   //const [filteredorders,setfilteredorders]=useState([])
-  
+
   const [Data, setData] = useState({
     orders: [],
     pagination: {
@@ -26,19 +27,31 @@ const OrdersDashboard = ({setAuth}) => {
     }
   });
  
-  const general_access= ["procurement_officer", "human_resources", "internal_auditor", "global_admin",
-    "Financial_manager","Director"];
-  const departmental_access=["waste_management_manager","Environmental_lab_manager","PVT_manager","waste_management_supervisor","lab_supervisor",
-    "Contracts_manager","Engineering_manager",]
-  const only_approvals=["accounts_dep"]
-  const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit) => {
+  const [ADMIN_ROLES_GENERAL,set_ADMIN_ROLES_GENERAL]=useState([])
+
+ 
+
+   const rbac_=async()=>{
+      try{
+          const response=await fetch_RBAC_ordermanagement()
+  
+           const data=response.data.data
+
+           set_ADMIN_ROLES_GENERAL(data.ADMIN_ROLES_GENERAL)
+
+          return data
+      }catch(error){
+        Sentry.captureException(error)
+      }
+    }
+  const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit,rbacData={}) => {
     setIsLoading(true);
     try {
-        
+        const { GENERAL_ACCESS_ORDERS = [], DEPARTMENTAL_ACCESS = [], APPROVALS_LIST=[] } = rbacData;
         let response;
         const token=localStorage.getItem("authToken")
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-        if (general_access.includes(user?.role)) {
+        if (GENERAL_ACCESS_ORDERS.includes(user?.role)) {
           const res = await axios.get(`${API_URL}/orders`,{
             params: { page, limit },
           headers:{Authorization:`Bearer ${token}`, 
@@ -52,7 +65,7 @@ const OrdersDashboard = ({setAuth}) => {
             pagination: res.data.Pagination
           })
 
-        }else if(departmental_access.includes(user?.role)) {
+        }else if(DEPARTMENTAL_ACCESS.includes(user?.role)) {
           
             if (!user?.Department) return;
             const token=localStorage.getItem("authToken")
@@ -76,7 +89,7 @@ const OrdersDashboard = ({setAuth}) => {
             })
          
 
-        }else if(only_approvals.includes(user?.Department)){
+        }else if(APPROVALS_LIST.includes(user?.Department)){
             const token=localStorage.getItem("authToken")
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
             const accounts_response = await axios.get(`${API_URL}/orders/accounts`, {
@@ -129,14 +142,17 @@ const OrdersDashboard = ({setAuth}) => {
         setIsLoading(false);
       }
     };
-    
+  
   useEffect(() => {
-   
-    if (user) {
-      fetchData();
-      
+    const init=async()=>{
+
+      const rbacData=await rbac_();
+      if (rbacData && user) {
+      await fetchData(Data.pagination?.page, Data.pagination?.limit, rbacData);
+      }
     }
-  }, [user?.role,setAuth]);
+    init();
+  }, [user,setAuth]);
 
   //const paginated_orders=orders.slice(startIndex,endIndex)
   //const totalPages = Math.ceil(orders.length / itemsperpage);
@@ -151,12 +167,14 @@ const OrdersDashboard = ({setAuth}) => {
  
   
   
-  const handlePageChange = (newPage) => {
-    fetchData(newPage, Data.pagination?.limit);
+  const handlePageChange =async (newPage) => {
+    const rbacData=await rbac_();
+    fetchData(newPage, Data.pagination?.limit,rbacData);
   };
 
-  const handleItemsPerPageChange = (newLimit) => {
-    fetchData(1, newLimit); // Reset to page 1 when changing limit
+  const handleItemsPerPageChange = async(newLimit) => {
+    const rbacData=await rbac_();
+    fetchData(1, newLimit,rbacData); // Reset to page 1 when changing limit
   };
   
 
@@ -166,7 +184,7 @@ const OrdersDashboard = ({setAuth}) => {
             </div>
   }
 const shouldShowRightColumn =
-  (admin_roles.includes(user?.role) || user?.role === "accounts") &&
+  (ADMIN_ROLES_GENERAL?.includes(user?.role) || user?.role === "accounts") &&
   (Duplicates || CompletedOrdersList);
 
 return (

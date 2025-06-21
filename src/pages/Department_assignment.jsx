@@ -5,9 +5,9 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import { useUser } from '../components/usercontext';
-  
+import { fetch_RBAC_department } from '../services/rbac_service';
+import * as Sentry from "@sentry/react"
 
-const global_ADMIN_ROLES=["admin","global_admin","human_resources"]
 const DepartmentManagement = (setAuth) => {
   // State
   const {user}=useUser()
@@ -20,8 +20,7 @@ const DepartmentManagement = (setAuth) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [modalLoading, setModalLoading] = useState(false);
   const [Error,setError]=useState("")
-
-  
+  const [ADMIN_ROLES,set_ADMIN_ROLES]=useState([])
   // UI State
   const [expandedDept, setExpandedDept] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -39,7 +38,18 @@ const DepartmentManagement = (setAuth) => {
     dueDate: '',
     status:'Pending'
   });
+  const rbac_=async()=>{
+    try{
+      const response=await fetch_RBAC_department()
+      const data=response.data.data
 
+      set_ADMIN_ROLES(data.ADMIN_ROLES_DEPARTMENT)
+
+    }catch(error){
+      Sentry.captureException(error)
+
+    }
+  }
   // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
@@ -78,6 +88,7 @@ const DepartmentManagement = (setAuth) => {
       }
     };
     fetchData();
+    rbac_()
   }, [setAuth]);
   
   // Add this right after the state declarations
@@ -328,7 +339,7 @@ const refreshDepartments = () => {
     }
   };
   const visibleDepartments = filteredDepartments.filter(dept => {
-    const isGlobalAccess = global_ADMIN_ROLES.includes(user.role);
+    const isGlobalAccess = ADMIN_ROLES.includes(user.role);
     const isDepartmentHead = String(dept.headOfDepartment.user._id) === String(user.userId);
     //console.log(dept.headOfDepartment?.user?._id)
     return isGlobalAccess || isDepartmentHead;
@@ -399,7 +410,7 @@ const refreshDepartments = () => {
     <div className="mt-4">
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium text-gray-700">Department Tasks</h3>
-        {(department.headOfDepartment?.user._id === user.userId || global_ADMIN_ROLES.includes(user.role)) && (
+        {(department.headOfDepartment?.user._id === user.userId || ADMIN_ROLES.includes(user.role)) && (
           <button
             onClick={() => openModal('assignTask', department)}
             className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded flex items-center"
@@ -472,7 +483,7 @@ const refreshDepartments = () => {
               )}
             </div>
             
-            {(department.headOfDepartment?.user._id === currentuser.userId || global_ADMIN_ROLES.includes(currentuser.role) )&& (
+            {(department.headOfDepartment?.user._id === currentuser.userId || ADMIN_ROLES.includes(currentuser.role) )&& (
               <button
                 onClick={() =>removeUserFromDepartment(department._id,user._id)}
                 className="text-red-500 hover:text-red-700"
@@ -496,7 +507,7 @@ const refreshDepartments = () => {
           <h1 className="text-2xl font-bold text-gray-800 sm:mb-0 mb-4">Department Management</h1>
           
           <div className="flex flex-col sm:flex-row sm:space-x-4 w-full sm:w-auto">
-            {global_ADMIN_ROLES.includes(user.role) && (
+            {ADMIN_ROLES.includes(user.role) && (
               <div className="relative mb-4 sm:mb-0 w-full sm:w-auto">
                 <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
@@ -509,7 +520,7 @@ const refreshDepartments = () => {
               </div>
             )}
             
-            {global_ADMIN_ROLES.includes(user.role) && (
+            {ADMIN_ROLES.includes(user.role) && (
               <button
                 onClick={() => openModal('addDept')}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
