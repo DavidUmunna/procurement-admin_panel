@@ -6,7 +6,7 @@ import { motion,AnimatePresence } from "framer-motion";
 
 const Add_user = () => {
   const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager",
-    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","QHSE_coordinator","Contracts_manager","Engineering_manager"];
+    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","QHSE_coordinator","Contracts_manager","Engineering_manager","BD_manager"];
   const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
@@ -128,6 +128,7 @@ const Add_user = () => {
                   <option value="HSE_dep">HSE Department</option>
                   <option value="Contracts_Department">Contracts Department</option>
                   <option value="Engineering_Department">Engineering Department</option>
+                  <option value="Business_Development">Business Development Department</option>
                 </select>
               </motion.div>
     

@@ -210,14 +210,15 @@ export default function UserList() {
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg"
                   >
-                  <option value="">Select Department</option>
-                  <option value="waste_management_dep">Waste Management</option>
-                  <option value="PVT">PVT</option>
-                  <option value="Environmental_lab_dep">Environmental Lab</option>
-                  <option value="accounts_dep">Accounts</option>
-                  <option value="Human resources">Human Resources</option>
-                  <option value="IT">Information Technology</option>
-                  <option value="Administration">Administration</option>
+                    <option value="">Select Department</option>
+                    <option value="waste_management_dep">Waste Management</option>
+                    <option value="PVT">PVT</option>
+                    <option value="Environmental_lab_dep">Environmental Lab</option>
+                    <option value="accounts_dep">Accounts</option>
+                    <option value="Human resources">Human Resources</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Business_Develoment">Business Development</option>
            
                   </select>
                 </div>
