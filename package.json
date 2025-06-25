@@ -23,7 +23,7 @@
     "html-entities": "^2.6.0",
     "jest": "^27.5.1",
     "jest-extended": "^4.0.2",
-    "lucide-react": "^0.479.0",
+    "lucide-react": "^0.512.0",
     "mermaid": "^11.6.0",
     "nano": "^10.1.4",
     "opossum": "^8.4.0",
