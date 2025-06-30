@@ -5,6 +5,8 @@ import { useUser } from "../components/usercontext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {Link} from "react-router-dom"
+//import { getCookie } from "../components/Helpers";
+import * as Sentry from "@sentry/react"
 export default function Sign_in({ setAuth }) {
   const navigate = useNavigate();
   const { setUser } = useUser();
@@ -22,15 +24,17 @@ export default function Sign_in({ setAuth }) {
     try {
       setLoading(true);
       const API_URL = process.env.REACT_APP_API_URL;
-      const response = await axios.post(
-        `${API_URL}/api/admin-user/login`,
-        { username, password },
-        { withCredentials:true,"ngrok-skip-browser-warning": "true"
+     const response = await axios.post(
+  `${API_URL}/api/admin-user/login`,
+  { username, password },
+  {
+    
+    withCredentials: true
+    }
+     );
 
-         }
-      );
 
-      if (response.data.success) {
+    if (response.data.success) {
         setAuth(true);
         localStorage.setItem("authToken",response.data.token)
         //localStorage.setItem("auth", "true");
@@ -44,8 +48,10 @@ export default function Sign_in({ setAuth }) {
       }
     } catch (error) {
       if (error.response) {
-        setError(error.response.data.message || "Login failed.");
+        Sentry.captureException(error)
+        setError(error.response.response.data.message || "Login failed.");
       } else if (error.request) {
+        //console.log(error.request)
         setError("Server is unreachable. Please check your connection.");
       } else {
         setError("An error occurred. Please try again.");

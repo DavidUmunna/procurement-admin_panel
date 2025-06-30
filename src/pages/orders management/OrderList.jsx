@@ -277,7 +277,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
   const handleDelete = async (orderId) => {
     try {
-      setIsLoading(false);
+      setIsLoading(true);
       await deleteOrder(orderId);
       setOrders(orders.filter(order => order._id !== orderId))
     } catch (error) {

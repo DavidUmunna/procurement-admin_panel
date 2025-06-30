@@ -19,3 +19,44 @@ A closer inspection of the frontend network behavior revealed that the request r
 
 #Resolution:
 The solution involved explicitly modifying the Nginx configuration. A location ^~ /download/ block was added before the static asset matcher to ensure that all download requests, including those for image files, are proxied directly to the backend server without being intercepted by Nginx's static file handling logic.
+
+###[29-06-25]
+##fileupload issue while implementing csrfToken 
+#Issue Summary:
+After implementing CSRF token validation and confirming it worked correctly, an issue arose during a file upload test. The application entered a loading state (`setLoading(true)`) and remained stuck, with the request never reaching the backend endpoint.
+##Initial INvestigation:
+- Extensive debugging showed no activity on the server side — the request was not hitting the endpoint.
+- CSRF validation was completely removed, and JWT tokens were used instead (`httpOnly: false`, standard for SPAs), but the issue persisted.
+- This eliminated CSRF as the root cause of the hanging behavior.
+
+---
+## Root Cause
+
+- Further inspection revealed that the file used during testing was an **Nginx server configuration file** (essentially a script).
+- Uploads of other file types (e.g., images, PDFs, Word documents) worked without any issues.
+- This behavior pointed to a problem specific to the **content** or **type** of the file being uploaded.
+
+### Possible Technical Causes
+
+- The script-like content of the file may have triggered browser or security middleware blocks.
+- MIME type mismatch or misclassification could have interfered with handling.
+- Some server configurations or middlewares may reject certain script types silently.
+
+---
+
+## Resolution Plan
+
+- Re-enable CSRF token validation.
+- Avoid using configuration or script files as test files for upload functionality.
+- Ensure the backend accepts only whitelisted MIME types:
+  - `image/jpeg`
+  - `image/jpg`
+  - `image/png`
+  - `application/pdf`
+  - `application/msword`
+  - `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+  - `application/vnd.oasis.opendocument.text`
+- Improve error handling on the frontend to notify users when requests fail silently or hang.
+- Add logging to middleware to inspect incoming files before full processing.
+
+---

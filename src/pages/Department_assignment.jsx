@@ -206,7 +206,7 @@ const refreshDepartments = () => {
           modalData = data;
       }
   
-      console.log("Modal data:", modalData);
+      
       setModal({
         show: true,
         type,

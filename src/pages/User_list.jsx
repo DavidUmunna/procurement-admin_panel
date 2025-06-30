@@ -112,7 +112,6 @@ export default function UserList() {
       return;
     }
 
-    console.log("Submitting edit form:", editForm);
 
     const updatedUser = await updateUser(editingUser._id, editForm);
 
@@ -121,7 +120,7 @@ export default function UserList() {
       return;
     }
 
-    console.log(updatedUser)
+   
     setUsers(prevUsers =>
       prevUsers.map(user =>
         user._id === editingUser._id ? updatedUser.data : user

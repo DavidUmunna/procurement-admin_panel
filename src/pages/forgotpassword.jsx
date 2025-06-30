@@ -32,14 +32,14 @@ export default function ForgotPassword() {
     try {
       const response = await sendResetLink(email);
 
-      console.log(response) // assume success = true if mail sent
+     // assume success = true if mail sent
       if (response.data.success) {
         setStep(2); // show email sent message
       } else {
         setError(response.response.data?.message);
       }
     } catch (error) {
-      console.log("eerr",error)
+   
       setError(error?.response?.data.message || "Something went wrong.");
     } finally {
       setLoading(false);

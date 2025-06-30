@@ -29,6 +29,9 @@ import InventoryManagement from "./pages/inventorymanagement/ParentComp";
 import SkipsManagement from "./pages/skips/parent";
 import ResetPassword from "./pages/ResetPassword";
 import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
+import Monitoring from "./pages/Monitoring"
+
+
 // Page transition animation
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -48,11 +51,31 @@ const PageTransition = ({ children }) => (
   </motion.div>
 );
 
+
 const App = () => {
   //const {user}=useUser()
   const location = useLocation();
   const [isauthenticated, setisauthenticated] = useState(false);
 
+  
+  /*useEffect(() => {
+    // Fetch CSRF token on app load
+    const check_csrf=()=>{
+        const API = process.env.REACT_APP_API_URL;
+      axios.get(`${API}/api/csrf-token`,{withCredentials:true})
+      
+      .catch(err => {
+        console.error('Failed to fetch CSRF token:', err);
+      });
+    }
+    check_csrf()
+    const Timer =setInterval(()=>{
+      check_csrf()
+      
+    },15*60*1000)
+    return () => clearInterval(Timer)
+    
+  }, []);*/
 
   useEffect(() => {
     
@@ -78,7 +101,7 @@ const App = () => {
       }
     };
     
-     
+    checkAuth()
     const Timer =setInterval(()=>{
       
       checkAuth();
@@ -268,6 +291,18 @@ const App = () => {
                 }
               />
               <Route
+                path="/monitoring"
+                element={
+                  isauthenticated ? (
+                    <PageTransition>
+                    <Monitoring />
+                    </PageTransition>
+                  ) : (
+                    <Navigate to="/adminlogin" />
+                  )
+                }
+              />
+              <Route
                 path="/unauthorized"
                 element={
                   isauthenticated ? (
@@ -279,6 +314,7 @@ const App = () => {
                   )
                 }
               />
+              
               {/* <Route
                 path="/admin-dashboard"
                 element={

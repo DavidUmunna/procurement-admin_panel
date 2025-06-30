@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react"
 import axios from "axios";
-
+import { getCookie } from "../components/Helpers";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 const orders="orders"
@@ -10,12 +10,14 @@ const orders="orders"
 export const getOrders = async (page , limit ) => {
   try {
     const token=localStorage.getItem("authToken")
-    
+
     const response = await axios.get(`${API_URL}/${orders}`,{
       params: { page, limit },
-      headers:{Authorization:`Bearer ${token}`, 
-      "ngrok-skip-browser-warning": "true"},
-      withCredential:true});
+      headers:{
+        Authorization:`Bearer ${token}`,
+       
+      "ngrok-skip-browser-warning":"true"},
+      withCredentials:true});
     //console.log("response",response)
     return response.data;
   } catch (error) {
@@ -54,15 +56,19 @@ export const getOrders = async (page , limit ) => {
 export const createOrder = async ({ formData, orderData }) => {
   try {
     let uploadedFileIds = [];
-
+    //const token_csrf = getCookie('XSRF-TOKEN');
+    
     // STEP 1: Upload files if present
+    console.log(formData)
     if (formData && formData.has("files")) {
-      const fileResponse = await axios.post(`${API_URL}/fileupload`, formData, {
+      const fileResponse = await axios.post(`${API_URL}/fileupload/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          "ngrok-skip-browser-warning": "true",
-        },
-      });
+          "ngrok-skip-browser-warning": "true"
+        
+      },
+      withCredentials:true}
+    );
 
       // Extract file IDs from response
       uploadedFileIds = fileResponse?.data?.files?._id;
@@ -73,11 +79,13 @@ export const createOrder = async ({ formData, orderData }) => {
       orderData.fileRefs = uploadedFileIds;
     }
 
-    // ✅ STEP 3: Always send order
+    //  STEP 3: Always send order
     const orderResponse = await axios.post(`${API_URL}/orders`, orderData, {
       headers: {
+        
         "ngrok-skip-browser-warning": "true",
       },
+      withCredentials:true
     });
 
     return {
@@ -100,7 +108,9 @@ export const createOrder = async ({ formData, orderData }) => {
 
 export const updateOrderStatus = async (orderId, status) => {
   try {
-    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status },{headers:{ "ngrok-skip-browser-warning": "true"}});
+    const token_csrf = getCookie('XSRF-TOKEN');
+    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status },{headers:{ "X-XSRF-TOKEN": token_csrf,"ngrok-skip-browser-warning": "true"},
+      withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error updating order:", error);
@@ -108,7 +118,7 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 export const downloadFile = async (fileId,filename) => {
   try {
-    console.log("filename",filename)
+   
     const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileId}/${filename}`,{responseType: "blob" ,
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
@@ -120,7 +130,9 @@ export const downloadFile = async (fileId,filename) => {
 
 export const deleteOrder = async (orderId) => {
   try {
-    await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{ "ngrok-skip-browser-warning": "true"}});
+    const token_csrf = getCookie('XSRF-TOKEN');
+    await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{"X-XSRF-TOKEN":token_csrf, "ngrok-skip-browser-warning": "true"},
+      withCredentials:true});
   } catch (error) {
      Sentry.captureMessage("Error deleting  orders")
           Sentry.captureException(error)

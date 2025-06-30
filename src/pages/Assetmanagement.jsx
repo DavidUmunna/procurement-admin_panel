@@ -108,7 +108,7 @@ const AssetManagement = ({setAuth}) => {
             },
             withCredentials: true,
           })
-      console.log(rbacRes)
+    
       set_ADMIN_ROLES_ASSET_MANAGEMENT(rbacRes.data.data.ADMIN_ROLES_ASSET_MANAGEMENT)
     }catch(error){
       Sentry.captureException(error)
@@ -117,13 +117,13 @@ const AssetManagement = ({setAuth}) => {
       setLoading(false)
     }
   }
-  console.log(ADMIN_ROLES_ASSET_MANAGEMENT)
+
   useEffect(() => {
     fetch_RBAC()
     fetchData();
     
   }, [setAuth]);
-  console.log(ADMIN_ROLES_ASSET_MANAGEMENT)
+
   const formatCategory = (category) => {
     const formatted = category
       .replace(/_/g, ' ') // Replace underscores with spaces

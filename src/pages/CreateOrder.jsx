@@ -3,7 +3,7 @@ import { createOrder } from "../services/OrderService";
 import { FileText, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../components/usercontext";
-
+import { getCookie } from "../components/Helpers";
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -31,7 +31,7 @@ const CreateOrder = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const[Error,setError]=useState("")
   const [staff,setStaff]=useState("")
-
+  const token_csrf = getCookie('XSRF-TOKEN');
   useEffect(() => {
     if (user) {
     
@@ -50,8 +50,7 @@ const CreateOrder = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
+    
     const formData = new FormData();
     const payload = {
       supplier,
@@ -66,13 +65,17 @@ const CreateOrder = () => {
 
     formData.append("email", email);
     formData.append("userId",user.userId)
+    
+
     files.forEach((file) => {
       formData.append("files", file);
     });
+    console.log(formData)
 
     try {
+      setIsSubmitting(true);
       const requestupload = await createOrder({ formData: formData, orderData: payload });
-      console.log(requestupload)
+     
       if (requestupload.order.data.success===true){
 
       
@@ -92,7 +95,7 @@ const CreateOrder = () => {
       //alert("Order Created!");
     } catch (error) {
       console.error("Error creating order:", error);
-      setError("due to no file present this error was staged your order must have gone through confirm from admins")
+      setError(" It seems there was an error processing your Request")
       //alert("Failed to create order. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -157,8 +160,11 @@ const CreateOrder = () => {
           animate="visible"
         >
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Create Purchase Request</h2>
-          <motion.form onSubmit={handleSubmit} className="space-y-4">
+          <motion.form onSubmit={handleSubmit} 
+          className="space-y-4">
+
             <motion.div className="mb-4" variants={inputVariants} initial="hidden" animate="visible">
+            
               <motion.div className="mb-4" variants={inputVariants} initial="hidden" animate="visible">
                 <label className="block text-gray-700 font-bold mb-2">Title:</label>
                 <input
