@@ -73,7 +73,7 @@ const SkipsManagement = () => {
   const fetchData = async (page = data.pagination?.page, limit = data.pagination?.limit) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       
       const params = {
@@ -123,7 +123,7 @@ const SkipsManagement = () => {
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 402  ) {
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         
         window.location.href = '/adminlogin'; 
       } else {
@@ -236,7 +236,7 @@ const SkipsManagement = () => {
     e.preventDefault();
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const res = await axios.post(`${API_URL}/skiptrack/create`, {
         ...formData,
         DeliveryOfEmptySkips: formData.DeliveryOfEmptySkips
@@ -260,7 +260,7 @@ const SkipsManagement = () => {
     } catch (err) {
       if (err.response?.status===401|| err.response?.status===402){
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         
         window.location.href = '/adminlogin'; 
       } else {
@@ -276,7 +276,7 @@ const SkipsManagement = () => {
     e.preventDefault();
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const res = await axios.put(`${API_URL}/skiptrack/${editingItem._id}`, formData, {
         headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
       });
@@ -297,7 +297,7 @@ const SkipsManagement = () => {
   const deleteItem = async (id) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       await axios.delete(`${API_URL}/skiptrack/${id}`, {
         headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning": "true" }
       });

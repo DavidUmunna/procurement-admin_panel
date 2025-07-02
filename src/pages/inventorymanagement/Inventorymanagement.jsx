@@ -3,7 +3,7 @@
 import * as Sentry from '@sentry/react';
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../components/usercontext';
-import { useNavigate } from 'react-router';
+
 import axios from "axios";
 import RecentActivity from './recentactivity';
 import { Plus, Minus,Trash2 } from "lucide-react"
@@ -12,7 +12,7 @@ import Categoryform from './Category_form';
 import CategorySelect from "./Category_select"
 import LoadingModal from "./Loading_modal"
 const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
-  const navigate = useNavigate();
+ 
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting]=useState(false)
   const [data, setData] = useState({
@@ -47,7 +47,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
     
     try {
       
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const [inventoryRes, categoriesRes] = await Promise.all([
         
@@ -99,7 +99,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
-          localStorage.removeItem('authToken');
+          localStorage.removeItem('sessionId');
           
           window.location.href = '/adminlogin'; 
         } else {
@@ -111,7 +111,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
     };
   useEffect(() => {
     fetchData();
-  }, [navigate]);
+  }, []);
 
   const resetForm = () => {
     setformdata({
@@ -136,7 +136,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
 
       if (quantityDifference === 0) return;
 
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: quantityDifference,
@@ -171,13 +171,13 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
 
   const addQuantity = async (itemId) => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: 1,
         userId: user?.userId
       }, {
-        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
+         withCredentials:true
       });
       
       // Update both inventoryItems and editingQuantities
@@ -215,13 +215,13 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   
   const removeQuantity = async (itemId) => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const res = await axios.put(`${API_URL}/inventory/${itemId}`, {
         quantity: -1,
         userId: user?.userId
       }, {
-        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" }
+        withCredentials:true
       });
       
       // Update both inventoryItems and editingQuantities
@@ -269,7 +269,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
   const DeleteItem=async(itemId)=>{
     try{
       setloading(true)
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const response=await axios.delete(`${API_URL}/inventory/${itemId}`,{
         headers: { Authorization: `Bearer ${token}` }
@@ -309,7 +309,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
     try {
       setIsSubmitting(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const res = await axios.post(`${API_URL}/inventory`, {
         ...formdata,
         AddedBy: user?.userId
@@ -339,7 +339,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         setAuth(false);
           window.location.href = '/adminlogin'; 
       } else {

@@ -1,15 +1,35 @@
 import axios from "axios"
 import * as Sentry from "@sentry/react"
+import { getCookie } from "../components/Helpers";
 
 
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    const excludedurls=[
+      "/api/access",
+      "/api/admin-user/login",
+      "/api/csrf-token"
+    ]
+    const request_url=error?.config.url ||""
+
+    const shouldHandlerrors=!excludedurls.some(ex=>request_url.includes(ex))
+    if (!error.response && shouldHandlerrors) {
+      window.location.href = "/adminlogin";
+    }
+    return Promise.reject(error);
+  }
+);
+
+const csrf_token=getCookie("XSRF-TOKEN")
 export const fetch_RBAC=async()=>{
       try{
 
-          const token = localStorage.getItem('authToken');
+
           const API_URL = `${process.env.REACT_APP_API_URL}/api`
           const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_GENERAL:true},{headers: {
-                Authorization: `Bearer ${token}`,
-               
+              
+                
                 "ngrok-skip-browser-warning": "true",
               },
               withCredentials: true,
@@ -17,7 +37,19 @@ export const fetch_RBAC=async()=>{
             return rbacRes
             
       }catch(error){
-        Sentry.captureException(error)
+        if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
+                                window.location.href = '/adminlogin';
+                              }else if (error.response?.status===401|| error.response?.status===403){
+                                                     
+                                //localStorage.removeItem('sessionId');
+                                
+                                window.location.href = '/adminlogin'; 
+                              }else{
+                                
+                                Sentry.captureException(error);
+                               
+                              }
+       
   
       }
 }
@@ -25,11 +57,11 @@ export const fetch_RBAC=async()=>{
 export const fetch_RBAC_DASH=async()=>{
   try{
 
-     const token = localStorage.getItem('authToken');
+     const token = localStorage.getItem('sessionId');
           const API_URL = `${process.env.REACT_APP_API_URL}/api`
           const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_DASHBOARD:true,GENERAL_ACCESS:true,DEPARTMENTAL_ACCESS:true},{headers: {
                 Authorization: `Bearer ${token}`,
-                
+                 
                 "ngrok-skip-browser-warning": "true",
               },
               withCredentials: true,
@@ -37,14 +69,25 @@ export const fetch_RBAC_DASH=async()=>{
     return rbacRes
 
   }catch(error){
-    Sentry.captureException(error)
+    if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
+        window.location.href = '/adminlogin';
+      }else if (error.response?.status===401|| error.response?.status===403){
+                             
+        //localStorage.removeItem('sessionId');
+        
+        window.location.href = '/adminlogin'; 
+      }else{
+        
+        Sentry.captureException(error);
+       
+      }
   }
 }
 
 export const fetch_RBAC_ordermanagement=async()=>{
   try{
 
-     const token = localStorage.getItem('authToken');
+     const token = localStorage.getItem('sessionId');
           const API_URL = `${process.env.REACT_APP_API_URL}/api`
           const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_GENERAL:true,GENERAL_ACCESS_ORDERS:true,DEPARTMENTAL_ACCESS:true,APPROVALS_LIST:true},{headers: {
                 Authorization: `Bearer ${token}`,
@@ -56,13 +99,24 @@ export const fetch_RBAC_ordermanagement=async()=>{
     return rbacRes
 
   }catch(error){
-    Sentry.captureException(error)
+   if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
+      window.location.href = '/adminlogin';
+    }else if (error.response?.status===401|| error.response?.status===403){
+                           
+      //localStorage.removeItem('sessionId');
+      
+      window.location.href = '/adminlogin'; 
+    }else{
+      
+      Sentry.captureException(error);
+     
+    }
   }
 }
 export const fetch_RBAC_department=async()=>{
   try{
 
-     const token = localStorage.getItem('authToken');
+     const token = localStorage.getItem('sessionId');
           const API_URL = `${process.env.REACT_APP_API_URL}/api`
           const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_DEPARTMENT:true},{headers: {
                 Authorization: `Bearer ${token}`,
@@ -74,7 +128,18 @@ export const fetch_RBAC_department=async()=>{
     return rbacRes
 
   }catch(error){
-    Sentry.captureException(error)
+    if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
+                            window.location.href = '/adminlogin';
+    }else if (error.response?.status===401|| error.response?.status===403){
+                           
+      //localStorage.removeItem('sessionId');
+      
+      window.location.href = '/adminlogin'; 
+    }else{
+      
+      Sentry.captureException(error);
+     
+    }
   }
 }
 

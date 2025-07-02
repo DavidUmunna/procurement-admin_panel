@@ -11,6 +11,7 @@ import PrintReport from './PrintReport';
 import CategoryForm from '../Category_form';
 import CategorySelect from '../Category_select';
 import ExcelExport from './Excelexport';
+import { getCookie } from '../../../components/Helpers';
 const InventoryLogs = () => {
   // Form state
   const [formData, setFormData] = useState({
@@ -53,7 +54,7 @@ const InventoryLogs = () => {
     
     try {
       
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('sessionId');
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         const [inventoryRes,categoryRes] = await Promise.all([
         
@@ -83,7 +84,7 @@ const InventoryLogs = () => {
       } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
-          localStorage.removeItem('authToken');
+          localStorage.removeItem('sessionId');
         
           window.location.href = '/adminlogin'; 
         } else {
@@ -102,16 +103,16 @@ const InventoryLogs = () => {
   }, []);
 
 
-
+  const csrf_token=getCookie("XSRF-TOKEN")
+  console.log(csrf_token)
   const handleSubmit = async(e) => {
     e.preventDefault();
     try{
         setLoading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-        const token = localStorage.getItem('authToken');
         const response=await axios.post(`${API_URL}/inventorylogs/create`,
             {...formData},
-        {headers:{Authorization:`Bearer ${token}`}})
+        {headers:{"x-csrf-token":csrf_token},withCredentials:true})
 
         setLogs([response.data.data,...logs])
         fetchData()
@@ -139,10 +140,10 @@ const InventoryLogs = () => {
     const handleDelete=async(itemId)=>{
         try{
             setLoading(true)
-            const token = localStorage.getItem('authToken');
+       
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
             await axios.delete(`${API_URL}/inventorylogs/${itemId}`,{
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers:{"x-csrf-token":csrf_token},withCredentials:true
             })
 
             setLogs(prevItem=>prevItem.filter(item=>item._id!==itemId))
@@ -190,9 +191,9 @@ const InventoryLogs = () => {
       try {
         setLoading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
-        const token = localStorage.getItem('authToken');
-        const res = await axios.put(`${API_URL}/inventorylogs/${editingItem._id}`, formData, {
-          headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
+  
+        const res = await axios.put(`${API_URL}/inventorylogs/${editingItem._id}`, formData, {headers:{"x-csrf-token":csrf_token},
+          withCredentials:true
         });
         
         setLogs(prevLogs =>

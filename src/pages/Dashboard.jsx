@@ -23,7 +23,7 @@ export const Dashboard=()=>{
     const [completedOrders, setcompletedOrders] = useState([]);
 
     const [ADMIN_ROLES_DASHBOARD,set_ADMIN_ROLES_DASHBOARD]=useState([])
-
+    
     
 
     const rbac_=async()=>{
@@ -34,7 +34,20 @@ export const Dashboard=()=>{
         set_ADMIN_ROLES_DASHBOARD(data.ADMIN_ROLES_DASHBOARD)
         return data
       }catch(error){
-        Sentry.captureException(error)
+        if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
+            
+                
+                window.location.href = '/adminlogin';
+              }else if (error.response?.status===401|| error.response?.status===403){
+                                     
+                //localStorage.removeItem('sessionId');
+                
+                window.location.href = '/adminlogin'; 
+              }else{
+                
+                Sentry.captureException(error);
+               
+              }
       }
     }
     useEffect(()=>{
@@ -49,8 +62,8 @@ export const Dashboard=()=>{
                   if (GENERAL_ACCESS.includes(user?.role)){
                 
                     const API_URL = `${process.env.REACT_APP_API_URL}/api`
-                    const token=localStorage.getItem("authToken")
-                    const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{Authorization:`Bearer ${token}`, 
+                    const token=localStorage.getItem("sessionId")
+                    const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{"x-session-id":token, 
                       "ngrok-skip-browser-warning": "true"},
                       withCredentials:true})
                      
@@ -58,11 +71,11 @@ export const Dashboard=()=>{
                     }else if(DEPARTMENTAL_ACCESS.includes(user?.role)){
                       if (!user?.Department) return;
                       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-                      const token=localStorage.getItem("authToken")
+                      const token=localStorage.getItem("sessionId")
                       const userReq=await axios.get(`${API_URL}/orders/department/all`,{params: {
                         Department: user.Department,
                        
-                      },headers:{Authorization:`Bearer ${token}`, 
+                      },headers:{"x-session-id":token, 
                       "ngrok-skip-browser-warning": "true"},
                       withCredentials:true})
                       
@@ -95,8 +108,17 @@ export const Dashboard=()=>{
     
             
             }catch(error){
-            
-                Sentry.captureException(error)
+              if (error.response?.status===401|| error.response?.status===403){
+                       
+                        //localStorage.removeItem('sessionId');
+                        
+                        window.location.href = '/adminlogin'; 
+                      }else{
+                        
+                        Sentry.captureException(error);
+                       
+                      }
+
     
             }
           }

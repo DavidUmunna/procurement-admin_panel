@@ -11,15 +11,15 @@ import {fetch_RBAC} from "../services/rbac_service"
 import * as Sentry from "@sentry/react"
 
 const navigation = [
-  { name: 'Requests', to: '/requestlist', icon: ClipboardDocumentListIcon },
-  { name: 'Create', to: '/createorder', icon: PlusCircleIcon },
-  { name: 'Add Users', to: '/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
-  { name: 'Users', to: '/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
-  {name:'Tasks', to:'/usertasks', icon: ClipboardDocumentCheckIcon }
+  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon },
+  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon },
+  { name: 'Add Users', to: '/admin/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
+  { name: 'Users', to: '/admin/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
+  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon }
 ];
 
 const userNavigation = [
-  { name: 'Your Profile', to: "/dashboard" },
+  { name: 'Your Profile', to: "/admin/dashboard" },
   { name: 'Sign out', to: '/signout' },
 ];
 

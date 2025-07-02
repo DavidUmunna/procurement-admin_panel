@@ -73,7 +73,7 @@ export default function UserList() {
 
   /*const getDepartment = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       const department_data = await axios.get(`${API_URL}/department`, {
         headers: { Authorization: `Bearer ${token}` }

@@ -9,6 +9,7 @@ import CompletedOrdersList from './Completed';
 import axios from 'axios';
 import PaginationControls from "../inventorymanagement/Paginationcontrols";
 import { fetch_RBAC_ordermanagement } from '../../services/rbac_service';
+import { getCookie } from "../../components/Helpers";
 
 const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
@@ -49,14 +50,19 @@ const OrdersDashboard = ({setAuth}) => {
     try {
         const { GENERAL_ACCESS_ORDERS = [], DEPARTMENTAL_ACCESS = [], APPROVALS_LIST=[] } = rbacData;
         let response;
-        const token=localStorage.getItem("authToken")
+        const token=localStorage.getItem("sessionId")
+        //const token=getCookie("sessionId")
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         if (GENERAL_ACCESS_ORDERS.includes(user?.role)) {
-          const res = await axios.get(`${API_URL}/orders`,{
-            params: { page, limit },
-          headers:{Authorization:`Bearer ${token}`, 
-            "ngrok-skip-browser-warning": "true"},
-            withCredential:true});
+          const res = await axios.get(`${API_URL}/orders`, {
+              params: { page, limit },
+              headers: {
+                "x-session-id": token,
+                "ngrok-skip-browser-warning": "true"
+              },
+              withCredentials: true
+            });
+
             response=res.data.data||[]
           
         
@@ -68,14 +74,14 @@ const OrdersDashboard = ({setAuth}) => {
         }else if(DEPARTMENTAL_ACCESS.includes(user?.role)) {
           
             if (!user?.Department) return;
-            const token=localStorage.getItem("authToken")
+
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
             const department_response = await axios.get(`${API_URL}/orders/department`, {
               params: {
                 Department: user.Department,
                 page,
                 limit,
-              },headers:{Authorization:`Bearer ${token}`, 
+              },headers:{"x-session-id":token, 
                 "ngrok-skip-browser-warning": "true"},
               withCredentials: true, // If you're using cookies/session
             });
@@ -90,14 +96,14 @@ const OrdersDashboard = ({setAuth}) => {
          
 
         }else if(APPROVALS_LIST.includes(user?.Department)){
-            const token=localStorage.getItem("authToken")
+
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
             const accounts_response = await axios.get(`${API_URL}/orders/accounts`, {
               params: {
                 
                 page,
                 limit,
-              },headers:{Authorization:`Bearer ${token}`, 
+              },headers:{"x-session-id":token, 
                 "ngrok-skip-browser-warning": "true"},
               withCredentials: true, // If you're using cookies/session
             });
@@ -128,12 +134,12 @@ const OrdersDashboard = ({setAuth}) => {
       } catch (err) {
         if (err.response?.status===401|| err.response?.status===403){
           setError("Session expired. Please log in again.");
-          localStorage.removeItem('authToken');
+          //localStorage.removeItem('sessionId');
           
           window.location.href = '/adminlogin'; 
         }else{
           
-          console.error(err);
+          Sentry.captureException(err);
           setError("Failed to load orders. Please try again later.");
         }
         

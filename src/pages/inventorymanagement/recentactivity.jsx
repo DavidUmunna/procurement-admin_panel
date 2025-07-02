@@ -26,7 +26,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       const fetchActivities = async (page , limit) => {
         setIsLoading(true);
         try {
-          const token = localStorage.getItem('authToken');
+          const token = localStorage.getItem('sessionId');
           //const params= { page, limit }
           
           //if (categories) params.category = categories;
@@ -52,7 +52,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
       };
       const fetchcategory=async()=>{
         try{
-          const token = localStorage.getItem('authToken');
+          const token = localStorage.getItem('sessionId');
           const API_URL = `${process.env.REACT_APP_API_URL}/api`;
           const response=await axios.get(`${API_URL}/inventory/categories`, {
             headers: {

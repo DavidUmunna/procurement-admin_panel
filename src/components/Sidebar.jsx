@@ -9,14 +9,14 @@ const Sidebar=forwardRef(({ isOpen, onClose },ref) =>{
   const {user}=useUser()
   const sidebar = [
     //{ name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
-    { name: "Assets Management", to: "/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","waste_management","human_resources","global_admin","PVT"] },
-    { name: "Add Vendor", to: "/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin'] },
-    { name: "Vendor", to: "/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin',"internal_auditor"] },
-    { name:"Inventory management" ,to:"/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","human_resources","global_admin","Environmental_lab_manager","lab_supervisor","QHSE_coordinator"] },
-    { name:"Inventory logs" ,to:"/inventorylogs", icon:History, visibleTo: ["global_admin","admin","QHSE_coordinator","lab_supervisor","procurement_officer","Environmental_lab_manager"] },
-    { name: "Department Assignment", to: "/departmentassignment", icon: Building2,visibleTo:["human_resources","global_admin"] },
-    { name: "Skips Tracking", to: "/skipstracking", icon: FiFileText,visibleTo:["global_admin","waste_management_manager","waste_management_supervisor"] },
-    { name: "App Monitoring", to: "/monitoring", icon: Activity,visibleTo:["global_admin"] },
+    { name: "Assets Management", to: "/admin/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","waste_management","human_resources","global_admin","PVT"] },
+    { name: "Add Vendor", to: "/admin/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin'] },
+    { name: "Vendor", to: "/admin/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin',"internal_auditor"] },
+    { name:"Inventory management" ,to:"/admin/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","human_resources","global_admin","Environmental_lab_manager","lab_supervisor","QHSE_coordinator"] },
+    { name:"Inventory logs" ,to:"/admin/inventorylogs", icon:History, visibleTo: ["global_admin","admin","QHSE_coordinator","lab_supervisor","procurement_officer","Environmental_lab_manager"] },
+    { name: "Department Assignment", to: "/admin/departmentassignment", icon: Building2,visibleTo:["human_resources","global_admin"] },
+    { name: "Skips Tracking", to: "/admin/skipstracking", icon: FiFileText,visibleTo:["global_admin","waste_management_manager","waste_management_supervisor"] },
+    { name: "App Monitoring", to: "/admin/monitoring", icon: Activity,visibleTo:["global_admin"] },
 
   ];
 

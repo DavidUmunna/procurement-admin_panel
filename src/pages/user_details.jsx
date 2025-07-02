@@ -33,7 +33,18 @@ const UserDetails = ({
       set_ADMIN_ROLES(data.ADMIN_ROLES_GENERAL)
       
     }catch(error){
-      Sentry.captureException(error)
+      if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
+        window.location.href = '/adminlogin';
+      }else if (error.response?.status===401|| error.response?.status===403){
+                             
+        //localStorage.removeItem('sessionId');
+        
+        window.location.href = '/adminlogin'; 
+      }else{
+        
+        Sentry.captureException(error);
+       
+      }
     }
   }
   useEffect(()=>{

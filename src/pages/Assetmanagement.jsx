@@ -49,12 +49,12 @@ const AssetManagement = ({setAuth}) => {
   const fetchData = async (page=data.pagination?.page,limit=data.pagination?.limit) => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const [AssetRes, statsRes, categoriesRes] = await Promise.all([
         axios.get(`${API_URL}/assets`, { params:{page,limit},
             headers: {
-              Authorization: `Bearer ${token}`,
+              "x-session-id":token,
               "ngrok-skip-browser-warning": "true",
             },
             withCredentials: true,
@@ -85,7 +85,7 @@ const AssetManagement = ({setAuth}) => {
       } catch (err) {  // add `: any` if you want better type safety
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please log in again.");
-          localStorage.removeItem('authToken');
+          localStorage.removeItem('sessionId');
           setAuth(false);
           window.location.href = '/adminlogin'; 
         } else {
@@ -100,11 +100,11 @@ const AssetManagement = ({setAuth}) => {
   const fetch_RBAC=async ()=>{
     try{
         setLoading(true)
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('sessionId');
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
         const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_ASSET_MANAGEMENT:true},{headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
+              "x-session-id":token,
+
             },
             withCredentials: true,
           })
@@ -182,12 +182,12 @@ const AssetManagement = ({setAuth}) => {
     e.preventDefault();
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const res = await axios.post(`${API_URL}/assets`, {
         ...formData,
         addedBy: user.userId
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { "x-session-id":token }
       });
       
       setAssetItems([...AssetItems, res.data.data]);
@@ -196,7 +196,7 @@ const AssetManagement = ({setAuth}) => {
     } catch (err) {
       if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         setAuth(false)
         window.location.href = '/adminlogin'; 
       }else{
@@ -212,9 +212,9 @@ const AssetManagement = ({setAuth}) => {
     e.preventDefault();
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("sessionId");
       const res = await axios.put(`${API_URL}/assets/${editingItem._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
+        headers: { "x-session-id":token ,"ngrok-skip-browser-warning": "true"}
       });
       
       setAssetItems(AssetItems.map(item => 
@@ -231,9 +231,9 @@ const AssetManagement = ({setAuth}) => {
   const deleteItem = async (id) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       await axios.delete(`${API_URL}/assets/${id}`, {
-        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning": "true" }
+        headers: { "x-session-id":token,"ngrok-skip-browser-warning": "true" }
       });
       setAssetItems(AssetItems.filter(item => item._id !== id));
     } catch (err) {

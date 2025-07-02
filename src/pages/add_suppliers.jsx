@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getCookie } from "../components/Helpers";
 export default function AddSupplier() {
   const [form, setForm] = useState({
     name: "",
@@ -12,32 +13,29 @@ export default function AddSupplier() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [Error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
+ const csrf_token=getCookie("XSRF-TOKEN")
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+   
 
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const response = await axios.post(`${API_URL}/supplier`,{form}, {
         
-        headers: {
-        "ngrok-skip-browser-warning":"true"}
-        
+        headers: {"x-csrf-token":csrf_token},
+        withCredentials:true       
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add supplier");
-      }
+      
 
-      setMessage("Supplier added successfully ✅");
+     
       setForm({ 
         name: "", 
         email: "", 
@@ -48,7 +46,7 @@ export default function AddSupplier() {
       });
       navigate("/suppliers"); // redirect after success
     } catch (err) {
-      setMessage(err.message || "Something went wrong");
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -58,9 +56,9 @@ export default function AddSupplier() {
     <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg mt-20">
       <h2 className="text-2xl font-semibold mb-4">Add Vendor</h2>
 
-      {message && (
-        <p className={`mb-4 ${message.includes("successfully") ? "text-green-600" : "text-red-600"}`}>
-          {message}
+      {Error && (
+        <p className="mb-4">
+          {Error}
         </p>
       )}
 

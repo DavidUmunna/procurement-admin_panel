@@ -186,11 +186,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   try {
     setIsLoading(true);
     const API_URL = `${process.env.REACT_APP_API_URL}/api`
-    const token = localStorage.getItem("authToken");
-    const headers = { 
-      Authorization: `Bearer ${token}`,
-      withCredentials: true,"ngrok-skip-browser-warning": "true"
-    };
+    const token = localStorage.getItem("sessionId");
+    
     
     // Get the comment for this specific order
     const orderComment = commentsByOrder[orderId] || '';
@@ -235,16 +232,16 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
         adminName: user.name, 
         comment: orderComment, // Use the specific order comment
         orderId 
-      }, {headers});
+      }, {withCredentials:true});
     } else if (newStatus === "Rejected" || newStatus === "Pending") {
       await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
         adminName: user.name,
         comment: orderComment, // Use the specific order comment
         orderId 
-      }, {headers});
+      }, {withCredentials:true});
     } else if (newStatus === "Completed") {
       await axios.put(`${API_URL}/orders/${orderId}/completed`,
-        orderId, {headers} 
+        orderId, {withCredentials:true} 
       )
     }
     
@@ -291,6 +288,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
   const toggleOrderDetails = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
+    if (expandedOrder===null){
+      setDropdownOpen(!dropdownOpen)
+    }
   };
 
   const toggleDropdown = (orderId, e) => {
@@ -319,6 +319,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       setIsLoading(false);
     }
   };
+
+  
 
   const getStatusBadge = (order) => {
     let bgColor, textColor, icon;
@@ -529,8 +531,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3">
-                            <h3 className="text-lg font-semibold text-gray-800 truncate">
-                              {order.Title || "Untitled Order"}
+                            <h3 className="text-lg font-semibold text-gray-800 ">
+                              {(order.Title || "Untitled Order").length > 30
+                               ? (order.Title || "Untitled Order").slice(0, 30) + "..."
+                               : order.Title || "Untitled Order"}
                             </h3>
                             {getStatusBadge(order)}
                           </div>

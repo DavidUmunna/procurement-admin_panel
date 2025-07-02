@@ -46,7 +46,7 @@ const Add_user = () => {
       console.error("user not created:",error)
       if (error.response?.status===401 || error.response?.status===403){
         setError("Session Expired. please Refresh page")
-        localStorage.removeItem("authToken")
+
 
         window.location.href='/adminlogin'
       }else{

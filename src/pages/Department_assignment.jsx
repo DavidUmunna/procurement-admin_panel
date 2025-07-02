@@ -55,28 +55,25 @@ const DepartmentManagement = (setAuth) => {
     const fetchData = async () => {
       setLoading(true);
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem("authToken");
-      const headers = { 
-        Authorization: `Bearer ${token}`,
-        withCredentials: true,"ngrok-skip-browser-warning": "true"
-      };
+
+     
 
       try {
         const [deptRes, usersRes, tasksRes, statsRes] = await Promise.allSettled([
-          axios.get(`${API_URL}/department`, { headers }),
-          axios.get(`${API_URL}/users`, { headers }),
-          axios.get(`${API_URL}/tasks`, { headers }),
-          axios.get(`${API_URL}/department/stats`, { headers })
+          axios.get(`${API_URL}/department`, { withCredentials:true }),
+          axios.get(`${API_URL}/users`, {withCredentials:true }),
+          axios.get(`${API_URL}/tasks`, {withCredentials:true }),
+          axios.get(`${API_URL}/department/stats`, { withCredentials:true })
         ]);
-
+        console.log("users",usersRes)
         setDepartments(deptRes.status === 'fulfilled' ? deptRes.value.data.data : []);
-        setUsers(usersRes.status === 'fulfilled' ? usersRes.value.data : []);
+        setUsers(usersRes.status === 'fulfilled' ? usersRes.value.data.data : []);
         setTasks(tasksRes.status === 'fulfilled' ? tasksRes.value.data.data : []);
         setStats(statsRes.status === 'fulfilled' ? statsRes.value.data : {});
       } catch (err) {
         if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         setAuth(false)
         window.location.href = '/adminlogin'; 
       }else{
@@ -96,12 +93,10 @@ const fetchDepartments = async () => {
 
   try {
     const API_URL = `${process.env.REACT_APP_API_URL}/api`
-    const token = localStorage.getItem("authToken");
-    const headers = { 
-      Authorization: `Bearer ${token}`,
-      withCredentials: true 
-    };
-    const response = await axios.get(`${API_URL}/department`, { headers });
+
+   
+   
+    const response = await axios.get(`${API_URL}/department`, { withCredentials:true });
     setDepartments(response.data.data);
   } catch (err) {
     console.error("Failed to fetch departments:", err);
@@ -223,12 +218,8 @@ const refreshDepartments = () => {
   // Department Operations
   const handleDepartmentSubmit = async () => {
     try {
-      const token = localStorage.getItem("authToken");
-      const headers = { 
-        Authorization: `Bearer ${token}`,
-        withCredentials: true 
-      };
 
+      
       const departmentData = {
         name: formData.name,
         headOfDepartment: {
@@ -240,11 +231,11 @@ const refreshDepartments = () => {
       let response;
       if (modal.type === 'addDept') {
         const API_URL=`${process.env.REACT_APP_API_URL}/api`
-        response = await axios.post(`${API_URL}/department`, departmentData, { headers });
+        response = await axios.post(`${API_URL}/department`, departmentData, { withCredentials:true });
         setDepartments(prev => [...prev, response.data.data]);
       } else {
         const API_URL=`${process.env.REACT_APP_API_URL}/api`
-        response = await axios.put(`${API_URL}/department/${modal.data._id}`, departmentData, { headers });
+        response = await axios.put(`${API_URL}/department/${modal.data._id}`, departmentData, { withCredentials:true });
         setDepartments(prev => prev.map(d => d._id === modal.data._id ? response.data.data : d));
       }
       
@@ -255,10 +246,10 @@ const refreshDepartments = () => {
   };
   const fetchTasks = async () => {
     try {
-      const API_URL=`${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem("authToken");
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
+     
       const response = await axios.get(`${API_URL}/tasks`, {
-        headers: { Authorization: `Bearer ${token}` },
+
         withCredentials: true
       });
       setTasks(response.data.data);
@@ -269,29 +260,27 @@ const refreshDepartments = () => {
 
   const deleteDepartment = async () => {
     try {
-      const token = localStorage.getItem("authToken");
+
       const API_URL=`${process.env.REACT_APP_API_URL}/api`
       await axios.delete(`${API_URL}/department/${modal.data._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+
         withCredentials: true
       });
       setDepartments(prev => prev.filter(d => d._id !== modal.data._id));
       closeModal();
     } catch (err) {
-      console.error("Delete error:", err.response?.data || err.message);
-    }
+      Sentry.captureException(err)}
   };
 
   // User Operations
   const addUserToDepartment = async () => {
     try {
-      const token = localStorage.getItem("authToken");
+      
       const API_URL=`${process.env.REACT_APP_API_URL}/api`
       const response = await axios.post(
         `${API_URL}/department/${modal.data._id}/users`,
         { userId: selectedUserId, name:users.find(u=>String(u._id)===String(selectedUserId))?.name },
         { 
-          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true 
         }
       );
@@ -303,7 +292,7 @@ const refreshDepartments = () => {
     } catch (err) {
       if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         setAuth(false)
         window.location.href = '/adminlogin'; 
       }else{
@@ -315,12 +304,11 @@ const refreshDepartments = () => {
 
   const removeUserFromDepartment = async (departmentId,userId) => {
     try {
-      const token = localStorage.getItem("authToken");
+
       const API_URL=`${process.env.REACT_APP_API_URL}/api`
       await axios.delete(
         `${API_URL}/department/${departmentId}/users/${userId}`,
         { 
-          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true 
         }
       );
@@ -329,7 +317,7 @@ const refreshDepartments = () => {
     } catch (err) {
       if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         setAuth(false)
         window.location.href = '/adminlogin'; 
       }else{
@@ -348,7 +336,6 @@ const refreshDepartments = () => {
   const assignTask = async () => {
     try {
       const API_URL=`${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem("authToken");
       await axios.post(`${API_URL}/tasks`, {
         title: formData.taskTitle,
         description: formData.taskDescription,
@@ -359,7 +346,6 @@ const refreshDepartments = () => {
         status:formData.status|| 'Pending'
        // status:
       }, { 
-        headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"},
         withCredentials: true 
       });
       //console.log(response)
@@ -628,6 +614,7 @@ const refreshDepartments = () => {
                   <option value="Environmental_lab_dep">Environmental Lab</option>
                   <option value="accounts_dep">Accounts</option>
                   <option value="Human resources">Human Resources</option>
+                  <option value="IT">IT</option>
                 </select>
 
                 </div>
@@ -640,7 +627,8 @@ const refreshDepartments = () => {
                     disabled={modalLoading}
                   >
                     <option value="">Select Head of Department</option>
-                    {modal.data?.users?.map(user => (
+   
+                    {Array.isArray(modal?.data?.users)&&modal.data.users.map(user => (
                       <option key={user._id} value={user._id}>{user.name}</option>
                     ))}
                   </select>

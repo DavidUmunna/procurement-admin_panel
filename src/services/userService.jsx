@@ -1,14 +1,15 @@
 import * as Sentry from "@sentry/react"
 import axios from "axios";
-//import User from "../../../procurement-users-panel/src/components/user-navbar";
+import { getCookie } from "../components/Helpers";
 
-//const circuitBreaker=require("opossum")
 
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api`
 
 const route="users"
 
+
+const csrf_token=getCookie("XSRF-TOKEN")
 
 
 export const get_users=async ()=>{
@@ -49,9 +50,9 @@ export const sendResetLink=async(email)=>{
 
 export const createUser = async (userData) => {
     try {
-      const token=localStorage.getItem("authToken")
+      const token=localStorage.getItem("sessionId")
      
-      const response = await axios.post(`${API_URL}/${route}`,userData,{headers:{Authorization:`Bearer ${token}`}});
+      const response = await axios.post(`${API_URL}/${route}`,userData,{headers:{"x-csrf-token":csrf_token},withCredentials:true});
      
       return response.data;
     } catch (error) {
@@ -78,7 +79,7 @@ export const createUser = async (userData) => {
 export const updateUser= async (userId, payload) => {
     try {
     
-      const response = await axios.put(`${API_URL}/${route}/${userId}/updateuser`,  payload );
+      const response = await axios.put(`${API_URL}/${route}/${userId}/updateuser`,  payload,{headers:{"x-csrf-token":csrf_token},withCredentials:true} );
      
       return response.data;
     } catch (error) {
@@ -90,7 +91,7 @@ export const updateUser= async (userId, payload) => {
 
 export const deleteUser = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/${route}/${userId}`);
+      await axios.delete(`${API_URL}/${route}/${userId}`,{headers:{"x-csrf-token":csrf_token},withCredentials:true});
     } catch (error) {
        Sentry.captureMessage("Error Deleting user")
        Sentry.captureException(error)

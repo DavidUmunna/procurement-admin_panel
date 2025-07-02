@@ -49,7 +49,7 @@ const MovingAverageChart = () => {
   const fetchSkipData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
       
       const response = await axios.get(`${API_URL}/skiptrack/analytics`, {
@@ -69,7 +69,7 @@ const MovingAverageChart = () => {
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 402) {
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('sessionId');
         window.location.href = '/adminlogin'; 
       } else {
         setError('Failed to fetch skip data');

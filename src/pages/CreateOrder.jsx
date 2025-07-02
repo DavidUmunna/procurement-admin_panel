@@ -3,7 +3,7 @@ import { createOrder } from "../services/OrderService";
 import { FileText, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../components/usercontext";
-import { getCookie } from "../components/Helpers";
+
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -31,7 +31,7 @@ const CreateOrder = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const[Error,setError]=useState("")
   const [staff,setStaff]=useState("")
-  const token_csrf = getCookie('XSRF-TOKEN');
+
   useEffect(() => {
     if (user) {
     
@@ -47,6 +47,7 @@ const CreateOrder = () => {
       setfilenames(uploadedFiles.map(file => file.name));
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();

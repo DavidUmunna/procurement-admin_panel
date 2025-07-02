@@ -89,7 +89,7 @@ const ExcelExport=({setopenmodal,setLoading,categories})=>{
             setLoading(true)
             setDownloadProgress(0)
              const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('sessionId');
 
             const response = await axios.post(
                 `${API_URL}/inventorylogs/export`,

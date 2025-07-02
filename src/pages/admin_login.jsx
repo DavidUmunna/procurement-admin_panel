@@ -21,35 +21,34 @@ export default function Sign_in({ setAuth }) {
     e.preventDefault();
     setError("");
     
+    setLoading(true);
     try {
-      setLoading(true);
       const API_URL = process.env.REACT_APP_API_URL;
      const response = await axios.post(
   `${API_URL}/api/admin-user/login`,
   { username, password },
-  {
-    
-    withCredentials: true
+  {withCredentials: true
     }
      );
 
 
-    if (response.data.success) {
+    if (response.data.success===true) {
         setAuth(true);
-        localStorage.setItem("authToken",response.data.token)
+
+
         //localStorage.setItem("auth", "true");
         setUser(response.data.user);
         //console.log(response.data.user)
         
-        navigate("/dashboard");
+        navigate("/admin/dashboard");
         //console.log(userData)
       } else {
         setError(response.data.message);
       }
     } catch (error) {
       if (error.response) {
+        setError(error.response.data.message || "Login failed.");
         Sentry.captureException(error)
-        setError(error.response.response.data.message || "Login failed.");
       } else if (error.request) {
         //console.log(error.request)
         setError("Server is unreachable. Please check your connection.");

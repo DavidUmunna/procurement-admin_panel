@@ -36,7 +36,7 @@ export default function ForgotPassword() {
       if (response.data.success) {
         setStep(2); // show email sent message
       } else {
-        setError(response.response.data?.message);
+        setError(response.response.data?.message|| "Operation failed");
       }
     } catch (error) {
    
