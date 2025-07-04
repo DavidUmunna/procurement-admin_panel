@@ -12,6 +12,7 @@ import Layout from "./pages/landinpage/layout/Layout"
 import PrivateRoute from "./pages/PrivateRoute";
 import ProtectedLayout from "./ProtectedLayout";
 import ResetPassword from "./pages/ResetPassword";
+import CompanyDataForm from "./pages/landinpage/CompanyData";
 // Pagetransition animation
 
 const App = () => {
@@ -92,6 +93,7 @@ const App = () => {
               
                 <Route index element={<Landingpage/>}/>
                 <Route path="/aboutus" element={<Aboutus/>}/>
+                <Route path="/companydata" element={<CompanyDataForm/>}/>
               </Route>
               <Route
                 path="/adminlogin"
