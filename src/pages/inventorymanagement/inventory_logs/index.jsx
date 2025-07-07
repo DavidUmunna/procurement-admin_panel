@@ -104,7 +104,7 @@ const InventoryLogs = () => {
 
 
   const csrf_token=getCookie("XSRF-TOKEN")
-  console.log(csrf_token)
+
   const handleSubmit = async(e) => {
     e.preventDefault();
     try{

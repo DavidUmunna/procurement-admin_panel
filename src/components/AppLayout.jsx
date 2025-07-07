@@ -2,10 +2,18 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./navBar";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { useEffect,useState } from "react";
 
 function AppLayout() {
   const location = useLocation();
-  
+   const [isReady, setIsReady] = useState(false);
+   useEffect(() => {
+    if (document.readyState === "complete") {
+      setIsReady(true);
+    } else {
+      window.addEventListener("load", () => setIsReady(true));
+    }
+  }, []);
   return (
     <div className="flex min-h-screen flex-col">
       {/* Persistent Navbar */}
@@ -13,7 +21,7 @@ function AppLayout() {
       
       {/* Animated content area */}
       <main className="flex-1 relative">
-        <motion.div
+        {isReady&&(<motion.div
           key={location.pathname}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -25,7 +33,7 @@ function AppLayout() {
           className="absolute inset-0"
         >
           <Outlet />
-        </motion.div>
+        </motion.div>)}
       </main>
     </div>
   );

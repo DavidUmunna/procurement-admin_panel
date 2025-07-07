@@ -61,7 +61,7 @@ export const createOrder = async ({ formData, orderData }) => {
     //const token_csrf = getCookie('XSRF-TOKEN');
     
     // STEP 1: Upload files if present
-    console.log(formData)
+  
     if (formData && formData.has("files")) {
       const fileResponse = await axios.post(`${API_URL}/fileupload/create`, formData, {
         headers: {
