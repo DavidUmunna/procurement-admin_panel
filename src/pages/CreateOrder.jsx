@@ -119,7 +119,7 @@ const CreateOrder = () => {
   };
 
   return (
-    <div className="relative mt-10 mb-32">
+    <div className="relative mt-10 mb-40">
       {/* Loading Modal */}
       <AnimatePresence>
         {isSubmitting && (
@@ -285,7 +285,7 @@ const CreateOrder = () => {
             </motion.button>
             <motion.button 
               type="submit" 
-              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex justify-center items-center gap-2"
+              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex justify-center items-center gap-2 mb-24"
               disabled={isSubmitting}
               whileHover={!isSubmitting ? { scale: 1.02 } : {}}
             >

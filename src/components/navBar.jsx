@@ -230,7 +230,7 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation */}
       <motion.div
-        className="fixed bottom-0 w-full  bg-gray-800 p-2 flex  justify-around items-center border-t border-gray-700 z-50 md:hidden "
+        className="fixed bottom-0 w-full  bg-gray-800 p-0 flex  justify-around items-center border-t border-gray-700 z-50 md:hidden "
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.3 }}
