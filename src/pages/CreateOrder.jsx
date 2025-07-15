@@ -31,12 +31,13 @@ const CreateOrder = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const[Error,setError]=useState("")
   const [staff,setStaff]=useState("")
-
+  const [role,setrole]=useState("")
   useEffect(() => {
     if (user) {
     
       setEmail(user.email);
       setStaff(user.userId)
+      setrole(user.role)
     }
   }, [user]);
 
@@ -61,7 +62,8 @@ const CreateOrder = () => {
       remarks,
       products,
       Title,
-      staff
+      staff,
+      role
     };
 
     formData.append("email", email);
@@ -71,7 +73,7 @@ const CreateOrder = () => {
     files.forEach((file) => {
       formData.append("files", file);
     });
-    console.log(formData)
+    
 
     try {
       setIsSubmitting(true);
@@ -89,6 +91,7 @@ const CreateOrder = () => {
         setRemarks("");
         settitle("");
         setError("")
+        setrole("")
       }else{
         setError("the file/order was not sent please reach out to IT")
 
