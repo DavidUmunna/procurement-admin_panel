@@ -34,7 +34,7 @@ const SkipsManagement = () => {
       value:0,
       unit:''
     },
-    SourceWell:"",
+    WasteSource:"",
     DispatchManifestNo:"",
     DispatchTruckRegNo:'',
     DriverName:"",
@@ -183,7 +183,7 @@ const SkipsManagement = () => {
       
       (item?.skip_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item?.DriverName && item?.DriverName.toLowerCase().includes(searchTerm.toLowerCase()))||
-      (item?.SourceWell.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item?.WasteSource.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(item => 
         selectedWasteStream === 'All' || item?.WasteStream === selectedWasteStream
@@ -250,7 +250,7 @@ const SkipsManagement = () => {
       : null,
         addedBy: user.userId
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials:true
       });
       
       setSkipItems([...SkipItems, res.data.data]);
@@ -258,7 +258,7 @@ const SkipsManagement = () => {
       setShowForm(false);
       fetchData(); // Refresh data
     } catch (err) {
-      if (err.response?.status===401|| err.response?.status===402){
+      if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
         localStorage.removeItem('sessionId');
         
@@ -296,16 +296,19 @@ const SkipsManagement = () => {
 
   const deleteItem = async (id) => {
     try {
+      setLoading(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('sessionId');
       await axios.delete(`${API_URL}/skiptrack/${id}`, {
-        headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning": "true" }
+      withCredentials:true
       });
       setSkipItems(SkipItems.filter(item => item._id !== id));
       fetchData(); // Refresh data
     } catch (err) {
         Sentry.captureMessage('Delete Failed');
         Sentry.captureException(err.response?.data || err.message)
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -318,7 +321,7 @@ const SkipsManagement = () => {
       value:0,
       unit:''
     },
-    SourceWell:"",
+    WasteSource:"",
     DispatchManifestNo:'',
     DispatchTruckRegNo:'',
     DriverName:"",
@@ -338,7 +341,7 @@ const SkipsManagement = () => {
       value:item.Quantity.value,
       unit:item.Quantity.unit
     },
-    SourceWell:item.SourceWell,
+    WasteSource:item.WasteSource,
     DispatchManifestNo:item.DispatchManifestNo,
     DispatchTruckNo:item.DispatchTruckRegNo,
     DriverName:item.DriverName||"",
@@ -403,9 +406,9 @@ const SkipsManagement = () => {
       {/* Header and Controls */}
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Skips Management</h1>
       
-    {/* Replace the existing controls container div with this */}
+
       <div className="flex flex-col sm:flex-row flex-wrap justify-between gap-3 mb-6">
-        {/* Search and Filters - stays on top row */}
+
         <div className="flex-1 flex flex-row flex-wrap gap-3 min-w-[250px]">
           {/* Search input */}
           <div className="relative flex-1 xs:flex-initial xs:w-48 sm:w-56">
@@ -554,7 +557,7 @@ const SkipsManagement = () => {
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Delivery Waybill No</th>
           <th
-            onClick={() => requestSort('SourceWell')}
+            onClick={() => requestSort('WasteSource')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Source Well</th>
           <th
@@ -615,7 +618,7 @@ const SkipsManagement = () => {
                   {item.DeliveryWaybillNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.SourceWell}
+                  {item.WasteSource}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.DispatchManifestNo}
@@ -776,11 +779,11 @@ const SkipsManagement = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SourceWell*</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">WasteSource*</label>
                   <input
                     type="text"
-                    name="SourceWell"
-                    value={formData.SourceWell}
+                    name="WasteSource"
+                    value={formData.WasteSource}
                     onChange={handleInputChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"

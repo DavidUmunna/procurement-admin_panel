@@ -113,10 +113,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       if (keyword) {
         const searchTerm = keyword.toLowerCase();
         const matchesOrderNumber = order.orderNumber?.toLowerCase().includes(searchTerm);
-        const matchesOrderedBy = order.orderedBy?.toLowerCase().includes(searchTerm);
+        const matchesOrderedBy = order.staff.name?.toLowerCase().includes(searchTerm);
         const matchesTitle = order.Title?.toLowerCase().includes(searchTerm);
+        const matchDepartment=order.staff.Department.toLowerCase().includes(searchTerm)
         
-        if (!matchesOrderNumber && !matchesOrderedBy && !matchesTitle) {
+        if (!matchesOrderNumber && !matchesOrderedBy && !matchesTitle && !matchDepartment) {
           return false;
         }
       }

@@ -13,7 +13,7 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
         stream: 'All',
         fileName: 'skips_report',
         fileFormat: 'xlsx',
-        SourceWell:''
+        WasteSource:''
     });
 
     const [validationErrors, setValidationErrors] = useState({});
@@ -35,7 +35,7 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
             stream: 'All',
             fileName: 'skips_report',
             fileFormat: 'xlsx',
-            SourceWell:''
+            WasteSource:''
         });
         setValidationErrors({});
     };
@@ -261,18 +261,18 @@ const ExcelExport = ({ setopenmodal, categories, setLoading }) => {
                         </div>
                         <div className="col-span-2 sm:col-span-1">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                SourceWell
+                                WasteSource
                             </label>
                             <input
                                 type="text"
-                                name="SourceWell"
-                                value={formData.SourceWell}
+                                name="WasteSource"
+                                value={formData.WasteSource}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                 required
                             />
-                            {validationErrors.SourceWell && (
-                                <p className="text-red-500 text-xs mt-1">{validationErrors.SourceWell}</p>
+                            {validationErrors.WasteSource && (
+                                <p className="text-red-500 text-xs mt-1">{validationErrors.WasteSource}</p>
                             )}
                         </div>
 

@@ -34,6 +34,7 @@ const OrdersDashboard = ({setAuth}) => {
 
    const rbac_=async()=>{
       try{
+          setIsLoading(true)
           const response=await fetch_RBAC_ordermanagement()
   
            const data=response.data.data
@@ -43,6 +44,8 @@ const OrdersDashboard = ({setAuth}) => {
           return data
       }catch(error){
         Sentry.captureException(error)
+      }finally{
+        setIsLoading(false)
       }
     }
   const fetchData = async (page=Data.pagination?.page,limit=Data.pagination?.limit,rbacData={}) => {
@@ -50,14 +53,16 @@ const OrdersDashboard = ({setAuth}) => {
     try {
         const { GENERAL_ACCESS_ORDERS = [], DEPARTMENTAL_ACCESS = [], APPROVALS_LIST=[] } = rbacData;
         let response;
-        const token=localStorage.getItem("sessionId")
-        //const token=getCookie("sessionId")
+
+        
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         if (GENERAL_ACCESS_ORDERS.includes(user?.role)) {
           const res = await axios.get(`${API_URL}/orders`, {
-              params: { page, limit },
+              params: { 
+                role:user?.role,
+                page, limit },
               headers: {
-                "x-session-id": token,
+                
                 "ngrok-skip-browser-warning": "true"
               },
               withCredentials: true
@@ -81,7 +86,7 @@ const OrdersDashboard = ({setAuth}) => {
                 Department: user.Department,
                 page,
                 limit,
-              },headers:{"x-session-id":token, 
+              },headers:{
                 "ngrok-skip-browser-warning": "true"},
               withCredentials: true, // If you're using cookies/session
             });
@@ -103,7 +108,7 @@ const OrdersDashboard = ({setAuth}) => {
                 
                 page,
                 limit,
-              },headers:{"x-session-id":token, 
+              },headers:{ 
                 "ngrok-skip-browser-warning": "true"},
               withCredentials: true, // If you're using cookies/session
             });
