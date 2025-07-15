@@ -71,7 +71,7 @@ const CreateOrder = () => {
     files.forEach((file) => {
       formData.append("files", file);
     });
-    console.log(formData)
+   
 
     try {
       setIsSubmitting(true);
