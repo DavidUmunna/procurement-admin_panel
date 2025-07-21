@@ -9,12 +9,13 @@ import PaginationControls from '../inventorymanagement/Paginationcontrols';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Excelexport from './excelexport';
-
+import SkipsToast from './skipsToast';
 
 
 const SkipsManagement = () => {
   const { user } = useUser();
   const [categories, setCategories] = useState([]);
+  const [IsLoading,setIsLoading]=useState(false)
   const [data, setData] = useState({
     activities: [],
     pagination: {
@@ -23,12 +24,17 @@ const SkipsManagement = () => {
       total: 0
     }
   });
+  const [toast, setToast] = useState(null)
   
   // State
   const [SkipItems, setSkipItems] = useState([]);
   const [formData, setFormData] = useState({
     skip_id: '',
     DeliveryWaybillNo:Number,
+    DateMobilized:null,
+    DateReceivedOnLocation:null,
+    SkipsTruckRegNo:'',
+    SkipsTruckDriver:'',
     WasteStream: '',
     Quantity: {
       value:0,
@@ -36,14 +42,15 @@ const SkipsManagement = () => {
     },
     WasteSource:"",
     DispatchManifestNo:"",
-    DispatchTruckRegNo:'',
-    DriverName:"",
-    DeliveryOfEmptySkips:null,
+    WasteTruckRegNo:'',
+    WasteDriverName:"",
     DemobilizationOfFilledSkips:null,
     DateFilled:null,
 
   });
-  
+  if(toast){
+    setTimeout(()=>setToast(null),3000)
+  }
   // Date range state
  
   const [dateRange, setDateRange] = useState({
@@ -235,12 +242,13 @@ const SkipsManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem('sessionId');
       const res = await axios.post(`${API_URL}/skiptrack/create`, {
         ...formData,
-        DeliveryOfEmptySkips: formData.DeliveryOfEmptySkips
-      ? formData.DeliveryOfEmptySkips.toISOString()
+        DateMobilized: formData.DateMobilized
+      ? formData.DateMobilized.toISOString()
       : null,
         DemobilizationOfFilledSkips: formData.DemobilizationOfFilledSkips
           ? formData.DemobilizationOfFilledSkips.toISOString()
@@ -252,7 +260,11 @@ const SkipsManagement = () => {
       }, {
         withCredentials:true
       });
-      
+      setToast({
+        show:true,
+        type:"success",
+        message:"your entry was added successfully"
+      })
       setSkipItems([...SkipItems, res.data.data]);
       resetForm();
       setShowForm(false);
@@ -264,6 +276,11 @@ const SkipsManagement = () => {
         
         window.location.href = '/adminlogin'; 
       } else {
+         setToast({
+        show: true,
+        type: 'error',
+        message: 'Operation failed'
+        });
         
         Sentry.captureMessage('Create Failed');
         Sentry.captureException(err.response?.data || err.message)
@@ -280,7 +297,11 @@ const SkipsManagement = () => {
       const res = await axios.put(`${API_URL}/skiptrack/${editingItem._id}`, formData, {
         headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
       });
-      
+      setToast({
+        show:true,
+        type:"success",
+        message:"your update was  success"
+      })
       setSkipItems(SkipItems.map(item => 
         item._id === editingItem._id ? res.data.data : item
       ));
@@ -314,8 +335,12 @@ const SkipsManagement = () => {
 
   const resetForm = () => {
     setFormData({
-       skip_id: '',
-       DeliveryWaybillNo:Number,
+    skip_id: '',
+    DeliveryWaybillNo:Number,
+    DateMobilized:null,
+    DateReceivedOnLocation:null,
+    SkipsTruckRegNo:Number,
+    SkipsTruckDriver:'',
     WasteStream: '',
     Quantity: {
       value:0,
@@ -323,31 +348,33 @@ const SkipsManagement = () => {
     },
     WasteSource:"",
     DispatchManifestNo:'',
-    DispatchTruckRegNo:'',
-    DriverName:"",
-    DeliveryOfEmptySkips:null,
+    WasteTruckRegNo:'',
+    WasteDriverName:"",
     DemobilizationOfFilledSkips:null,
     DateFilled:null,
     });
   };
-
+  
   const setupEdit = (item) => {
     setEditingItem(item);
     setFormData({
        skip_id: item.skip_id,
        DeliveryWaybillNo:item.DeliveryWaybillNo,
-    WasteStream: item.WasteStream,
-    Quantity: {
-      value:item.Quantity.value,
-      unit:item.Quantity.unit
-    },
-    WasteSource:item.WasteSource,
-    DispatchManifestNo:item.DispatchManifestNo,
-    DispatchTruckNo:item.DispatchTruckRegNo,
-    DriverName:item.DriverName||"",
-    DeliveryOfEmptySkips:item.DeliveryOfEmptySkips,
-    DemobilizationOfFilledSkips:item.DemobilizationOfFilledSkips,
-    DateFilled:item.DateFilled,
+       DateMobilized:item.DateMobilized,
+       DateReceivedOnLocation:item.DateReceivedOnLocation,
+       SkipsTruckRegNo:item.SkipsTruckRegNo,
+       SkipsTruckDriver:item.SkipsTruckDriver,
+       WasteStream: item.WasteStream,
+       Quantity: {
+         value:item.Quantity.value,
+         unit:item.Quantity.unit
+       },
+       WasteSource:item.WasteSource,
+       DispatchManifestNo:item.DispatchManifestNo,
+       WasteTruckRegNo:item.WasteTruckRegNo,
+       WasteDriverName:item.WasteDriverName||"",
+       DemobilizationOfFilledSkips:item.DemobilizationOfFilledSkips,
+       DateFilled:item.DateFilled,
     });
     setShowForm(true);
   };
@@ -557,25 +584,38 @@ const SkipsManagement = () => {
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Delivery Waybill No</th>
           <th
+            onClick={() => requestSort('DateMobilized')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Date Mobilized</th>
+          <th
+            onClick={() => requestSort('DateReceivedOnLocation')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Date Received On Location</th>
+          <th
+            onClick={() => requestSort('SkipsTruckRegNo')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Skips Truck Reg No</th>
+          <th
+            onClick={() => requestSort('SkipsTruckDriver')}
+            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+          >Skips Truck Driver Name</th>
+          <th
             onClick={() => requestSort('WasteSource')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Source Well</th>
+          >Waste Source</th>
           <th
             onClick={() => requestSort('DispatchManifestNo')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Dispatch Manifest No</th>
           <th
-            onClick={() => requestSort('DispatchTruckRegNo')}
+            onClick={() => requestSort('WasteTruckRegNo')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Truck No</th>
+          >Waste Truck Reg No</th>
           <th
-            onClick={() => requestSort('DriverName')}
+            onClick={() => requestSort('WasteDriverName')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Driver Name</th>
-          <th
-            onClick={() => requestSort('DeliveryOfEmptySkips')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Empty Delivery</th>
+          >Waste Driver Name</th>
+          
           <th
             onClick={() => requestSort('DemobilizationOfFilledSkips')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
@@ -618,6 +658,18 @@ const SkipsManagement = () => {
                   {item.DeliveryWaybillNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DateMobilized?.split('T')[0]}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.DateReceivedOnLocation?.split('T')[0]}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.SkipsTruckRegNo}
+                </td>
+                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {item.SkipsTruckDriver}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.WasteSource}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -629,9 +681,7 @@ const SkipsManagement = () => {
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.DriverName}
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DeliveryOfEmptySkips?.split('T')[0]}
-                </td>
+                
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.DemobilizationOfFilledSkips?.split('T')[0]}
                 </td>
@@ -759,7 +809,7 @@ const SkipsManagement = () => {
                         <option value="">Unit</option>
                         <option value="kg">kg</option>
                         <option value="liters">liters</option>
-                        <option value="tonne">tons</option>
+                        <option value="tonne">tonnes</option>
                         {/* Add more units as needed */}
                       </select>
                     </div>
@@ -774,6 +824,44 @@ const SkipsManagement = () => {
                     type="number"
                     name="DeliveryWaybillNo"
                     value={formData.DeliveryWaybillNo}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Monbilized</label>
+                  <DatePicker
+                    selected={formData.DateMobilized}
+                    onChange={(date) => handleDateChange("DateMobilized", date)}
+                    className='border-4'
+                  />
+                </div>
+                  <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Recieved On Location</label>
+                  <DatePicker
+                    selected={formData.DateReceivedOnLocation}
+                    onChange={(date) => handleDateChange("DateReceivedOnLocation", date)}
+                    className='border-4'
+                  />
+                </div>
+                 <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SkipsTruckRegNo</label>
+                  <input
+                    type="text"
+                    name="SkipsTruckRegNo"
+                    value={formData.SkipsTruckRegNo}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SkipsDriverName</label>
+                  <input
+                    type="text"
+                    name="SkipsDriverName"
+                    value={formData.SkipsDriverName}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -802,35 +890,28 @@ const SkipsManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">DispatchTruckRegNo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">WasteTruckRegNo</label>
                   <input
                     type="text"
-                    name="DispatchTruckRegNo"
-                    value={formData.DispatchTruckRegNo}
+                    name="WasteTruckRegNo"
+                    value={formData.WasteTruckRegNo}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">DriverName</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">WasteDriverName</label>
                   <input
                     type="text"
-                    name="DriverName"
-                    value={formData.DriverName}
+                    name="WasteDriverName"
+                    value={formData.WasteDriverName}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Of Empty Skips*</label>
-                  <DatePicker
-                    selected={formData.DeliveryOfEmptySkips}
-                    onChange={(date) => handleDateChange("DeliveryOfEmptySkips", date)}
-                    required
-                    className='mt-5 border-4'
-                  />
-                </div>
+              
+                
                  <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Demobilization Of Filled Skips</label>
                   <DatePicker
@@ -844,7 +925,7 @@ const SkipsManagement = () => {
                   <DatePicker
                     selected={formData.DateFilled}
                     onChange={(date) => handleDateChange("DateFilled", date)}
-                    className='border-4'
+                    className='mt-5 border-4'
                   />
                 </div>
                 
@@ -863,12 +944,24 @@ const SkipsManagement = () => {
                   Cancel
                 </button>
                 <button
+                disabled={IsLoading}
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
                 >
-                  <FiSave className="mr-2" />
+                  
+                {IsLoading ? (
+                  <>
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                    Saving...
+                </>):(<>
+                <FiSave className="mr-2" />
                   {editingItem ? 'Update Item' : 'Save Item'}
-                </button>
+                </>
+                  )}
+              </button>
               </div>
               </div>
             </form>
@@ -884,6 +977,7 @@ const SkipsManagement = () => {
           {Error}
         </div>
       )}
+      {toast && (<SkipsToast toast={toast} setToast={setToast}/>)}
     </div>
   );
 };
