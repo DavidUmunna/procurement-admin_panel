@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react"
 import React, {  useState,useEffect } from "react";
+
 import {
 
   updateOrderStatus,
@@ -8,19 +9,23 @@ import {
   
 } from "../../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaFilePdf, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment } from "react-icons/fa";
+import { FileText } from "lucide-react";
+import { FaFilePdf,FaInfoCircle, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment } from "react-icons/fa";
 import { FiDownload,  } from "react-icons/fi";
 import { useUser } from "../../components/usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import ExportMemoModal from "./ExportMemoModal";
+import MoreInformationResponse from "./MoreInformationResponse";
+import SkipsToast from "../skips/skipsToast";
 
 
 
 
 
 
-const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
+const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -31,20 +36,24 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   const [isLoading, setIsLoading] = useState(false);
   //const [error, setError] = useState(null);
   const [commentsByOrder, setCommentsByOrder] = useState({});
+  const [ResponseByOrder, setResponseByOrder] = useState({});
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
   const [isVisible, setIsVisible]=useState(false)
-  const [toast, setToast] = useState({ show: false, message: '' });
-
-
+  const [toast, setToast] = useState({ show: false,type:null ,message: '' });
+  const [ExportOpen, setIsExportOpen] = useState(false)
+  const [selectedRequest, setSelectedRequest] = useState(null)
+  const [OpenResponseOrderId,setOpenResponseOrderId]=useState(null)
+  const [validate,setvalidate]=useState(false)
+  const [responseText, setResponseText] = useState("");
+  const [responses, setResponses] = useState([]);
 
   const getOverallStatus = (approvals, department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
     if (approvals.some(a => a.status === "Completed")) return "Completed";
-  
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     
-   let REQUIRED_APPROVALS;
+    let REQUIRED_APPROVALS;
 
     switch (department) {
       case "waste_management_dep":
@@ -53,13 +62,15 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       case "Environmental_lab_dep":
         REQUIRED_APPROVALS = 4;
         break;
-      default:
-        REQUIRED_APPROVALS = 3;
-    }
-
-  
-    if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
-    if (approvalCount > 0) return "Partially Approved";
+        default:
+          REQUIRED_APPROVALS = 3;
+        }
+        
+        
+        if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
+        if (approvalCount > 0) return "Partially Approved";
+        else if (approvals.some(a=>a.status==="More Information")) return "More Information"
+    
   
     return "Pending";
   };
@@ -92,6 +103,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       case "Rejected":
         const rejectors = approvals?.filter(a => a.status === "Rejected").map(a => a.admin).join(", ");
         return `Rejected by ${rejectors}`;
+      case "More Information":
+        return `More Information required `
       default:
         return "Awaiting review";
     }
@@ -162,6 +175,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
       ...prev,
       [selectedOrderId]: "" // Clear comment for this specific order
     }));
+    setResponseByOrder(prev=>({
+      ...prev,
+      [selectedOrderId]:""
+    }))
   }
   
 }, [selectedOrderId]);
@@ -177,8 +194,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
     e.preventDefault();
   
     setOpenCommentOrderId(null);
-    setToast({ show: true, message: 'Comment saved successfully!' });
-    setTimeout(() => setToast({ show: false, message: '' }), 3000);
+    setToast({ show: true, type:'success', message: 'Comment saved successfully!' });
+    setTimeout(() => setToast({ show: false, type:null, message: '' }), 3000);
 
   };
  
@@ -187,11 +204,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
   try {
     setIsLoading(true);
     const API_URL = `${process.env.REACT_APP_API_URL}/api`
-    const token = localStorage.getItem("sessionId");
+
     
     
     // Get the comment for this specific order
     const orderComment = commentsByOrder[orderId] || '';
+
     
     // Optimistic update
     setOrders(prevOrders => {
@@ -229,20 +247,30 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
     
     // Then send specific approve/reject requests
     if (newStatus === "Approved") {
+      setvalidate(false)
       await axios.put(`${API_URL}/orders/${orderId}/approve`, { 
         adminName: user.name, 
         comment: orderComment, // Use the specific order comment
         orderId 
       }, {withCredentials:true});
-    } else if (newStatus === "Rejected" || newStatus === "Pending") {
+    } else if (newStatus === "Rejected" ) {
       await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
         adminName: user.name,
         comment: orderComment, // Use the specific order comment
         orderId 
       }, {withCredentials:true});
     } else if (newStatus === "Completed") {
+      setvalidate(false)
       await axios.put(`${API_URL}/orders/${orderId}/completed`,
         orderId, {withCredentials:true} 
+      )
+    }else if (newStatus==="More Information"){
+      setvalidate(true)
+      await axios.put(`${API_URL}/orders/${orderId}/MoreInfo`,
+        { adminName: user.name,
+        comment: orderComment, // Use the specific order comment
+        orderId 
+      },{withCredentials:true}
       )
     }
     
@@ -267,11 +295,18 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
           : order
       )
     );
+     if (error.response?.status===401|| error.response?.status===403){
+          setError("Session expired. Please log in again.");
+          //localStorage.removeItem('sessionId');
+          
+          window.location.href = '/adminlogin';}
   } finally {
     setIsLoading(false);
     setDropdownOpen(null);
   }
 };
+
+
 
   const handleDelete = async (orderId) => {
     try {
@@ -325,7 +360,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
   const getStatusBadge = (order) => {
     let bgColor, textColor, icon;
-    const status = order.status==="Completed"?order.status:getOverallStatus(order.Approvals);
+    const status = order.status==="Completed"?order.status:order.status==="More Information"?order.status:getOverallStatus(order.Approvals);
     switch (status) {
       case "Approved":
         bgColor = "bg-green-100";
@@ -347,6 +382,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
         textColor = "text-blue-800";
         icon = <FaCheck className="mr-1" />;
         break;
+      case "More Information":
+        bgColor = "bg-amber-100";       
+        textColor = "text-amber-800";   
+        icon = <FaInfoCircle className="mr-1" />;  
+        break;
+        
       default:
         bgColor = "bg-gray-100";
         textColor = "text-gray-800";
@@ -446,7 +487,37 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
           </span>
         )}
       </div>
+      <div className="flex ">
 
+        <button 
+          onClick={() => {
+            setSelectedRequest(prev => prev === order ? null : order)
+            setIsExportOpen(true)
+          }}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-md rounded p-1 ml-1"
+          >
+          <FileText className="h-4 w-4" />
+          Export Memo
+        </button>
+        {order.Approvals?.some(a=>(a.status==="More Information" || a.status==="Rejected")) &&(
+
+          
+          <button
+      
+          onClick={()=> setOpenResponseOrderId(prev=>prev===order._id? null:order._id)}
+        className="relative px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ml-3"
+       >
+          Response
+       
+           {order.staffResponse.length > 0 && (
+          <span className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            {order.staffResponse.length}
+          </span>
+           )}
+        </button>
+          )
+        }
+      </div>
       {order.remarks && (
         <div>
           <p className="font-medium text-gray-600">Remarks:</p>
@@ -578,7 +649,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
                                     className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
                                   >
                                     <div className="py-1">
-                                      {["Pending", "Approved", "Rejected", "Completed"]
+                                      {["Pending", "Approved", "Rejected", "Completed","More Information"]
                                         .filter(
                                           (statusOption) =>
                                             statusOption !== "Completed" || user?.Department === "accounts_dep"
@@ -605,6 +676,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
                                               )}
                                               {statusOption === "Pending" && (
                                                 <FaClock className="text-yellow-500" />
+                                              )}
+                                              {statusOption === "More Information" && (
+                                                <FaInfoCircle className="text-yellow-500" />
                                               )}
                                               {statusOption === "Completed" && user?.Department === "accounts_dep" && (
                                                 <FaCheck className="text-blue-500" />
@@ -688,11 +762,28 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
 
                         </div>
                       </div>
-
+                      
                       <AnimatePresence>
                         {expandedOrder === order._id && renderOrderDetails(order)}
                       </AnimatePresence>
                     </div>
+
+                    {OpenResponseOrderId===order._id && <MoreInformationResponse 
+                    responseTesxt={responseText}
+                    setResponseText={setResponseText}
+                    responses={responses}
+                    setResponses={setResponses}
+                    setToast={setToast}
+                    toast={toast}
+                    canApprove={user.canApprove}
+                    setResponseByOrder={setResponseByOrder}
+                    ResponseByOrder={ResponseByOrder}
+                    order={order}
+                    
+                    selectedOrderId={order._id}
+                    setIsLoading={setIsLoading}
+                    RefreshRequest={RefreshRequest}
+                    setOpenResponseOrderId={setOpenResponseOrderId}/>}
                   </motion.li>
                 ))}
               </AnimatePresence>
@@ -705,10 +796,16 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError }) => {
             </div>
           )}
           {toast.show && (
-            <div className="fixed bottom-4 right-4 p-4 bg-green-500 text-white rounded-lg shadow-lg">
-              {toast.message}
-            </div>
+           <SkipsToast toast={toast} 
+           setToast={setToast}/>
           )}
+         
+         <ExportMemoModal
+           isOpen={ExportOpen}
+           onClose={()=>setIsExportOpen(false)}
+           requestId={selectedRequest?._id}
+           requestTitle={selectedRequest?.Title}
+          />
 
       </div>
     </div>

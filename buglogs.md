@@ -80,3 +80,16 @@ I observed that after the refactoring of my routing logic,the navbar kept refres
 
 # Resolution
 all forms of animation implementations were moved to the child component(AppLayout) which contained all the routes individually,single responsibility principle was not being followed with respect to animation, whichis meant to only change where the contents are changing 
+
+
+### [19-07-25]
+##  data Update Issue
+# Issue summary
+so this problems springs from the response modal in development, there is a field on the modal where the staff user can see past responses made by himself tot he admin, then there is also another field like a form where he can make another response and submit, when he does that, the history of responses gets updated, but the problem is after you close the modal, the response badge for that request still reads the previous amount of responses  and does not update
+
+# Root cause
+the use of two different states: in the request, the staffresponse field is used directly to reflect the number of responses but when the modal is opened up there is another call to the backend for the past responses because because this state needs to update frequently where as the request state does not update frequently
+
+# Resolution
+Sending a Callback as a prop from the parent component 
+to the modal once the modal fetches data for past responses it triggers the request list to rerender

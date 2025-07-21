@@ -15,7 +15,7 @@ const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
   const [orders, setOrders] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   //const [filteredorders,setfilteredorders]=useState([])
 
@@ -156,10 +156,17 @@ const OrdersDashboard = ({setAuth}) => {
   
   useEffect(() => {
     const init=async()=>{
+      try{
 
-      const rbacData=await rbac_();
-      if (rbacData && user) {
-      await fetchData(Data.pagination?.page, Data.pagination?.limit, rbacData);
+        setIsLoading(true)
+        const rbacData=await rbac_();
+        if (rbacData && user) {
+          await fetchData(Data.pagination?.page, Data.pagination?.limit, rbacData);
+        }
+      }catch(error){
+        setError("An Error Occurred")
+      }finally{
+        setIsLoading(false)
       }
     }
     init();
@@ -175,6 +182,22 @@ const OrdersDashboard = ({setAuth}) => {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
+
+  const RefreshRequest=async ()=>{
+    try{
+      setIsLoading(true)
+      const rbacData=await rbac_();
+        if (rbacData && user) {
+          await fetchData(Data.pagination?.page, Data.pagination?.limit, rbacData);
+        }
+     
+    }catch(error){
+      setError("There was an error while updating ")
+    }finally{
+      setIsLoading(false)
+    }
+
+  }
  
   
   
@@ -190,7 +213,7 @@ const OrdersDashboard = ({setAuth}) => {
   
 
   if (isLoading) {
-    return   <div className="p-8 flex justify-center">
+    return   <div className="p-8 flex justify-center items-center min-h-screen">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
   }
@@ -213,6 +236,7 @@ return (
         setOrders={setOrders}
         error={error}
         setError={setError}
+        RefreshRequest={RefreshRequest}
       />
       <div>
         <PaginationControls

@@ -49,4 +49,15 @@ add managing director role (added)
 
 make approvals pane scrollable(implemented)
 
-add export to excel button/component(pending)
+add export to excel button/component(Implemented)
+
+## [19/07/25]
+add more information option option to purchase✅
+order model field "status" ✅
+add staffResponses to purchase order model schema✅
+
+add controller function for more information status update✅
+
+add notification functions for alert functionality ✅
+
+add corresponding endpoint routes✅

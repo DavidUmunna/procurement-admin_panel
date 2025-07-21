@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getCookie } from "../components/Helpers";
+
 export default function AddSupplier() {
   const [form, setForm] = useState({
     name: "",
@@ -19,7 +19,7 @@ export default function AddSupplier() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
- const csrf_token=getCookie("XSRF-TOKEN")
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -29,7 +29,7 @@ export default function AddSupplier() {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const response = await axios.post(`${API_URL}/supplier`,{form}, {
         
-        headers: {"x-csrf-token":csrf_token},
+
         withCredentials:true       
       });
 
