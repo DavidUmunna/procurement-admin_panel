@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as Sentry from '@sentry/react';
-import UserDetails from "./user_details"
+import UserDetails from "./UserDetails"
 import React, { useState } from 'react';
 import { useUser } from "../components/usercontext";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ export const Dashboard=()=>{
     const [pendingOrders, setPendingOrders] = useState([]);
     const [rejectedOrders, setRejectedOrders] = useState([]);
     const [completedOrders, setcompletedOrders] = useState([]);
-
+    const [MoreInformation,setMoreInformation]=useState([])
     const [ADMIN_ROLES_DASHBOARD,set_ADMIN_ROLES_DASHBOARD]=useState([])
     
     
@@ -97,6 +97,8 @@ export const Dashboard=()=>{
                     setPendingOrders(response?.filter((order) => order.status === "Pending"));
                     setRejectedOrders(response?.filter((order) => order.status === "Rejected"));
                     setcompletedOrders(response?.filter((order) => order.status === "Completed"));
+                    setMoreInformation(response?.filter((order)=>order.Approvals).filter((approval)=>approval.status==="More Information"))
+               
                    
 
                  }else{
@@ -137,7 +139,7 @@ export const Dashboard=()=>{
 
     },[user])
    
-
+  
    
     const request_length=(request)=>{
       return Array.isArray(request) ? request.length : 0;
@@ -160,6 +162,7 @@ export const Dashboard=()=>{
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
             <UserDetails user={user}   rejectedOrders={rejectedOrders||[]} request_amount={request_amount} 
             approvedOrders={approvedOrders||[]} pendingOrders={pendingOrders||[]} completedOrders={completedOrders||[]}
+            MoreInformation={MoreInformation}
              />
             {ADMIN_ROLES_DASHBOARD.includes(user?.role)&&<CostDashboard orders={orders}/>}
             

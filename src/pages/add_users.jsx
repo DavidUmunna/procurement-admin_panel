@@ -125,7 +125,7 @@ const Add_user = () => {
                   <option value="IT">Information Technology</option>
                   <option value="Administration">Administration</option>
                   <option value="Procurement_department">Procurement Department</option>
-                  <option value="HSE_dep">HSE Department</option>
+                  <option value="QHSE_dep">QHSE Department</option>
                   <option value="Contracts_Department">Contracts Department</option>
                   <option value="Engineering_Department">Engineering Department</option>
                   <option value="Business_Development">Business Development Department</option>
