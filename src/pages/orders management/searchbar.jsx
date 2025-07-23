@@ -34,7 +34,7 @@ const Searchbar = () => {
   };
 
   const handleSearch = () => {
-    console.log('Search parameters:', search);
+    
   };
 
   const handleClear = () => {
@@ -110,9 +110,9 @@ const Searchbar = () => {
           </motion.button>
           {export_departments.includes(user.Department)&&<button
                  onClick={() => setshowmodal(!showmodal)}
-                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 "
                  >
-                 Export to excel
+                   Excel Export 
           </button>
                 }
 

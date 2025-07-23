@@ -67,7 +67,7 @@ const CompanyDataForm = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log(formData)
+    
     try{
         setloading(true)
         const API=process.env.REACT_APP_API_URL

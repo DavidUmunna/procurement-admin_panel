@@ -68,8 +68,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         
         
         if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
-        if (approvalCount > 0) return "Partially Approved";
-        else if (approvals.some(a=>a.status==="More Information")) return "More Information"
+        if (approvalCount > 0 && !approvals.some(a=>a.status==="More Information")) return "Partially Approved";
+        if (approvals.some(a=>a.status==="More Information")) return "More Information"
     
   
     return "Pending";
@@ -312,7 +312,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     try {
       setIsLoading(true);
       await deleteOrder(orderId);
-      setOrders(orders.filter(order => order._id !== orderId))
+      RefreshRequest()
+      //setOrders(orders.filter(order => order._id !== orderId))
+
     } catch (error) {
       Sentry.captureMessage("Error updating status")
       Sentry.captureException(error)
@@ -489,7 +491,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       </div>
       <div className="flex ">
 
-        <button 
+        {user.role==="accounts"&&(<button 
           onClick={() => {
             setSelectedRequest(prev => prev === order ? null : order)
             setIsExportOpen(true)
@@ -498,7 +500,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
           >
           <FileText className="h-4 w-4" />
           Export Memo
-        </button>
+        </button>)}
         {order.Approvals?.some(a=>(a.status==="More Information" || a.status==="Rejected")) &&(
 
           
@@ -678,7 +680,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                                 <FaClock className="text-yellow-500" />
                                               )}
                                               {statusOption === "More Information" && (
-                                                <FaInfoCircle className="text-yellow-500" />
+                                                <FaInfoCircle className="text-black" />
                                               )}
                                               {statusOption === "Completed" && user?.Department === "accounts_dep" && (
                                                 <FaCheck className="text-blue-500" />

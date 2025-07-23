@@ -3,6 +3,7 @@ import { createOrder } from "../services/OrderService";
 import { FileText, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../components/usercontext";
+import { FiInfo } from "react-icons/fi";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -31,7 +32,10 @@ const CreateOrder = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const[Error,setError]=useState("")
   const [staff,setStaff]=useState("")
-
+  const [role,setrole]=useState("")
+  const [IsTarget,setIsTarget]=useState(false)
+  const [targetDepartment,setTargetDepartment]=useState("")
+  const [showInfo, setShowInfo] = useState(false);
   useEffect(() => {
     if (user) {
     
@@ -48,7 +52,10 @@ const CreateOrder = () => {
     }
   };
   
-
+  const handleInputChange=(e)=>{
+    setIsTarget(e.target.checked)
+  }
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -61,12 +68,16 @@ const CreateOrder = () => {
       remarks,
       products,
       Title,
-      staff
+      staff,
+      role,
+
     };
 
     formData.append("email", email);
     formData.append("userId",user.userId)
-    
+    if (IsTarget){
+      payload.targetDepartment=targetDepartment
+    };
 
     files.forEach((file) => {
       formData.append("files", file);
@@ -89,6 +100,8 @@ const CreateOrder = () => {
         setRemarks("");
         settitle("");
         setError("")
+        setrole("")
+        setTargetDepartment("")
       }else{
         setError("the file/order was not sent please reach out to IT")
 
@@ -97,6 +110,12 @@ const CreateOrder = () => {
     } catch (error) {
       console.error("Error creating order:", error);
       setError(" It seems there was an error processing your Request")
+      if (error.response?.status===401|| error.response?.status===403){
+          setError("Session expired. Please log in again.");
+          //localStorage.removeItem('sessionId');
+          
+          window.location.href = '/adminlogin';}
+
       //alert("Failed to create order. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -117,7 +136,9 @@ const CreateOrder = () => {
     const updatedProducts = products.filter((_, i) => i !== index);
     setProducts(updatedProducts);
   };
-
+  if(showInfo){
+    setTimeout(()=>setShowInfo(false),2500)
+  }
   return (
     <div className="relative mt-10 mb-40">
       {/* Loading Modal */}
@@ -185,6 +206,66 @@ const CreateOrder = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </motion.div>
+
+            <div className="flex justify-center items-center">
+                  <input
+                    type="checkbox"
+                    name="IsTarget"
+                    checked={IsTarget}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm text-gray-700">Target Department?
+                  </label>
+                  <div className="relative ">
+                     {showInfo && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="absolute left-10 mt-2 w-64 bg-white p-3 rounded-lg shadow-lg border border-gray-200 z-10"
+                          >
+                            <p className="text-sm text-gray-700">
+                              This parameter is for those who want to make a request to 
+                              another department from their current (those functioning in two Departments)                             
+                            </p>
+                          </motion.div>
+                        )}
+                  <button
+                  onClick={(e)=>{
+                    
+                    e.stopPropagation()
+                    e.preventDefault()
+                    setShowInfo(!showInfo)}
+                  }
+                  className="text-gray-500 hover:text-blue-600 transition-colors ml-3 "
+                  aria-label="What is Target Department"
+                  >
+                    <FiInfo size={18}/>
+                  </button>
+                  </div>
+            </div>
+            {IsTarget&&(
+               <div className="">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                  <select
+                    name="targetDepartment"
+                    value={targetDepartment}
+                    onChange={(e)=>setTargetDepartment(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="">Select Department</option>
+                    <option value="waste_management_dep">Waste Management</option>
+                    <option value="PVT">PVT</option>
+                    <option value="Environmental_lab_dep">Environmental Lab</option>
+                    <option value="accounts_dep">Accounts</option>
+                    <option value="Human resources">Human Resources</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="Administration">Administration</option>
+                    <option value="QHSE">QHSE</option>
+                               
+                  </select>
+                </div>
+            )}
            
 
             <label className="block mb-2">Urgency</label>

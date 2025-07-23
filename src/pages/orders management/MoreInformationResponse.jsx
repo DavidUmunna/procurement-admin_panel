@@ -156,7 +156,7 @@ const MoreInformationResponse = ({
   const handleDelete = async (orderId, responseId) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      const response = await axios.delete(`${API_URL}/orders/${orderId}`, {
+      const response = await axios.delete(`${API_URL}/orders/${orderId}/staffresponse`, {
         params: { responseId }, 
         withCredentials: true
       });
