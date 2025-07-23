@@ -36,3 +36,5 @@ nginx.conf
 jest.config.js
 .babelrc
 
+CNAME
+
