@@ -227,7 +227,7 @@ const MoreInformationResponse = ({
                   className="flex justify-between items-center bg-gray-100 p-2 rounded"
                 >
                   <div className="flex-1">
-                    <p className="text-sm font-extrabold text-gray-700">{canApprove === true ? 'From:' : 'To:'}  {response.admin}</p>                      
+                    <p className="text-sm font-extrabold text-gray-700"><strong>To:</strong> {response.admin}</p>                      
                     <p className="text-sm text-gray-700"><strong>Response:</strong> {response.message}</p>                      
                     <p className="text-sm text-gray-700"><strong>Date of Response:</strong> {new Date(response.timestamps).toLocaleDateString()}</p>
                   </div>
