@@ -9,7 +9,7 @@ import CostDashboard from "./CostDashboard";
 import { get_user_orders } from '../services/OrderService';
 import { fetch_RBAC_DASH } from '../services/rbac_service';
 import UserDetailsSkeleton from '../skeletons/UserDetails_skeleton';
-
+import { motion } from 'framer-motion';
 
 
 
@@ -167,7 +167,11 @@ export const Dashboard=()=>{
       {isLoading ? (<UserDetailsSkeleton/>):(
 
         
-        <div className=" min-h-screen bg-gray-300  mt-14">
+        <motion.div
+        initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+         className=" min-h-screen bg-gray-300  mt-14">
         
            
         
@@ -180,7 +184,7 @@ export const Dashboard=()=>{
             />
             {ADMIN_ROLES_DASHBOARD.includes(user?.role)&&<CostDashboard orders={orders}/>}
             
-            </div>
+            </motion.div>
           )
           }
           </>

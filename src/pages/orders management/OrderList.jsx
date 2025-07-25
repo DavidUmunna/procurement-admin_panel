@@ -47,15 +47,15 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [responseText, setResponseText] = useState("");
   const [responses, setResponses] = useState([]);
 
-  const getOverallStatus = (approvals, department) => {
+  const getOverallStatus = (approvals, Department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
     if (approvals.some(a => a.status === "Completed")) return "Completed";
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     
     let REQUIRED_APPROVALS;
-
-    switch (department) {
+    console.log("overall",Department)
+    switch (Department) {
       case "waste_management_dep":
         REQUIRED_APPROVALS = 5;
         break;
@@ -65,7 +65,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         default:
           REQUIRED_APPROVALS = 3;
         }
-        
+        console.log("overallstatus required approvals",REQUIRED_APPROVALS)
         
         if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
         if (approvalCount > 0 && !approvals.some(a=>a.status==="More Information")) return "Partially Approved";
@@ -77,9 +77,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   
   const getStatusExplanation = (approvals,Department) => {
     const status = getOverallStatus(approvals,Department);
+    console.log("the department",Department)
     const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
 
-
+    
     let REQUIRED_APPROVALS;
 
     switch(Department){
@@ -94,6 +95,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
         
     }
+    console.log("status explanation required approvals",REQUIRED_APPROVALS)
     
     switch(status) {
       case "Approved":
@@ -273,6 +275,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       },{withCredentials:true}
       )
     }
+    RefreshRequest()
     
   } catch (error) {
     
@@ -362,7 +365,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
   const getStatusBadge = (order) => {
     let bgColor, textColor, icon;
-    const status = order.status==="Completed"?order.status:order.status==="More Information"?order.status:getOverallStatus(order.Approvals);
+    const status = order.status==="Completed"?order.status:order.status==="More Information"?order.status:getOverallStatus(order.Approvals,order.staff?.Department);
     switch (status) {
       case "Approved":
         bgColor = "bg-green-100";
@@ -413,7 +416,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       
       <div className="p-3 bg-gray-50 rounded-lg">
           <p className="font-semibold text-gray-700">
-            Current Status: <span className="ml-2">{order.status==="Completed"?order.status:getOverallStatus(order.Approvals)}</span>
+            Current Status: <span className="ml-2">{order.status==="Completed"?order.status:getOverallStatus(order.Approvals,order.staff?.Department)}</span>
           </p>
           <p className="text-sm text-gray-500 mt-1">
             {getStatusExplanation(order.Approvals,order?.staff?.Department)}
@@ -434,7 +437,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
   {(
     <div className="text-gray-600 mt-2">
-      <p className="font-medium">Approvals:</p>
+      <p className="font-medium">Review Actions:</p>
 
       {order.Approvals?.length > 0 ? (
         <ul className="mt-1 space-y-2 max-h-40 overflow-y-auto list-none ">
@@ -453,6 +456,43 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       )}
     </div>
   )}
+
+  {/* Add the Pending Approvals section here */}
+ {order.PendingApprovals?.length > 0 && (
+  <div className="text-gray-600 mt-3">
+    <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-t-lg border border-blue-100">
+      <p className="font-medium text-blue-800 flex items-center">
+        <svg className="w-4 h-4 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+        </svg>
+        Pending Approvals ({order.PendingApprovals.length})
+      </p>
+      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+        Awaiting Action
+      </span>
+    </div>
+    <div className="max-h-32 overflow-y-auto border border-t-0 border-blue-100 rounded-b-lg">
+      <ul className="divide-y divide-blue-50">
+        {order.PendingApprovals.map((user, index) => (
+          <li key={index} className="px-3 py-2 hover:bg-blue-50 transition-colors duration-150">
+            <div className="flex items-center">
+              <div className="relative flex-shrink-0 mr-3">
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-yellow-400 ring-2 ring-white"></span>
+              </div>
+              <div>
+                <p className="font-medium text-gray-700">{user.name}</p>
+                <p className="text-xs text-gray-500">Pending since {new Date(order.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+)}
 
   <p className={`${order.urgency === "VeryUrgent" ? "text-red-600" : "text-gray-600"} mt-2`}>
     <span className="font-medium">Urgency:</span> {order.urgency}
@@ -529,7 +569,6 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       )}
     </motion.div>
   );
-
   const renderEmptyState = () => (
     <div className="p-8 text-center">
       <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
