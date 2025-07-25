@@ -54,7 +54,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     
     let REQUIRED_APPROVALS;
-    console.log("overall",Department)
+    
     switch (Department) {
       case "waste_management_dep":
         REQUIRED_APPROVALS = 5;
@@ -65,8 +65,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         default:
           REQUIRED_APPROVALS = 3;
         }
-        console.log("overallstatus required approvals",REQUIRED_APPROVALS)
-        
+
         if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
         if (approvalCount > 0 && !approvals.some(a=>a.status==="More Information")) return "Partially Approved";
         if (approvals.some(a=>a.status==="More Information")) return "More Information"
@@ -77,7 +76,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   
   const getStatusExplanation = (approvals,Department) => {
     const status = getOverallStatus(approvals,Department);
-    console.log("the department",Department)
+   
     const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
 
     
@@ -95,7 +94,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
         
     }
-    console.log("status explanation required approvals",REQUIRED_APPROVALS)
+
     
     switch(status) {
       case "Approved":
