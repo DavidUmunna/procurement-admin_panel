@@ -105,7 +105,7 @@ export default function Navbar() {
                             isActive(item.to)
                               ? 'bg-gray-900 text-white'
                               : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                            'rounded-md px-3 py-2 text-sm font-medium flex items-center gap-1'
+                            'rounded-md px-2 py-1 text-sm font-medium flex items-center gap-1'
                           )}
                         >
                           <item.icon className="h-5 w-5" />
@@ -149,7 +149,7 @@ export default function Navbar() {
                                   to={item.to}
                                   className={classNames(
                                     active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm text-gray-700'
+                                    'block px-1 py-1 text-sm text-gray-700'
                                   )}
                                 >
                                   {item.name}
@@ -238,7 +238,7 @@ export default function Navbar() {
         {filteredNav.map((item) => (
           <button
             key={item.name}
-            className="flex flex-col items-center justify-center p-2 rounded-full hover:bg-gray-700 transition-colors duration-200"
+            className="flex flex-col items-center justify-center p-1 rounded-full hover:bg-gray-700 transition-colors duration-200"
             onClick={() => navigate(item.to)}
           >
             <item.icon className="h-6 w-6 text-gray-300 hover:text-white" />

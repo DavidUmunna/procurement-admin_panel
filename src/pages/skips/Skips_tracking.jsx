@@ -286,6 +286,8 @@ const SkipsManagement = () => {
         Sentry.captureException(err.response?.data || err.message)
       }
       
+    }finally{
+      setLoading(false)
     }
   };
 

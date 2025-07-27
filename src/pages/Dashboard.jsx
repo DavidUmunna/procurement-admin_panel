@@ -171,10 +171,7 @@ export const Dashboard=()=>{
         initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-         className=" min-h-screen bg-gray-300  mt-14">
-        
-           
-        
+         className=" min-h-screen bg-gray-300  mt-16">     
              
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
