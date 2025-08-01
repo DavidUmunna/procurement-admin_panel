@@ -7,7 +7,7 @@ import { useUser } from '../../components/usercontext';
 import axios from "axios";
 import RecentActivity from './recentactivity';
 import { Plus, Minus,Trash2 } from "lucide-react"
-import PaginationControls from './Paginationcontrols';
+import PaginationControls from '../../components/Paginationcontrols';
 import Categoryform from './Category_form';
 import CategorySelect from "./Category_select"
 import LoadingModal from "./Loading_modal"

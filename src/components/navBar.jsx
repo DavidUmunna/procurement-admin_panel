@@ -5,17 +5,19 @@ import React, { useState,useRef,useEffect } from 'react';
 import { useUser } from "./usercontext";
 import user_img from "./assets/user.png";
 import { motion } from 'framer-motion';
-import { PanelLeft } from 'lucide-react';
+import { PanelLeft,CalendarClock } from 'lucide-react';
 import Sidebar from './Sidebar';
 import {fetch_RBAC} from "../services/rbac_service"
 import * as Sentry from "@sentry/react"
 
 const navigation = [
-  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon },
-  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon },
+  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon , hiddenFor:['guest']},
+  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon, hiddenFor:['guest'] },
   { name: 'Add Users', to: '/admin/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
   { name: 'Users', to: '/admin/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
-  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon }
+  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon },
+  {name:'Schedule Manager', to:'/admin/schedulemanager', icon: CalendarClock ,visibleTo:['accounts',"Financial_manager","internal_auditor"] },
+
 ];
 
 const userNavigation = [
@@ -42,7 +44,9 @@ export default function Navbar() {
 
   const filteredNav = navigation.filter(item => {
     if (item.visibleTo) return item.visibleTo.includes(user?.role);
+    if (item.hiddenFor?.includes(user?.role)) return null;
     return true;
+
   });
   
     useEffect(()=>{
@@ -105,7 +109,7 @@ export default function Navbar() {
                             isActive(item.to)
                               ? 'bg-gray-900 text-white'
                               : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                            'rounded-md px-3 py-2 text-sm font-medium flex items-center gap-1'
+                            'rounded-md px-2 py-1 text-sm font-medium flex items-center gap-1'
                           )}
                         >
                           <item.icon className="h-5 w-5" />
@@ -149,7 +153,7 @@ export default function Navbar() {
                                   to={item.to}
                                   className={classNames(
                                     active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm text-gray-700'
+                                    'block px-1 py-1 text-sm text-gray-700'
                                   )}
                                 >
                                   {item.name}
@@ -238,7 +242,7 @@ export default function Navbar() {
         {filteredNav.map((item) => (
           <button
             key={item.name}
-            className="flex flex-col items-center justify-center p-2 rounded-full hover:bg-gray-700 transition-colors duration-200"
+            className="flex flex-col items-center justify-center p-1 rounded-full hover:bg-gray-700 transition-colors duration-200"
             onClick={() => navigate(item.to)}
           >
             <item.icon className="h-6 w-6 text-gray-300 hover:text-white" />

@@ -10,7 +10,7 @@ import {
 } from "../../services/OrderService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText } from "lucide-react";
-import { FaFilePdf,FaInfoCircle, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment } from "react-icons/fa";
+import { FaFilePdf,FaInfoCircle, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment, FaMoneyBillWave } from "react-icons/fa";
 import { FiDownload,  } from "react-icons/fi";
 import { useUser } from "../../components/usercontext";
 import Searchbar from "./searchbar";
@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import ExportMemoModal from "./ExportMemoModal";
 import MoreInformationResponse from "./MoreInformationResponse";
 import SkipsToast from "../skips/skipsToast";
-
+import DownloadStatus from "../../components/Downloadstatus";
 
 
 
@@ -46,7 +46,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [validate,setvalidate]=useState(false)
   const [responseText, setResponseText] = useState("");
   const [responses, setResponses] = useState([]);
-
+  const [downloaded, setDownloaded] = useState(0);
+  const [total, setTotal] = useState(0);
   const getOverallStatus = (approvals, Department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
@@ -66,10 +67,13 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
           REQUIRED_APPROVALS = 3;
         }
 
-        if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
-        if (approvalCount > 0 && !approvals.some(a=>a.status==="More Information")) return "Partially Approved";
-        if (approvals.some(a=>a.status==="More Information")) return "More Information"
-    
+       const hasMoreInfo = approvals.some(a => a.status === "More Information");
+       const hasAwaitingFunding = approvals.some(a => a.status === "Awaiting Funding");
+       
+       if (approvalCount >= REQUIRED_APPROVALS) return "Approved";
+       if (approvalCount > 0 && !hasMoreInfo && !hasAwaitingFunding) return "Partially Approved";
+       if (hasMoreInfo && !hasAwaitingFunding) return "More Information";
+       if (hasAwaitingFunding) return "Awaiting Funding";
   
     return "Pending";
   };
@@ -105,7 +109,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         const rejectors = approvals?.filter(a => a.status === "Rejected").map(a => a.admin).join(", ");
         return `Rejected by ${rejectors}`;
       case "More Information":
-        return `More Information required `
+        return `More Information required`
+      case "Awaiting Funding":
+        return `Request Awaiting Funding`
       default:
         return "Awaiting review";
     }
@@ -199,12 +205,19 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     setTimeout(() => setToast({ show: false, type:null, message: '' }), 3000);
 
   };
- 
+  const updateOrderStatus_Specific = async (endpoint, data,orderId) => {
+    try{
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
+
+      await axios.put(`${API_URL}/orders/${orderId}/${endpoint}`, data, { withCredentials: true });
+    }catch(error){
+      Sentry.captureException(error)
+    }
+  };
   
   const handleStatusChange = async (orderId, newStatus) => {
   try {
     setIsLoading(true);
-    const API_URL = `${process.env.REACT_APP_API_URL}/api`
 
     
     
@@ -247,33 +260,40 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     await updateOrderStatus(orderId, newStatus);
     
     // Then send specific approve/reject requests
+    
     if (newStatus === "Approved") {
-      setvalidate(false)
-      await axios.put(`${API_URL}/orders/${orderId}/approve`, { 
-        adminName: user.name, 
-        comment: orderComment, // Use the specific order comment
-        orderId 
-      }, {withCredentials:true});
-    } else if (newStatus === "Rejected" ) {
-      await axios.put(`${API_URL}/orders/${orderId}/reject`, { 
+      setvalidate(false);
+      await updateOrderStatus_Specific("approve", {
         adminName: user.name,
-        comment: orderComment, // Use the specific order comment
-        orderId 
-      }, {withCredentials:true});
+        comment: orderComment,
+        orderId,
+      },orderId);
+    } else if (newStatus === "Rejected") {
+      await updateOrderStatus_Specific("reject", {
+        adminName: user.name,
+        comment: orderComment,
+        orderId,
+      },orderId);
     } else if (newStatus === "Completed") {
-      setvalidate(false)
-      await axios.put(`${API_URL}/orders/${orderId}/completed`,
-        orderId, {withCredentials:true} 
-      )
-    }else if (newStatus==="More Information"){
-      setvalidate(true)
-      await axios.put(`${API_URL}/orders/${orderId}/MoreInfo`,
-        { adminName: user.name,
-        comment: orderComment, // Use the specific order comment
-        orderId 
-      },{withCredentials:true}
-      )
+      setvalidate(false);
+      await updateOrderStatus_Specific("completed", { orderId },orderId);
+    } else if (newStatus === "More Information") {
+      setvalidate(true);
+      await updateOrderStatus_Specific("MoreInfo", {
+        adminName: user.name,
+        comment: orderComment,
+        orderId,
+      },orderId);
+    } else if(newStatus==="Awaiting Funding") {
+      setvalidate(true);
+      await updateOrderStatus_Specific("funding",{
+        adminName:user.name,
+        comment:orderComment,
+        orderId
+      },orderId)
     }
+
+
     RefreshRequest()
     
   } catch (error) {
@@ -341,8 +361,15 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
    const handleFileDownload = async (fileId,filename, event) => {
     event.stopPropagation();
     try {
+      setError("");
+      setDownloaded(0);
+      setTotal(0);
       setIsLoading(true);
-      const fileData = await downloadFile(fileId,filename);
+      
+      const fileData = await downloadFile(fileId,filename, (e) => {
+      setDownloaded(e.loaded);
+      setTotal(e.total || 0);
+    });
       const url = window.URL.createObjectURL(new Blob([fileData]));
       const link = document.createElement("a");
       link.href = url;
@@ -391,6 +418,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         textColor = "text-amber-800";   
         icon = <FaInfoCircle className="mr-1" />;  
         break;
+      case "Awaiting Funding":
+        bgColor = "bg-purple-100";       
+        textColor = "text-purple-800";   
+        icon = <FaMoneyBillWave className="mr-1" />;  // Money/funding icon
+        break;
+      
         
       default:
         bgColor = "bg-gray-100";
@@ -690,10 +723,18 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                     className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
                                   >
                                     <div className="py-1">
-                                      {["Pending", "Approved", "Rejected", "Completed","More Information"]
+                                      {["Pending", "Approved", "Rejected", "Completed","More Information", "Awaiting Funding"]
                                         .filter(
                                           (statusOption) =>
-                                            statusOption !== "Completed" || user?.Department === "accounts_dep"
+
+                                            statusOption !== "Completed" || user?.Department === "accounts_dep" 
+                                            
+                                          
+                                        ).filter(
+                                            (statusOption) =>
+
+
+                                            statusOption !== "Awaiting Funding" || user?.Department==="accounts_dep"
                                         )
                                         .map((statusOption) => (
                                           <button
@@ -723,6 +764,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                               )}
                                               {statusOption === "Completed" && user?.Department === "accounts_dep" && (
                                                 <FaCheck className="text-blue-500" />
+                                              )}
+                                              {(statusOption === "Awaiting Funding" && user?.Department==="accounts_dep") && (
+                                                <FaMoneyBillWave className="text-amber-600" />
                                               )}
 
                                             </span>
@@ -847,6 +891,13 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
            requestId={selectedRequest?._id}
            requestTitle={selectedRequest?.Title}
           />
+          {isLoading && total > 0 && (
+            <DownloadStatus
+              downloadedBytes={downloaded}
+              totalBytes={total}
+              label={`Downloading file`}
+            />
+          )}
 
       </div>
     </div>

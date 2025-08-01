@@ -5,8 +5,8 @@ import { motion,AnimatePresence } from "framer-motion";
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
-  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","waste_management_manager","waste_management_supervisor","PVT_manager",
-    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","QHSE_coordinator","Contracts_manager","Engineering_manager","BD_manager"];
+  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","Waste Management Manager","Waste Management Supervisor","PVT_manager",
+    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","QHSE Coordinator","Contracts_manager","Engineering_manager","BD_manager", "Logistics Manager"];
   const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");

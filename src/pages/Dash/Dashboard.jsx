@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as Sentry from '@sentry/react';
-import UserDetails from "./UserDetails"
+import UserDetails from "../UserDetails"
 import React, { useState } from 'react';
-import { useUser } from "../components/usercontext";
+import { useUser } from "../../components/usercontext";
 import { useEffect } from "react";
 import axios from "axios"
 import CostDashboard from "./CostDashboard";
-import { get_user_orders } from '../services/OrderService';
-import { fetch_RBAC_DASH } from '../services/rbac_service';
-import UserDetailsSkeleton from '../skeletons/UserDetails_skeleton';
+import { get_user_orders } from '../../services/OrderService';
+import { fetch_RBAC_DASH } from '../../services/rbac_service';
+import UserDetailsSkeleton from '../../skeletons/UserDetails_skeleton';
 import { motion } from 'framer-motion';
 
 
@@ -23,16 +23,17 @@ export const Dashboard=()=>{
     const [rejectedOrders, setRejectedOrders] = useState([]);
     const [completedOrders, setcompletedOrders] = useState([]);
     const [MoreInformation,setMoreInformation]=useState([])
-    const [ADMIN_ROLES_DASHBOARD,set_ADMIN_ROLES_DASHBOARD]=useState([])
+    const [DepartmentalAccess,setDepartmentalAccess]=useState([])
+    const [GeneralAccess,setGeneralAccess]=useState([])
     const [isLoading, setIsLoading]=useState(false)
-    
+
 
     const rbac_=async()=>{
       try{
         const response=await fetch_RBAC_DASH()
         const data=response.data.data
 
-        set_ADMIN_ROLES_DASHBOARD(data.ADMIN_ROLES_DASHBOARD)
+       
         return data
       }catch(error){
         if (error.message === "Network Error" || error.code === "ERR_NETWORK"){
@@ -63,26 +64,25 @@ export const Dashboard=()=>{
                   if (GENERAL_ACCESS.includes(user?.role)){
                 
                     const API_URL = `${process.env.REACT_APP_API_URL}/api`
-                    const token=localStorage.getItem("sessionId")
-                    const userReq=await axios.get(`${API_URL}/orders/all`,{headers:{"x-session-id":token, 
-                      "ngrok-skip-browser-warning": "true"},
+                 
+                    const userReq=await axios.get(`${API_URL}/orders/DailyRequests`,{
                       withCredentials:true})
                      
                       response=userReq.data.data
                     }else if(DEPARTMENTAL_ACCESS.includes(user?.role)){
                       if (!user?.Department) return;
                       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-                      const token=localStorage.getItem("sessionId")
-                      const userReq=await axios.get(`${API_URL}/orders/department/all`,{params: {
+                      
+                      const userReq=await axios.get(`${API_URL}/orders/DailyRequests`,{params: {
                         Department: user.Department,
-                       
-                      },headers:{"x-session-id":token, 
-                      "ngrok-skip-browser-warning": "true"},
-                      withCredentials:true})
+                      },withCredentials:true})
                       
                       response=userReq.data.data
                     }else{
-                      const userReq= await get_user_orders(user?.userId)
+                      const API_URL = `${process.env.REACT_APP_API_URL}/api`
+                      const userReq= await axios.get(`${API_URL}/orders/StaffRequests`,{params:{
+                        userId:user.userId
+                      }})
                       response=userReq.orders
                     }
                     if (Array.isArray(response)){
@@ -133,7 +133,9 @@ export const Dashboard=()=>{
           setIsLoading(true)
           const rbacData=await rbac_()
           if (rbacData){
-            
+            const {GENERAL_ACCESS=[],DEPARTMENTAL_ACCESS=[]}=rbacData
+            setDepartmentalAccess(DEPARTMENTAL_ACCESS)
+            setGeneralAccess(GENERAL_ACCESS)
             fetchorder(rbacData);
           }
         }catch(error){
@@ -154,7 +156,7 @@ export const Dashboard=()=>{
       return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
-
+    console.log("Access",DepartmentalAccess,GeneralAccess)
     
 
     
@@ -171,18 +173,15 @@ export const Dashboard=()=>{
         initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-         className=" min-h-screen bg-gray-300  mt-14">
-        
-           
-        
+         className=" min-h-screen bg-gray-300  mt-16">     
              
             <h1 className="text-3xl font-bold text-gray-800">Welcome {user?.name.split(" ")[1]}</h1>
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
             <UserDetails user={user}   rejectedOrders={rejectedOrders||[]} request_amount={request_amount} 
             approvedOrders={approvedOrders||[]} pendingOrders={pendingOrders||[]} completedOrders={completedOrders||[]}
-            MoreInformation={MoreInformation}
+            MoreInformation={MoreInformation} DepartmentalAcess={DepartmentalAccess}  GeneralAccess={GeneralAccess}
             />
-            {ADMIN_ROLES_DASHBOARD.includes(user?.role)&&<CostDashboard orders={orders}/>}
+
             
             </motion.div>
           )

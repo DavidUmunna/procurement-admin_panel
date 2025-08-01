@@ -11,16 +11,34 @@ import store from "./js/store/store"
 import { UserProvider } from "./components/usercontext";
 import { ErrorBoundary } from 'react-error-boundary';
 import Fallback from "./components/errorboundary";
-
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      useErrorBoundary:true,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 15 * 60 * 1000, // 15 minutes
+      refetchOnWindowFocus: false,
+      retry: 2,
+    },
+  },
+});
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Sentry.ErrorBoundary fallback={<p>something went wrong</p>}>
+  <Sentry.ErrorBoundary fallback={<Fallback/>}
+  showDialog
+  onError={(error, componentStack, eventId) => {
+    console.error(error);
+  }}>
   <Provider store={store} >
 
       <BrowserRouter>
         <ErrorBoundary fallback={<Fallback/>}>
             <UserProvider>
-                <App />
+                <QueryClientProvider client={queryClient}>
+                  <App />
+                </QueryClientProvider>
             </UserProvider> 
         </ErrorBoundary>  
       </BrowserRouter>

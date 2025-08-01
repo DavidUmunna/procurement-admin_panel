@@ -1,7 +1,7 @@
     /* eslint-disable react-hooks/exhaustive-deps */
 import * as Sentry from '@sentry/react';
 import React,{useState,useEffect} from "react"
-import PaginationControls from "./Paginationcontrols";
+import PaginationControls from "../../components/Paginationcontrols";
 import axios from "axios";
 import { useUser } from "../../components/usercontext";
 

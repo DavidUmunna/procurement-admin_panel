@@ -2,7 +2,7 @@ import { Navigate, Route, Routes} from "react-router-dom";
 import CreateOrder from "./pages/CreateOrder";
 import "./index.css";
 import Users from "./pages/User_list";
-import { Dashboard } from "./pages/Dashboard";
+import { Dashboard } from "./pages/Dash/Dashboard";
 import AddSupplier from "./pages/Suppliers/add_suppliers";
 import SupplierList from "./pages/Suppliers/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
@@ -15,7 +15,9 @@ import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
 import Monitoring from "./pages/Monitoring"
 import AppLayout from "./components/AppLayout"
 import Addusers from "./pages/add_users"
-
+import ScheduleManager from "./pages/SchedulingComponents/ScheduleManager";
+import  DraftSchedules  from './pages/SchedulingComponents/ScheduleManager/DraftSchedules';
+import  ScheduleEditor  from './pages/SchedulingComponents/ScheduleEditor';
 const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
     return (
         
@@ -85,12 +87,36 @@ const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
                           )
                         }
                       />
-                       <Route
+                      <Route
                         path="addsupplier"
                         element={
                           isauthenticated ? (
                            
                               <AddSupplier />
+                            
+                          ) : (
+                            <Navigate to="/adminlogin" />
+                          )
+                        }
+                      />
+                      <Route
+                        path="schedules"
+                        element={
+                          isauthenticated ? (
+                           
+                              <DraftSchedules />
+                            
+                          ) : (
+                            <Navigate to="/adminlogin" />
+                          )
+                        }
+                      />
+                      <Route
+                        path="schedules/:id/edit"
+                        element={
+                          isauthenticated ? (
+                           
+                              <ScheduleEditor />
                             
                           ) : (
                             <Navigate to="/adminlogin" />
@@ -109,12 +135,24 @@ const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
                           )
                         }
                       />
-                       <Route
+                      <Route
                         path="supplierlist"
                         element={
                           isauthenticated ? (
                            
                               <SupplierList />
+                            
+                          ) : (
+                            <Navigate to="/adminlogin" />
+                          )
+                        }
+                      />
+                      <Route
+                        path="schedulemanager"
+                        element={
+                          isauthenticated ? (
+                           
+                              <ScheduleManager />
                             
                           ) : (
                             <Navigate to="/adminlogin" />
