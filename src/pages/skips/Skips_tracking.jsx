@@ -294,6 +294,7 @@ const SkipsManagement = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
   
       const res = await axios.put(`${API_URL}/skiptrack/${editingItem._id}`, formData, {
@@ -312,8 +313,11 @@ const SkipsManagement = () => {
       setShowForm(false);
       fetchData(); // Refresh data
     } catch (err) {
+      
         Sentry.captureMessage('Update Failed');
         Sentry.captureException(err.response?.data || err.message)
+    }finally{
+      setIsLoading(false)
     }
   };
 
