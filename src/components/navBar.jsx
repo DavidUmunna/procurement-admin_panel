@@ -11,12 +11,12 @@ import {fetch_RBAC} from "../services/rbac_service"
 import * as Sentry from "@sentry/react"
 
 const navigation = [
-  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon },
-  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon },
+  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon , hiddenFor:['guest']},
+  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon, hiddenFor:['guest'] },
   { name: 'Add Users', to: '/admin/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
   { name: 'Users', to: '/admin/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
   {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon },
-  {name:'Schedule Manager', to:'/admin/schedulemanager', icon: CalendarClock ,visibleTo:['global_admin','accounts',"Financial_manager"] },
+  {name:'Schedule Manager', to:'/admin/schedulemanager', icon: CalendarClock ,visibleTo:['accounts',"Financial_manager","internal_auditor"] },
 
 ];
 
@@ -44,7 +44,9 @@ export default function Navbar() {
 
   const filteredNav = navigation.filter(item => {
     if (item.visibleTo) return item.visibleTo.includes(user?.role);
+    if (item.hiddenFor?.includes(user?.role)) return null;
     return true;
+
   });
   
     useEffect(()=>{

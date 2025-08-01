@@ -71,12 +71,12 @@ const Requests = (approvedRequests || []).concat(RequestsAwaitingFunding || []);
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Schedule Name</label>
+        <label className="block text-sm font-medium text-gray-700"><strong>Schedule Name</strong></label>
         <input
           type="text"
           value={scheduleName}
           onChange={(e) => setScheduleName(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-md border-2 focus:border-blue-500 focus:ring-blue-500"
         />
       </div>
 

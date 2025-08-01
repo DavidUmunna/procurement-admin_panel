@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as Sentry from "@sentry/react"
+
 const DraftSchedules = ({ refreshKey, onEdit })=>{
   const queryClient = useQueryClient();
   const API = process.env.REACT_APP_API_URL;
@@ -53,6 +54,7 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
       onSuccess: () => {
         queryClient.invalidateQueries('draftSchedules');
         queryClient.invalidateQueries('submittedSchedules');
+        toast.success("Draft submitted Successfully")
       }
     }
   );

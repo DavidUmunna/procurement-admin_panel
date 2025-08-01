@@ -55,10 +55,10 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-900">
-                    {requestId.orderNumber} - {requestId.supplier}
+                    {requestId.orderNumber} - {requestId.Title}
                   </p>
                   <p className="text-sm text-gray-500">
-                    ${requestId?.totalAmount}
+                    ₦{requestId?.products.reduce((sum,val)=>(sum=sum+val.price),0)}
                   </p>
                 </div>
               </label>
