@@ -531,7 +531,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       </div>
       <div className="flex ">
 
-        {user.role==="accounts"&&(<button 
+        {(user.role==="accounts" || user.role==="Financial_manager")&&(<button 
           onClick={() => {
             setSelectedRequest(prev => prev === order ? null : order)
             setIsExportOpen(true)
