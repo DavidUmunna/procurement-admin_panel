@@ -5,10 +5,10 @@ import React, { useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiSearch, FiCalendar } from 'react-icons/fi';
 import { useUser } from '../../components/usercontext';
 import axios from 'axios';
-import PaginationControls from '../inventorymanagement/Paginationcontrols';
+import PaginationControls from '../../components/Paginationcontrols';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Excelexport from './excelexport';
+import ExcelExport from './excelexport';
 import SkipsToast from './skipsToast';
 
 
@@ -43,7 +43,7 @@ const SkipsManagement = () => {
     WasteSource:"",
     DispatchManifestNo:"",
     WasteTruckRegNo:'',
-    WasteDriverName:"",
+    WasteTruckDriverName:"",
     DemobilizationOfFilledSkips:null,
     DateFilled:null,
 
@@ -287,7 +287,7 @@ const SkipsManagement = () => {
       }
       
     }finally{
-      setLoading(false)
+      setIsLoading(false)
     }
   };
 
@@ -295,10 +295,10 @@ const SkipsManagement = () => {
     e.preventDefault();
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('sessionId');
+  
       const res = await axios.put(`${API_URL}/skiptrack/${editingItem._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` ,"ngrok-skip-browser-warning": "true"}
-      });
+        headers: {"ngrok-skip-browser-warning": "true"}
+      ,withCredentials:true});
       setToast({
         show:true,
         type:"success",
@@ -351,7 +351,7 @@ const SkipsManagement = () => {
     WasteSource:"",
     DispatchManifestNo:'',
     WasteTruckRegNo:'',
-    WasteDriverName:"",
+    WasteTruckDriverName:"",
     DemobilizationOfFilledSkips:null,
     DateFilled:null,
     });
@@ -374,7 +374,7 @@ const SkipsManagement = () => {
        WasteSource:item.WasteSource,
        DispatchManifestNo:item.DispatchManifestNo,
        WasteTruckRegNo:item.WasteTruckRegNo,
-       WasteDriverName:item.WasteDriverName||"",
+       WasteTruckDriverName:item.WasteTruckDriverName||"",
        DemobilizationOfFilledSkips:item.DemobilizationOfFilledSkips,
        DateFilled:item.DateFilled,
     });
@@ -614,7 +614,7 @@ const SkipsManagement = () => {
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Waste Truck Reg No</th>
           <th
-            onClick={() => requestSort('WasteDriverName')}
+            onClick={() => requestSort('WasteTruckDriverName')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Waste Driver Name</th>
           
@@ -678,10 +678,10 @@ const SkipsManagement = () => {
                   {item.DispatchManifestNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DispatchTruckRegNo}
+                  {item.WasteTruckRegNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DriverName}
+                  {item.WasteTruckDriverName}
                 </td>
                 
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -862,8 +862,8 @@ const SkipsManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">SkipsDriverName</label>
                   <input
                     type="text"
-                    name="SkipsDriverName"
-                    value={formData.SkipsDriverName}
+                    name="SkipsTruckDriver"
+                    value={formData.SkipsTruckDriver}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -906,8 +906,8 @@ const SkipsManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">WasteDriverName</label>
                   <input
                     type="text"
-                    name="WasteDriverName"
-                    value={formData.WasteDriverName}
+                    name="WasteTruckDriverName"
+                    value={formData.WasteTruckDriverName}
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -957,7 +957,7 @@ const SkipsManagement = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                    Saving...
+                      Saving...
                 </>):(<>
                 <FiSave className="mr-2" />
                   {editingItem ? 'Update Item' : 'Save Item'}
@@ -971,7 +971,7 @@ const SkipsManagement = () => {
           </div>
         </div>
       )}
-      {openmodal && (<Excelexport setopenmodal={setopenmodal} categories={categories} setLoading={setLoading} />)}
+      {openmodal && (<ExcelExport setopenmodal={setopenmodal} categories={categories} setIsLoading={setIsLoading} IsLoading={IsLoading} />)}
 
       {/* Error Display */}
       {Error && (

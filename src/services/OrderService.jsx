@@ -118,10 +118,13 @@ export const updateOrderStatus = async (orderId, status) => {
     console.error("Error updating order:", error);
   }
 };
-export const downloadFile = async (fileId,filename) => {
+export const downloadFile = async (fileId,filename,onProgress) => {
   try {
    
     const response_2 = await axios.get(`${API_URL}/fileupload/download/${fileId}/${filename}`,{responseType: "blob" ,
+      onDownloadProgress: (e) => {
+      if (onProgress) onProgress(e);
+    },
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {

@@ -5,7 +5,7 @@ import React, { useState,useRef,useEffect } from 'react';
 import { useUser } from "./usercontext";
 import user_img from "./assets/user.png";
 import { motion } from 'framer-motion';
-import { PanelLeft } from 'lucide-react';
+import { PanelLeft,CalendarClock } from 'lucide-react';
 import Sidebar from './Sidebar';
 import {fetch_RBAC} from "../services/rbac_service"
 import * as Sentry from "@sentry/react"
@@ -15,7 +15,9 @@ const navigation = [
   { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon },
   { name: 'Add Users', to: '/admin/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
   { name: 'Users', to: '/admin/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
-  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon }
+  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon },
+  {name:'Schedule Manager', to:'/admin/schedulemanager', icon: CalendarClock ,visibleTo:['global_admin','accounts',"Financial_manager"] },
+
 ];
 
 const userNavigation = [

@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import axios from "axios"
 import {FaEdit, FaTrash} from "react-icons/fa"
 import { useUser } from '../../../components/usercontext';
-import PaginationControls from '../Paginationcontrols';
+import PaginationControls from '../../../components/Paginationcontrols';
 import { FiPlus } from 'react-icons/fi';
 import PrintReport from './PrintReport';
 import CategoryForm from '../Category_form';

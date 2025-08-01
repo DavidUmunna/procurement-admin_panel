@@ -21,15 +21,13 @@ axios.interceptors.response.use(
   }
 );
 
-const csrf_token=getCookie("XSRF-TOKEN")
+
 export const fetch_RBAC=async()=>{
       try{
 
 
           const API_URL = `${process.env.REACT_APP_API_URL}/api`
-          const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_GENERAL:true},{headers: {
-              
-                
+          const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_GENERAL:true,PROTECTED_USERS:true},{headers: {
                 "ngrok-skip-browser-warning": "true",
               },
               withCredentials: true,

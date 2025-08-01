@@ -7,7 +7,7 @@ import Duplicates from './Duplicates';
 import { get_user_orders } from '../../services/OrderService';
 import CompletedOrdersList from './Completed';
 import axios from 'axios';
-import PaginationControls from "../inventorymanagement/Paginationcontrols";
+import PaginationControls from "../../components/Paginationcontrols";
 import { fetch_RBAC_ordermanagement } from '../../services/rbac_service';
 import { getCookie } from "../../components/Helpers";
 

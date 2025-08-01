@@ -6,7 +6,7 @@ import { useUser } from '../components/usercontext';
 import Assetsanalysis from "../components/Assetsanalysis";
 import AssetsConditionChart from './Asssetvisuals';
 import axios from 'axios';
-import PaginationControls from './inventorymanagement/Paginationcontrols';
+import PaginationControls from '../components/Paginationcontrols';
 
 
 const AssetManagement = ({setAuth}) => {

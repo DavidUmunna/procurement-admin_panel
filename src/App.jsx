@@ -13,6 +13,8 @@ import PrivateRoute from "./pages/PrivateRoute";
 import ProtectedLayout from "./ProtectedLayout";
 import ResetPassword from "./pages/ResetPassword";
 import CompanyDataForm from "./pages/landinpage/CompanyData";
+import { ToastContainer } from 'react-toastify';
+
 // Pagetransition animation
 
 const App = () => {
@@ -136,7 +138,7 @@ const App = () => {
                   element={<Logout setAuth={setisauthenticated} />}
                   />
             </Routes>
-         
+            <ToastContainer/>
         </div>
       
     
