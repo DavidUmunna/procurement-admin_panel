@@ -16,7 +16,7 @@ const navigation = [
   { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon, hiddenFor:['Visitor'] },
   { name: 'Add Users', to: '/admin/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
   { name: 'Users', to: '/admin/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
-  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon },
+  {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon, hiddenFor:['Visitor']},
   { name: "Skips Tracking", to: "/admin/skipstracking", icon: FiFileText,visibleTo:["Visitor"] },
   {name:'Schedule Manager', to:'/admin/schedulemanager', icon: CalendarClock ,visibleTo:['accounts',"Financial_manager","internal_auditor"] },
 
