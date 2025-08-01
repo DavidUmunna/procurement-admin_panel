@@ -9,13 +9,15 @@ import { PanelLeft,CalendarClock } from 'lucide-react';
 import Sidebar from './Sidebar';
 import {fetch_RBAC} from "../services/rbac_service"
 import * as Sentry from "@sentry/react"
+import {FiFileText} from "react-icons/fi"
 
 const navigation = [
-  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon , hiddenFor:['guest']},
-  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon, hiddenFor:['guest'] },
+  { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon , hiddenFor:['Visitor']},
+  { name: 'Create', to: '/admin/createorder', icon: PlusCircleIcon, hiddenFor:['Visitor'] },
   { name: 'Add Users', to: '/admin/addusers', icon: UserIcon, visibleTo: ['global_admin'] },
   { name: 'Users', to: '/admin/users', icon: UsersIcon, visibleTo: [ 'global_admin'] },
   {name:'Tasks', to:'/admin/usertasks', icon: ClipboardDocumentCheckIcon },
+  { name: "Skips Tracking", to: "/admin/skipstracking", icon: FiFileText,visibleTo:["Visitor"] },
   {name:'Schedule Manager', to:'/admin/schedulemanager', icon: CalendarClock ,visibleTo:['accounts',"Financial_manager","internal_auditor"] },
 
 ];
