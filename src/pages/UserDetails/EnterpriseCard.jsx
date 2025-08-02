@@ -22,7 +22,8 @@ export const EnterpriseCard = ({
       whileHover={hoverEffect ? { y: -4, boxShadow: `0 10px 25px -5px rgba(0,0,0,0.1)` } : {}}
       className={`bg-white rounded-xl ${shadowClasses[shadow]} ${
         border ? `border border-${colorPalette.neutral[200]}` : ''
-      } overflow-hidden ${className}`}
+      } overflow-x-auto max-w-full ${className}`}
+      style={{ whiteSpace: 'nowrap' }}
       {...props}
     >
       {children}

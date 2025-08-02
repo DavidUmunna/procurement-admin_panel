@@ -83,7 +83,8 @@ export const Dashboard=()=>{
                       const userReq= await axios.get(`${API_URL}/orders/StaffRequests`,{params:{
                         userId:user.userId
                       }})
-                      response=userReq.orders
+                      response=userReq.data.data
+                      console.log("response",response)
                     }
                     if (Array.isArray(response)){
                           
@@ -91,7 +92,6 @@ export const Dashboard=()=>{
                     setRequest(response)
                     setorders(response)
 
-                    
                     
                    
                     setApprovedOrders(response?.filter((order) => order.status === "Approved"));
@@ -125,7 +125,8 @@ export const Dashboard=()=>{
     
             }
           }
-          
+           
+      console.log(orders)
           
       const init=async()=>{
         try{
@@ -156,7 +157,7 @@ export const Dashboard=()=>{
       return Array.isArray(request) ? request.length : 0;
     }
     const request_amount=request_length(request)
-    console.log("Access",DepartmentalAccess,GeneralAccess)
+
     
 
     
@@ -179,7 +180,7 @@ export const Dashboard=()=>{
             <p className="text-gray-600 mt-2">Manage your Requests efficiently.</p>
             <UserDetails user={user}   rejectedOrders={rejectedOrders||[]} request_amount={request_amount} 
             approvedOrders={approvedOrders||[]} pendingOrders={pendingOrders||[]} completedOrders={completedOrders||[]}
-            MoreInformation={MoreInformation} DepartmentalAcess={DepartmentalAccess}  GeneralAccess={GeneralAccess}
+            MoreInformation={MoreInformation||[]} DepartmentalAcess={DepartmentalAccess}  GeneralAccess={GeneralAccess}
             />
 
             

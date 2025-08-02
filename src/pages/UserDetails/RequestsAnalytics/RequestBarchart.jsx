@@ -18,7 +18,7 @@ const RequestBarChart = ({DepartmentalAccess=[],GeneralAccess=[]}) => {
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         const params={}
         params.view=viewMode
-        console.log("department access",DepartmentalAccess)
+
         if (DepartmentalAccess?.includes(user.role)){
           params.Department=user.Department
         }else if (GeneralAccess?.includes(user.role)){
