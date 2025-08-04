@@ -1,5 +1,8 @@
 import { useQuery } from 'react-query';
+import { toast } from 'react-toastify';
 import {useState} from "react"
+import * as Sentry from "@sentry/react"
+import { FiTrash } from 'react-icons/fi';
 import axios from 'axios';
 import PaginationControls from '../../../components/Paginationcontrols';
 import ScheduleSearchBar from './ScheduleSearchBar';
@@ -36,6 +39,19 @@ const SubmittedSchedules = ({ refreshKey }) => {
       onSuccess: (data) => setFilteredSchedules(data.schedules)
     }
   );
+  const handleDelete=async(scheduleId)=>{
+    try{
+      const response=await axios.delete(`${API}/api/scheduling/disbursement-schedules/${scheduleId}`,{withCredentials:true})
+      console.log(response)
+      setFilteredSchedules((prevSchedules) =>
+      prevSchedules.filter((schedule) => schedule._id !== scheduleId)
+      );
+      toast.success("deleted successfully")
+    }catch(error){
+      Sentry.captureException(error)
+      toast.error(error.message)
+    }
+  }
   
   
   const handlePageChange = (newPage) => {
@@ -67,9 +83,17 @@ const SubmittedSchedules = ({ refreshKey }) => {
                 <h3 className="font-medium">
                   {schedule.name || 'Untitled Schedule'} - {new Date(schedule.createdAt).toLocaleDateString()}
                 </h3>
+                <div className='flex mx-3  align-middle'>
+
                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColors[schedule.status]}`}>
                   {schedule.status}
                 </span>
+                <button 
+                className='ml-2'
+                onClick={()=>handleDelete(schedule._id)}>
+                    <FiTrash/>
+                </button>
+                </div>
               </div>
               <div className="p-4 grid grid-cols-4 gap-4">
                 <div>

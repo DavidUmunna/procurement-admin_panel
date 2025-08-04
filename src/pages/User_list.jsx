@@ -4,6 +4,7 @@ import { get_users, deleteUser, updateUser } from "../services/userService";
 import { motion, AnimatePresence } from "framer-motion";
 
 import {Users} from "lucide-react"
+import { fetch_RBAC_ALL } from "../services/rbac_service";
 
 // Animation Variants
 const containerVariants = {
@@ -29,15 +30,13 @@ const departmentColors = {
 };
 
 // Role options
-const roleOptions = ["procurement_officer", "human_resources", "internal_auditor", "global_admin","admin",
-  "Financial_manager","Waste Management Manager","Waste Management Supervisor","lab_supervisor","Director","Environmental_lab_manager","PVT_manager","staff",
-  "Contracts_manager","Documentation_officer","Engineering_manager","QHSE Coordinator", "Logistics Manager"];
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("All");
   const [loading,setloading]=useState(false)
   const [editingUser, setEditingUser] = useState(null);
+  const [ALLROLES, set_ALLROLES]=useState([])
   const [editForm, setEditForm] = useState({
     name: "",
     Department: "",
@@ -47,9 +46,23 @@ export default function UserList() {
     email:""
   });
   const [showEditModal, setShowEditModal] = useState(false);
+  const fetch_all=async()=>{
+    try{
+      const response=await fetch_RBAC_ALL()
+
+      set_ALLROLES(response.data.data.ALL_ROLES)
+
+    }catch(error){
+      Sentry.captureException(error)
+      Sentry.captureMessage("there was an error while fetching roles")
+
+    }
+  }
+
 
   useEffect(() => {
     fetch_users();
+    fetch_all()
     
   }, []);
 
@@ -231,9 +244,10 @@ export default function UserList() {
                     className="w-full p-2 border border-gray-300 rounded-lg"
                     required
                   >
+                    {console.log("all roles",ALLROLES)}
                     <option value="">Select Role</option>
-                    {roleOptions.map(role => (
-                      <option key={role} value={role}>{role}</option>
+                    {ALLROLES?.map((user,index) => (
+                      <option key={index} value={user}>{user}</option>
                     ))}
                   </select>
                 </div>
