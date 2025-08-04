@@ -244,7 +244,7 @@ export default function UserList() {
                     className="w-full p-2 border border-gray-300 rounded-lg"
                     required
                   >
-                    {console.log("all roles",ALLROLES)}
+                    
                     <option value="">Select Role</option>
                     {ALLROLES?.map((user,index) => (
                       <option key={index} value={user}>{user}</option>

@@ -84,7 +84,7 @@ export const Dashboard=()=>{
                         userId:user.userId
                       }})
                       response=userReq.data.data
-                      console.log("response",response)
+                     
                     }
                     if (Array.isArray(response)){
                           
@@ -126,7 +126,7 @@ export const Dashboard=()=>{
             }
           }
            
-      console.log(orders)
+     
           
       const init=async()=>{
         try{

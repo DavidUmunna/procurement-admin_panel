@@ -2,20 +2,39 @@ import React, { useEffect, useState } from "react";
 import { createUser } from "../services/userService";
 import { Eye, EyeOff } from "react-feather";
 import { motion,AnimatePresence } from "framer-motion";
+import { fetch_RBAC_ALL } from "../services/rbac_service";
+import * as Sentry from "@sentry/react"
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
-  const roles = ["staff", "admin", "procurement_officer","human_resources","internal_auditor","global_admin","Waste Management Manager","Waste Management Supervisor","PVT_manager",
-    "lab_supervisor","Environmental_lab_manager","accounts","Director","Financial_manager","QHSE Coordinator","Contracts_manager","Engineering_manager","BD_manager", "Logistics Manager","Visitor"];
+  const [ALLROLES, set_ALLROLES]=useState([])
   const [Error,setError]=useState("")
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [Department,setDepartment]=useState("")
   const [password, setpassword] = useState("");
-  const [role, setrole] = useState(roles[0]);
+  const [role, setrole] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isVisible, setisVisible]=useState(false)
   const [loading, setloading]=useState(false)
+
+  const fetch_all=async()=>{
+      try{
+        const response=await fetch_RBAC_ALL()
+  
+        set_ALLROLES(response.data.data.ALL_ROLES)
+  
+      }catch(error){
+        Sentry.captureException(error)
+        Sentry.captureMessage("there was an error while fetching roles")
+  
+      }
+    }
+
+  useEffect(()=>{
+
+    fetch_all()
+  },[])
   useEffect(()=>{
     setisVisible(true)
     const timer=setTimeout(()=>{
@@ -36,7 +55,7 @@ const Add_user = () => {
         setemail("");
         setpassword("");
         setDepartment("")
-        setrole(roles[0]);
+        setrole("");
        
       }else{
         setError("user was not created")
@@ -159,7 +178,7 @@ const Add_user = () => {
                     onChange={(e) => setrole(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   >
-                    {roles.map((role) => (
+                    {ALLROLES.map((role) => (
                       <option key={role} value={role}>
                         {role}
                       </option>

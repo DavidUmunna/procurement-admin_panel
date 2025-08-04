@@ -65,7 +65,7 @@ const DepartmentManagement = (setAuth) => {
           axios.get(`${API_URL}/tasks`, {withCredentials:true }),
           axios.get(`${API_URL}/department/stats`, { withCredentials:true })
         ]);
-        console.log("users",usersRes)
+       
         setDepartments(deptRes.status === 'fulfilled' ? deptRes.value.data.data : []);
         setUsers(usersRes.status === 'fulfilled' ? usersRes.value.data.data : []);
         setTasks(tasksRes.status === 'fulfilled' ? tasksRes.value.data.data : []);
