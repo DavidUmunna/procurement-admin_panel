@@ -34,7 +34,7 @@ const SubmittedSchedules = ({ refreshKey }) => {
       pagination: res.data.Pagination
     })),
     {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 3* 60 * 1000,
       keepPreviousData: true,
       onSuccess: (data) => setFilteredSchedules(data.schedules)
     }
@@ -105,13 +105,27 @@ const SubmittedSchedules = ({ refreshKey }) => {
                   <p className="font-medium">{schedule.requests.length}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Request Titles</p>
+                  <p className="text-sm text-gray-500">Requests (To Be Posted)</p>
                   <ul className="font-medium list-disc list-inside">
-                    {schedule.requests.map((request, index) => (
-                      <li key={index}>{request.requestId.Title}</li>
-                    ))}
+                    {schedule.requests
+                      .filter(request => request.included === true)
+                      .map((request, index) => (
+                        <li key={index}>{request.requestId.Title}</li>
+                      ))}
                   </ul>
                 </div>
+                
+                <div>
+                  <p className="text-sm text-gray-500">Requests(Removed)</p>
+                  <ul className="font-medium list-disc list-inside">
+                    {schedule.requests
+                      .filter(request => request.included === false)
+                      .map((request, index) => (
+                        <li key={index}>{request.requestId.Title}</li>
+                      ))}
+                  </ul>
+                </div>
+
                 <div>
                   <p className="text-sm text-gray-500">MD Review Date</p>
                   <p className="font-medium">

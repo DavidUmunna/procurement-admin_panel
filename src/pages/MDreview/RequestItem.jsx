@@ -21,6 +21,7 @@ export const RequestItem = ({ request, isSelected, onToggle }) => {
           <p className="text-sm text-gray-500">
             <strong>Department: </strong> {request?.staff?.Department} • <strong>Requested By: </strong>{request.staff?.name} • {new Date(request.createdAt).toLocaleDateString()}
           </p>
+          
         </div>
         <div className="text-right">
           <p className="text-sm font-medium">

@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { toast } from 'react-toastify';
 
 export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
   const [formData, setFormData] = useState({
     name: initialData.name || '',
-    requests: initialData.requests || []
+    requests: initialData.requests || [],
+    AccountsComment:initialData.AccountsComment||""
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+    toast.success("Schedule Updated Successfully")
   };
 
   const toggleRequest = (requestId) => {
@@ -37,7 +40,18 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
           required
         />
       </div>
-
+<div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Information For MD
+        </label>
+        <input
+          type="text"
+          value={formData.AccountsComment}
+          onChange={(e) => setFormData({...formData, AccountsComment: e.target.value})}
+          className="w-full h-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
+      </div>
       <div className="border rounded-lg overflow-hidden mb-6">
         <div className="bg-gray-50 p-4 border-b">
           <h3 className="font-medium">Included Requests</h3>

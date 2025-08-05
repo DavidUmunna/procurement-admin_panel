@@ -36,14 +36,22 @@ export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
     // 2. Identify removed request IDs
     const removedRequests = schedule?.requests
       .filter(req => !selectedRequests.includes(req.requestId._id))
-      .map(req => req.requestId._id);
+      .map(req =>({
+        requestId:req.requestId._id,
+        included:false,
+
+
+      })
+
+
+      );
 
     // 3. Submit to API
     await reviewSchedule({
       status: 'Reviewed by MD',
-      requests: includedRequests, // Only the selected ones
+      requests: [...includedRequests,...removedRequests], // Only the selected ones
       mdComments: comments,
-      removedRequests,
+      
       reviewedByMDAt: new Date()
     });
 
@@ -85,6 +93,12 @@ export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
                 onToggleRequest={handleToggleRequest}
                 totalAmount={totalAmount}
               />
+              {schedule.AccountsComment && (
+                <div className="bg-blue-50 p-4 border-t">
+                  <p className="text-sm font-medium text-gray-700">Information From Accounts:</p>
+                  <p className="text-sm text-gray-600 mt-1">{schedule.AccountsComment}</p>
+                </div>
+              )}
             </>
           )}
         </div>
