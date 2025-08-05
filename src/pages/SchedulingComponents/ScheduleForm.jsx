@@ -44,7 +44,7 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Information For MD
         </label>
-        <input
+        <textarea
           type="text"
           value={formData.AccountsComment}
           onChange={(e) => setFormData({...formData, AccountsComment: e.target.value})}
