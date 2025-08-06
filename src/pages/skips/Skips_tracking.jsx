@@ -372,8 +372,8 @@ const SkipsManagement = () => {
        SkipsTruckDriver:item.SkipsTruckDriver,
        WasteStream: item.WasteStream,
        Quantity: {
-         value:item.Quantity.value,
-         unit:item.Quantity.unit
+         value:item.Quantity?.value||0,
+         unit:item.Quantity?.unit||""
        },
        WasteSource:item.WasteSource,
        DispatchManifestNo:item.DispatchManifestNo,
@@ -658,7 +658,7 @@ const SkipsManagement = () => {
                   </span>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.Quantity?.value}{item.Quantity?.unit}
+                  {item.Quantity?.value} {item.Quantity?.unit}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.DeliveryWaybillNo}
@@ -790,6 +790,7 @@ const SkipsManagement = () => {
                         type="number"
                         name="QuantityValue"
                         min="1"
+                        step="any"
                         value={formData?.Quantity?.value}
                         onChange={(e) =>
                           setFormData({

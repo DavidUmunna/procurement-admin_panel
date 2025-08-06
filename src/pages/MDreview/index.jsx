@@ -96,7 +96,7 @@ export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
               {schedule.AccountsComment && (
                 <div className="bg-blue-50 p-4 border-t">
                   <p className="text-sm font-medium text-gray-700">Information From Accounts:</p>
-                  <p className="text-sm text-gray-600 mt-1">{schedule.AccountsComment}</p>
+                  <p className="text-sm text-gray-600 mt-1 break-words">{schedule.AccountsComment}</p>
                 </div>
               )}
             </>

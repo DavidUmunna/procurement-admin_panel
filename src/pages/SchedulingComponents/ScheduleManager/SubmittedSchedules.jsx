@@ -136,7 +136,7 @@ const SubmittedSchedules = ({ refreshKey }) => {
               {schedule.mdComments && (
                 <div className="bg-blue-50 p-4 border-t">
                   <p className="text-sm font-medium text-gray-700">MD Comments:</p>
-                  <p className="text-sm text-gray-600 mt-1">{schedule.mdComments}</p>
+                  <p className="text-sm text-gray-600 mt-1 break-words ">{schedule.mdComments}</p>
                 </div>
               )}
             </div>
