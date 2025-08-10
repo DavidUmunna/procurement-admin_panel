@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import {useState} from "react"
 import * as Sentry from "@sentry/react"
-import { FiTrash } from 'react-icons/fi';
+import { FiTrash, FiUpload } from 'react-icons/fi';
 import axios from 'axios';
 import PaginationControls from '../../../components/Paginationcontrols';
 import ScheduleSearchBar from './ScheduleSearchBar';
@@ -18,7 +18,7 @@ const SubmittedSchedules = ({ refreshKey }) => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [filteredSchedules, setFilteredSchedules]=useState([])
-  
+  const [downloadProgress, setDownloadProgress] = useState(0);
   const { data, isLoading } = useQuery(
     ['submittedSchedules', refreshKey, page, limit],
     () => axios.get(`${API}/api/scheduling/disbursement-schedules`, {
@@ -42,7 +42,7 @@ const SubmittedSchedules = ({ refreshKey }) => {
   const handleDelete=async(scheduleId)=>{
     try{
       const response=await axios.delete(`${API}/api/scheduling/disbursement-schedules/${scheduleId}`,{withCredentials:true})
-      console.log(response)
+      
       setFilteredSchedules((prevSchedules) =>
       prevSchedules.filter((schedule) => schedule._id !== scheduleId)
       );
@@ -50,6 +50,48 @@ const SubmittedSchedules = ({ refreshKey }) => {
     }catch(error){
       Sentry.captureException(error)
       toast.error(error.message)
+    }
+  }
+  const handlexport=async(scheduleId)=>{
+    try{
+      const response=await axios.get(`${API}/api/scheduling/accounts/export-schedule/${scheduleId}`,{
+          
+        responseType: 'blob',
+        onDownloadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / (progressEvent.total || 100)
+            );
+            setDownloadProgress(percentCompleted);
+        },
+        withCredentials:true
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `schdule.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      // Show success notification
+      toast.success('Export completed successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+      });
+      
+
+
+    }catch(error){
+      Sentry.captureException(error)
+      toast.error(error.message)
+      if(error.response?.status===401||error.response?.status===403){        
+        window.location.href = '/adminlogin'; 
+      }
     }
   }
   
@@ -92,6 +134,12 @@ const SubmittedSchedules = ({ refreshKey }) => {
                 className='ml-2'
                 onClick={()=>handleDelete(schedule._id)}>
                     <FiTrash/>
+                </button>
+                <button
+                className='ml-3'
+                onClick={()=>handlexport(schedule._id)}
+                >
+                  <FiUpload />
                 </button>
                 </div>
               </div>
@@ -142,6 +190,18 @@ const SubmittedSchedules = ({ refreshKey }) => {
             </div>
           ))}
         </div>
+      )}
+      {/*Progress Bar*/}
+      {downloadProgress > 0 && downloadProgress < 100 && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                    className="bg-blue-600 h-2.5 rounded-full" 
+                    style={{ width: `${downloadProgress}%` }}
+                ></div>
+                <p className="text-xs text-center mt-1">
+                    Exporting: {downloadProgress}%
+                </p>
+            </div>
       )}
       
       {data?.pagination && filteredSchedules.length > 0 && (

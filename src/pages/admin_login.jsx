@@ -85,7 +85,7 @@ export default function Sign_in({ setAuth }) {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-              Sign in to account
+              Sign in to Your Account
           </h2>
         </div>
 
@@ -175,7 +175,7 @@ export default function Sign_in({ setAuth }) {
             <p className="text-center text-sm text-gray-500">
               Can't sign in?{" "}
               <span
-                onClick={() => setIsVisible(true)}
+                onClick={() => setIsVisible(!isVisible)}
                 className="font-bold text-blue-700 cursor-pointer hover:underline"
               >
                 Contact IT Team
