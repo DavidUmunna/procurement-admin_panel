@@ -71,9 +71,16 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
                   <p className="text-sm font-medium text-gray-900">
                     {requestId.orderNumber} - {requestId.Title}
                   </p>
-                  <p className="text-sm text-gray-500">
-                    ₦{requestId?.products.reduce((sum,val)=>(sum=sum+val.price),0)}
-                  </p>
+                  <div className='flex justify-between'>
+                    <div>
+                      <p><strong>Department:</strong>  {requestId.staff.Department}</p>
+                      <p><strong>Requested By:</strong> {requestId.staff.name}</p>
+                      <p><strong>Date</strong> {requestId.createdAt?.split('T')[0]}</p>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      ₦{requestId?.products.reduce((sum,val)=>(sum=sum+val.price),0)}
+                    </p>
+                  </div>
                 </div>
               </label>
             </li>

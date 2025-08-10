@@ -49,11 +49,3 @@
 
 ---
 
-## ✅ MVP Scope
-
-For initial release, prioritize the following:
-
-- `REQ-001` to `REQ-003` (Staff request lifecycle)
-- `SCH-001` to `SCH-003` (Schedule creation and submission)
-- `MD-001` to `MD-003` (MD review process)
-- `FD-001` (On-Hold management)
