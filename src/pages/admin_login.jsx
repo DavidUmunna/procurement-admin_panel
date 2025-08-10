@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import AdminImg from "../components/assets/admin.png"
+import AdminImg from "../components/assets/haldenlogo_1 copy.png"
 import { useUser } from "../components/usercontext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -82,7 +82,7 @@ export default function Sign_in({ setAuth }) {
             transition={{ duration: 0.5, ease: "easeOut" }}
             loading="eager"
             fetchpriority="high"
-            className="mx-auto h-10 w-auto"
+            className="mx-auto h-14 w-14 "
           />
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
               Sign in to Your Account

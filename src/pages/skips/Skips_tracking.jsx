@@ -272,7 +272,7 @@ const SkipsManagement = () => {
     } catch (err) {
       if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
-        localStorage.removeItem('sessionId');
+       
         
         window.location.href = '/adminlogin'; 
       } else {
