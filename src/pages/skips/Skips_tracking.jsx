@@ -836,7 +836,7 @@ const SkipsManagement = () => {
                   />
                 </div>
                  <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Monbilized</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Mobilized</label>
                   <DatePicker
                     selected={formData.DateMobilized}
                     onChange={(date) => handleDateChange("DateMobilized", date)}
