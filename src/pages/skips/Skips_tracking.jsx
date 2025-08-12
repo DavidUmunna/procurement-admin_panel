@@ -54,8 +54,8 @@ const SkipsManagement = () => {
   // Date range state
  
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().setDate(1)), // 1st of current month
-    endDate: new Date() // Today
+    startDate: null, 
+    endDate: null 
   });
   const [openmodal,setopenmodal]=useState(false)
   //const [closemodal,setclosemodal]=useState(false)
@@ -71,23 +71,26 @@ const SkipsManagement = () => {
 
   // Format date to YYYY-MM-DD
   const formatDate = (date) => {
-    if (!date) return '';
+    if (!date) return "";
     const d = new Date(date);
     return d.toISOString().split('T')[0];
   };
 
   // Fetch skips data with date range
-  const fetchData = async (page = data.pagination?.page, limit = data.pagination?.limit) => {
+  const fetchData = async (page = data.pagination?.page,
+    limit = data.pagination?.limit ,
+    startDate=formatDate(dateRange.startDate),
+    endDate=formatDate(dateRange.endDate)) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('sessionId');
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      
+   
       const params = {
         page,
         limit,
-        startDate: formatDate(dateRange.startDate),
-        endDate: formatDate(dateRange.endDate)
+        startDate: startDate,
+        endDate: endDate
       };
 
       const [skipsRes, statsRes, categoriesRes] = await Promise.all([
@@ -155,7 +158,7 @@ const SkipsManagement = () => {
       endDate: end 
     });
     if (start && end){
-      fetchData()
+      fetchData(undefined,undefined,start,end)
     }
   };
 
@@ -190,7 +193,10 @@ const SkipsManagement = () => {
       
       (item?.skip_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item?.DriverName && item?.DriverName.toLowerCase().includes(searchTerm.toLowerCase()))||
-      (item?.WasteSource.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item?.WasteSource.toLowerCase().includes(searchTerm.toLowerCase()))||
+      (item?.DispatchManifestNo?.includes(searchTerm))||
+      (item?.DeliveryWaybillNo?.toString().includes(searchTerm))
+
     )
     .filter(item => 
         selectedWasteStream === 'All' || item?.WasteStream === selectedWasteStream
@@ -431,6 +437,8 @@ const SkipsManagement = () => {
     });
   };
 
+
+
   
   
 
@@ -476,7 +484,9 @@ const SkipsManagement = () => {
               selectsRange={true}
               startDate={dateRange.startDate}
               endDate={dateRange.endDate}
-              onChange={handleDateRangeChange}
+               onChange={(update) => {
+                handleDateRangeChange(update);
+              }}
               isClearable={true}
               placeholderText="Date range"
               className="pl-4 pr-10 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
@@ -573,6 +583,7 @@ const SkipsManagement = () => {
       <thead className="bg-gray-50">
         <tr>
           {/* Define fixed widths for each column via w- classes */}
+          <th className="w-1/12 px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
           <th
             onClick={() => requestSort('skip_id')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
@@ -634,7 +645,6 @@ const SkipsManagement = () => {
             onClick={() => requestSort('lastUpdated')}
             className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
           >Last Updated</th>
-          <th className="w-1/12 px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
@@ -642,25 +652,35 @@ const SkipsManagement = () => {
           <tr>
             <td colSpan="12" className="px-4 py-4 text-center text-gray-500">No skip items found</td>
           </tr>
-        ) : (
-          filteredItems.map((item) => (
-            <React.Fragment key={item._id}>
-              <tr className="hover:bg-gray-50">
+        ) :
+
+          (
+            filteredItems.map((item) => (
+              <React.Fragment key={item._id}>
+            <tr className="hover:bg-gray-50">
+            <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+            <button onClick={() => setupEdit(item)} className="text-blue-600 hover:text-blue-900">
+                    <FiEdit2 />
+                  </button>
+                  <button onClick={() => deleteItem(item._id)} className="text-red-600 hover:text-red-900">
+                    <FiTrash2 />
+                  </button>
+                  </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     
                     <div className="ml-2 text-sm font-medium text-gray-900">{item.skip_id}</div>
                   </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {formatCategory(item.WasteStream)}
+                  {formatCategory(item.WasteStream)}
                   </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.Quantity?.value} {item.Quantity?.unit}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.DeliveryWaybillNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -673,42 +693,37 @@ const SkipsManagement = () => {
                   {item.SkipsTruckRegNo}
                 </td>
                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.SkipsTruckDriver}
-                </td>
+                 {item.SkipsTruckDriver}
+                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.WasteSource}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DispatchManifestNo}
+                {item.DispatchManifestNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.WasteTruckRegNo}
+                {item.WasteTruckRegNo}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.WasteTruckDriverName}
+                {item.WasteTruckDriverName}
                 </td>
                 
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DemobilizationOfFilledSkips?.split('T')[0]}
+                {item.DemobilizationOfFilledSkips?.split('T')[0]}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DateFilled?.split('T')[0]}
+                {item.DateFilled?.split('T')[0]}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {item.lastUpdated?.split('T')[0]}
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                  <button onClick={() => setupEdit(item)} className="text-blue-600 hover:text-blue-900">
-                    <FiEdit2 />
-                  </button>
-                  <button onClick={() => deleteItem(item._id)} className="text-red-600 hover:text-red-900">
-                    <FiTrash2 />
-                  </button>
-                </td>
-              </tr>
-            </React.Fragment>
-          ))
-        )}
+                
+                </tr>
+                </React.Fragment>
+              )
+            
+            )
+          )}
       </tbody>
     </table>
         </div>
