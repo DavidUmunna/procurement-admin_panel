@@ -23,7 +23,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       total: 0
     }
   });
-  const access_free_roles=["procurement_officer","admin","human_resources","global_admin"]
+ 
 
   const [categories, setCategories] = useState([]);
   const [formdata, setformdata] = useState({

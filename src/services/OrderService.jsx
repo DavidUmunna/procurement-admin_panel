@@ -28,14 +28,18 @@ export const getOrders = async (page , limit ) => {
 
     return [];
   }
-};export const get_user_orders = async ( userId ) => {
+};export const get_user_orders = async ( userId ,page,limit) => {
  
   try {
     const requests = [];
 
     if (userId) {
       const token=localStorage.getItem("sessionId")
-      requests.push(axios.get(`${API_URL}/${orders}/${userId}`,{headers:{"x-session-id":token},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
+      requests.push(axios.get(`${API_URL}/${orders}/${userId}`,{ params: {
+                
+                page,
+                limit,
+              },headers:{"x-session-id":token},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
       requests.push(axios.get(`${API_URL}/fileupload/${userId}`, { responseType: "blob" },{headers:{"x-session-id":token},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
     }
     

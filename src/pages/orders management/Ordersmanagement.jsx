@@ -125,8 +125,13 @@ const OrdersDashboard = ({setAuth}) => {
 
         }
         else {
-          const res = await get_user_orders(user?.userId);
-          response = res.orders||[];
+          const res = await get_user_orders(user?.userId,page,limit);
+          response = res.orders.data||[];
+          
+          setData({
+              orders:response,
+              pagination:res.orders.Pagination
+            })
         }
         
         if (Array.isArray(response)) {

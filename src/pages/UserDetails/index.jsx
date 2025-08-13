@@ -161,7 +161,7 @@ const UserDetails = ({
       <RequestBarChart DepartmentalAccess={DepartmentalAcess} GeneralAccess={GeneralAccess} />
       {/*<SchedulingButton/>*/}
       
-      {(user.role==='global_admin'&& PROTECTED_USERS.includes(String(user.userId)))&&(  
+      {(PROTECTED_USERS.includes(String(user.userId)))&&(  
         <ScheduleList />
       )
       }

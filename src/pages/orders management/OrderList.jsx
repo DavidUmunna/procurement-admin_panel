@@ -510,12 +510,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
             <div className="flex items-center">
               <div className="relative flex-shrink-0 mr-3">
                 <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user.Reviewer.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-yellow-400 ring-2 ring-white"></span>
               </div>
               <div>
-                <p className="font-medium text-gray-700">{user.name}</p>
+                <p className="font-medium text-gray-700">{user.Reviewer.name}</p>
                 <p className="text-xs text-gray-500">Pending since {new Date(order.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
