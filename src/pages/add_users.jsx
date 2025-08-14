@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "react-feather";
 import { motion,AnimatePresence } from "framer-motion";
 import { fetch_RBAC_ALL } from "../services/rbac_service";
 import * as Sentry from "@sentry/react"
+import {toast } from "react-toastify"
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
@@ -49,8 +50,8 @@ const Add_user = () => {
       setloading(true)
       const user_data = await createUser({ name, email, password,Department, role });
       //console.log("Submitting User data:", user_data);
-      if (user_data.success===true){
-
+      if (user_data.data.success===true){
+        toast.success(user_data.data.message)
         setname("");
         setemail("");
         setpassword("");
@@ -62,7 +63,10 @@ const Add_user = () => {
         
       }
     }catch(error){
-      console.error("user not created:",error)
+      if (error.response){
+
+        toast.error(error.response.data.message)
+      }
       if (error.response?.status===401 || error.response?.status===403){
         setError("Session Expired. please Refresh page")
 
@@ -178,6 +182,7 @@ const Add_user = () => {
                     onChange={(e) => setrole(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   >
+                    <option value="" disabled>Select a role...</option>
                     {ALLROLES.map((role) => (
                       <option key={role} value={role}>
                         {role}

@@ -261,7 +261,8 @@ const CreateOrder = () => {
                     <option value="Human resources">Human Resources</option>
                     <option value="IT">Information Technology</option>
                     <option value="Administration">Administration</option>
-                    <option value="QHSE">QHSE</option>
+                    <option value="QHSE_dep">QHSE</option>
+                    <option value="Procurement_department">Procurement Department</option>
                                
                   </select>
                 </div>
