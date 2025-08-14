@@ -20,8 +20,8 @@ import ExportMemoModal from "./ExportMemoModal";
 import MoreInformationResponse from "./MoreInformationResponse";
 import SkipsToast from "../skips/skipsToast";
 import DownloadStatus from "../../components/Downloadstatus";
-
-
+import OTPModal from "../../components/OTPModal";
+import { toast } from "react-toastify";
 
 
 
@@ -39,7 +39,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [ResponseByOrder, setResponseByOrder] = useState({});
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
   const [isVisible, setIsVisible]=useState(false)
-  const [toast, setToast] = useState({ show: false,type:null ,message: '' });
+  const [Toast, setToast] = useState({ show: false,type:null ,message: '' });
   const [ExportOpen, setIsExportOpen] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState(null)
   const [OpenResponseOrderId,setOpenResponseOrderId]=useState(null)
@@ -48,6 +48,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [responses, setResponses] = useState([]);
   const [downloaded, setDownloaded] = useState(0);
   const [total, setTotal] = useState(0);
+  const [StatusState,setStatusState]=useState("")
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
   const getOverallStatus = (approvals, Department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
@@ -211,11 +213,17 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
       await axios.put(`${API_URL}/orders/${orderId}/${endpoint}`, data, { withCredentials: true });
     }catch(error){
+      
       Sentry.captureException(error)
+      if(error.response?.status===403){
+      toast.error(error.response.data.message)
+
+
+    }
     }
   };
   
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleStatusChange = async (orderId, newStatus,otp="") => {
   try {
     setIsLoading(true);
 
@@ -264,12 +272,14 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     if (newStatus === "Approved") {
       setvalidate(false);
       await updateOrderStatus_Specific("approve", {
+        otp,
         adminName: user.name,
         comment: orderComment,
         orderId,
       },orderId);
     } else if (newStatus === "Rejected") {
       await updateOrderStatus_Specific("reject", {
+        otp,
         adminName: user.name,
         comment: orderComment,
         orderId,
@@ -317,11 +327,17 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
           : order
       )
     );
-     if (error.response?.status===401|| error.response?.status===403){
-          setError("Session expired. Please log in again.");
-          //localStorage.removeItem('sessionId');
+    if(error.response?.status===403){
+      toast.error(error.response.data.message)
+
+
+    }
+     if (error.response?.status===401){
           
-          window.location.href = '/adminlogin';}
+      setError("Session expired. Please log in again.");
+      //localStorage.removeItem('sessionId');
+      
+      window.location.href = '/adminlogin';}
   } finally {
     setIsLoading(false);
     setDropdownOpen(null);
@@ -345,7 +361,29 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       setIsLoading(false);
     }
   };
+   
 
+  const handleApproveClick = async (orderId,statusOption) => {
+    try{
+      const API_URL = `${process.env.REACT_APP_API_URL}/api`
+
+      const response=await axios.post(`${API_URL}/otp/${orderId}/send-otp`,{orderId},{withCredentials:true});
+
+      
+      //setOtpModalOpen(true);
+    }catch(error){
+        if (error.response?.status===401|| error.response?.status===403){
+          setError("Session expired. Please log in again.");
+          //localStorage.removeItem('sessionId');
+          
+          window.location.href = '/adminlogin';}
+          else{
+            Sentry.captureException(error)
+
+          }
+    }
+  };
+  
   const toggleOrderDetails = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
     if (expandedOrder===null){
@@ -386,6 +424,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       setIsLoading(false);
     }
   };
+ 
 
   
 
@@ -456,6 +495,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
+          <p className="text-gray-600"><span className="font-medium">Request Title:</span> {order.Title || "N/A"}</p>
           <p className="text-gray-600"><span className="font-medium">Request Number:</span> {order.orderNumber || "N/A"}</p>
           {order.supplier!=="Halden"&&(<p className="text-gray-600"><span className="font-medium">Supplier:</span> {order.supplier || "N/A"}</p>)}
           <p className="text-gray-600"><span className="font-medium">Requested By:</span> {order.staff?.name}</p>
@@ -678,8 +718,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3">
                             <h3 className="text-lg font-semibold text-gray-800 ">
-                              {(order.Title || "Untitled Order").length > 30
-                               ? (order.Title || "Untitled Order").slice(0, 30) + "..."
+                              {(order.Title || "Untitled Order").length > 40
+                               ? (order.Title || "Untitled Order").slice(0, 40) + "..."
                                : order.Title || "Untitled Order"}
                             </h3>
                             {getStatusBadge(order)}
@@ -737,7 +777,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                             statusOption !== "Awaiting Funding" || user?.Department==="accounts_dep"
                                         )
                                         .map((statusOption) => (
-                                          <button
+                                          <div
                                             key={statusOption}
                                             className={`flex items-center w-full px-4 py-2 text-sm ${
                                               order.status === statusOption
@@ -746,7 +786,16 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                             }`}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              handleStatusChange(order._id, statusOption);
+                                              if(statusOption==="Approved" || statusOption==="Rejected"){
+                                                setOtpModalOpen(!otpModalOpen)
+  
+                                                setStatusState(statusOption)
+                                                handleApproveClick(order._id,statusOption)
+                                                
+                                              }else{
+
+                                                handleStatusChange(order._id, statusOption);
+                                              }
                                             }}
                                           >
                                             <span className="mr-5">
@@ -771,7 +820,17 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
                                             </span>
                                             {statusOption}
-                                          </button>
+                                               {otpModalOpen&&(
+
+                                             <OTPModal
+                                             onClose={() => setOtpModalOpen(false)}
+                                             statusOption={StatusState}
+                                             orderId={order._id}
+                                             onSubmit={handleStatusChange}
+                                               />
+                                             )
+                                             }
+                                          </div>
                                         ))}
                                       {user.role==="global_admin"&&(<button
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
@@ -796,6 +855,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                               </AnimatePresence>
                             </div>
                           )}
+                           
 
                           {openCommentOrderId===order._id && (
                             <div key={order._id}
@@ -859,7 +919,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                     responses={responses}
                     setResponses={setResponses}
                     setToast={setToast}
-                    toast={toast}
+                    toast={Toast}
                     canApprove={user.canApprove}
                     setResponseByOrder={setResponseByOrder}
                     ResponseByOrder={ResponseByOrder}
@@ -880,8 +940,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
               {error}
             </div>
           )}
-          {toast.show && (
-           <SkipsToast toast={toast} 
+          {Toast.show && (
+           <SkipsToast toast={Toast} 
            setToast={setToast}/>
           )}
          
@@ -898,6 +958,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
               label={`Downloading file`}
             />
           )}
+         
 
       </div>
     </div>
