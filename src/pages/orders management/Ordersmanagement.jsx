@@ -10,6 +10,7 @@ import axios from 'axios';
 import PaginationControls from "../../components/Paginationcontrols";
 import { fetch_RBAC_ordermanagement } from '../../services/rbac_service';
 import { getCookie } from "../../components/Helpers";
+import { isProd } from "../../components/env";
 
 const OrdersDashboard = ({setAuth}) => {
   const {user}=useUser()
@@ -43,7 +44,7 @@ const OrdersDashboard = ({setAuth}) => {
 
           return data
       }catch(error){
-        Sentry.captureException(error)
+        if(isProd)Sentry.captureException(error)
       }finally{
         setIsLoading(false)
       }
@@ -149,7 +150,7 @@ const OrdersDashboard = ({setAuth}) => {
           window.location.href = '/adminlogin'; 
         }else{
           
-          Sentry.captureException(err);
+          if(isProd)Sentry.captureException(err);
           setError("Failed to load orders. Please try again later.");
         }
         

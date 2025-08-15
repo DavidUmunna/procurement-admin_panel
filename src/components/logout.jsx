@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "./usercontext";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { isProd } from "./env";
 import * as Sentry from "@sentry/react"
 export default function SignOut({ setAuth }) {
     const { user,setUser } = useUser();
@@ -36,7 +37,7 @@ export default function SignOut({ setAuth }) {
                         window.location.href = '/adminlogin'; 
                       }else{
                         
-                        Sentry.captureException(error);
+                       if (isProd) Sentry.captureException(error);
                        
                       }
                 

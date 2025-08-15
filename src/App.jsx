@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import * as Sentry from '@sentry/react'
+import { isProd } from "./components/env";
 import "./index.css";
 import Logout from "./components/logout";
 import Adminlogin from "./pages/admin_login";
@@ -64,7 +65,8 @@ const App = () => {
         setisauthenticated(response.data.authenticated);
       } catch (error) {
         setisauthenticated(false);
-        Sentry.captureException(error)
+
+        if (isProd) Sentry.captureException(error)
       }
     };
     

@@ -3,7 +3,29 @@ import { BrowserTracing } from "@sentry/tracing";
 
 Sentry.init({
   dsn: "https://70c4617b75c9227dfdfa5c8222db19d5@o4509425534042112.ingest.de.sentry.io/4509425539416144",
-  integrations: [new BrowserTracing()],
+  integrations: [new Sentry.BrowserTracing()],
   tracesSampleRate: 1.0,
-  environment: "production", // optional
+  environment: "production",
+
+  beforeSend(event, hint) {
+    const error = hint.originalException;
+
+    // Ignore specific error messages
+    if (error && error.message) {
+      const ignoredMessages = [
+        "Network Error",
+        "Request failed with status code 401"
+      ];
+      if (ignoredMessages.some(msg => error.message.includes(msg))) {
+        return null; // Drop from Sentry (not counted toward quota)
+      }
+    }
+    // Ignore errors from specific URLs
+    if (event.request && event.request.url && event.request.url.includes("/api/access")) {
+      return null;
+    }
+
+    return event; // All other errors will be sent
+  }
 });
+

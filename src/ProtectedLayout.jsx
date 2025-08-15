@@ -6,7 +6,7 @@ import { Dashboard } from "./pages/Dash/Dashboard";
 import AddSupplier from "./pages/Suppliers/add_suppliers";
 import SupplierList from "./pages/Suppliers/supplierList";
 import DepartmentAssignment from "./pages/Department_assignment";
-import AssetsManagement from "./pages/Assetmanagement";
+import AssetsManagement from "./pages/AssetManagement/Assetmanagement";
 import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import UserTasks from "./pages/Usertask";
 import InventoryManagement from "./pages/inventorymanagement/ParentComp";

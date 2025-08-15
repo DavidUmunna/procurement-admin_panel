@@ -5,6 +5,7 @@ import { motion,AnimatePresence } from "framer-motion";
 import { fetch_RBAC_ALL } from "../services/rbac_service";
 import * as Sentry from "@sentry/react"
 import {toast } from "react-toastify"
+import { isProd } from "../components/env";
 //import Navbar from "../components/navBar"
 
 const Add_user = () => {
@@ -26,8 +27,11 @@ const Add_user = () => {
         set_ALLROLES(response.data.data.ALL_ROLES)
   
       }catch(error){
-        Sentry.captureException(error)
-        Sentry.captureMessage("there was an error while fetching roles")
+        if(isProd){
+
+          Sentry.captureException(error)
+          Sentry.captureMessage("there was an error while fetching roles")
+        }
   
       }
     }
@@ -49,24 +53,24 @@ const Add_user = () => {
     try{
       setloading(true)
       const user_data = await createUser({ name, email, password,Department, role });
-      //console.log("Submitting User data:", user_data);
-      if (user_data.data.success===true){
-        toast.success(user_data.data.message)
+
+      
+      if (user_data){
+        
         setname("");
         setemail("");
         setpassword("");
         setDepartment("")
         setrole("");
+
        
       }else{
         setError("user was not created")
         
       }
     }catch(error){
-      if (error.response){
-
-        toast.error(error.response.data.message)
-      }
+      
+      
       if (error.response?.status===401 || error.response?.status===403){
         setError("Session Expired. please Refresh page")
 

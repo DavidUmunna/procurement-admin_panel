@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as Sentry from "@sentry/react"
 import axios from 'axios';
+import { isProd } from '../../../components/env';
 const CompanyDataForm = () => {
   const [formData, setFormData] = useState({
     CompanyName: '',
@@ -87,7 +88,7 @@ const CompanyDataForm = () => {
         setError({ show: true, message: `An Error occured with your Entry: ${err}` });
         setTimeout(() => setError({ show: false, message: '' }), 3000);
         console.error(err)
-        Sentry.captureException(err)
+        if (isProd)Sentry.captureException(err)
     }finally{
         setloading(false)
     }

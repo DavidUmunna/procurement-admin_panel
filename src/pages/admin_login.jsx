@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {Link} from "react-router-dom"
 //import { getCookie } from "../components/Helpers";
 import * as Sentry from "@sentry/react"
+import { isProd } from "../components/env";
 export default function Sign_in({ setAuth }) {
   const navigate = useNavigate();
   const { setUser } = useUser();
@@ -48,7 +49,7 @@ export default function Sign_in({ setAuth }) {
     } catch (error) {
       if (error.response) {
         setError(error.response.data.message || "Login failed.");
-        Sentry.captureException(error)
+         if (isProd) Sentry.captureException(error)
       } else if (error.request) {
         //console.log(error.request)
         setError("Server is unreachable. Please check your connection.");

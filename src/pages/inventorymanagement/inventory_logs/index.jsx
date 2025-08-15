@@ -12,6 +12,7 @@ import CategoryForm from '../Category_form';
 import CategorySelect from '../Category_select';
 import ExcelExport from './Excelexport';
 import { getCookie } from '../../../components/Helpers';
+import { isProd } from '../../../components/env';
 const InventoryLogs = () => {
   // Form state
   const [formData, setFormData] = useState({
@@ -88,7 +89,7 @@ const InventoryLogs = () => {
         
           window.location.href = '/adminlogin'; 
         } else {
-          Sentry.captureException( err);
+          if (isProd)Sentry.captureException( err);
         }
       } finally {
         setLoading(false);
@@ -122,8 +123,11 @@ const InventoryLogs = () => {
         //const updatedItem=Inventorylogitem.find(item=>item._id===itemId)
 
     }catch(error){
+      if(isProd){
+
         Sentry.captureMessage("failed to create entry")
         Sentry.captureException(error)
+      }
     }finally{
         setLoading(false)
     }
@@ -150,8 +154,12 @@ const InventoryLogs = () => {
             fetchData()
 
         }catch(error){
+          
+          if(isProd){
+
             Sentry.captureMessage("failed to create entry")
             Sentry.captureException(error)
+          }
         }finally{
             setLoading(false)
         }
@@ -207,8 +215,11 @@ const InventoryLogs = () => {
         setShowForm(false);
         fetchData(); // Refresh data
       } catch (err) {
+        if (isProd){
+
           Sentry.captureMessage('Update Failed');
           Sentry.captureException(err.response?.data || err.message)
+        }
       }finally{
         setLoading(false)
       }

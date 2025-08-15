@@ -22,6 +22,7 @@ import SkipsToast from "../skips/skipsToast";
 import DownloadStatus from "../../components/Downloadstatus";
 import OTPModal from "../../components/OTPModal";
 import { toast } from "react-toastify";
+import { isProd } from "../../components/env";
 
 
 
@@ -214,7 +215,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       await axios.put(`${API_URL}/orders/${orderId}/${endpoint}`, data, { withCredentials: true });
     }catch(error){
       
-      Sentry.captureException(error)
+      if(isProd)Sentry.captureException(error)
       if(error.response?.status===403){
       toast.error(error.response.data.message)
 
@@ -307,9 +308,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     RefreshRequest()
     
   } catch (error) {
-    
-    Sentry.captureMessage("Error updating status")
-    Sentry.captureException(error)
+    if(isProd){
+
+      Sentry.captureMessage("Error updating status")
+      Sentry.captureException(error)
+    }
 
     setError("Failed to update order status");
     const orderComment = commentsByOrder[orderId] || '';
@@ -354,8 +357,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       //setOrders(orders.filter(order => order._id !== orderId))
 
     } catch (error) {
-      Sentry.captureMessage("Error updating status")
-      Sentry.captureException(error)
+      if(isProd){
+
+        Sentry.captureMessage("Error updating status")
+        Sentry.captureException(error)
+      }
       setError("Failed to delete order");
     } finally {
       setIsLoading(false);
@@ -378,7 +384,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
           
           window.location.href = '/adminlogin';}
           else{
-            Sentry.captureException(error)
+            if (isProd)Sentry.captureException(error)
 
           }
     }
@@ -417,8 +423,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      Sentry.captureMessage("Error updating status")
-      Sentry.captureException(error)
+      if(isProd){
+
+        Sentry.captureMessage("Error updating status")
+        Sentry.captureException(error)
+      }
       setError("Failed to download file");
     } finally {
       setIsLoading(false);
@@ -550,7 +559,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
             <div className="flex items-center">
               <div className="relative flex-shrink-0 mr-3">
                 <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium">
-                  {user.Reviewer.name.charAt(0).toUpperCase()}
+                  {user.Reviewer?.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-yellow-400 ring-2 ring-white"></span>
               </div>

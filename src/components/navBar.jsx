@@ -5,11 +5,13 @@ import React, { useState,useRef,useEffect } from 'react';
 import { useUser } from "./usercontext";
 import user_img from "./assets/user.png";
 import { motion } from 'framer-motion';
+import { isProd } from './env';
 import { PanelLeft,CalendarClock } from 'lucide-react';
 import Sidebar from './Sidebar';
 import {fetch_RBAC} from "../services/rbac_service"
 import * as Sentry from "@sentry/react"
 import {FiFileText} from "react-icons/fi"
+
 
 const navigation = [
   { name: 'Requests', to: '/admin/requestlist', icon: ClipboardDocumentListIcon , hiddenFor:['Visitor']},
@@ -65,7 +67,7 @@ export default function Navbar() {
         }
           }catch(error){
 
-            Sentry.captureException(error)
+            if (isProd) Sentry.captureException(error)
           }
         }
         rbac_()

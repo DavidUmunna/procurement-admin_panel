@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import {Users} from "lucide-react"
 import { fetch_RBAC_ALL } from "../services/rbac_service";
+import { isProd } from "../components/env";
 
 // Animation Variants
 const containerVariants = {
@@ -53,8 +54,11 @@ export default function UserList() {
       set_ALLROLES(response.data.data.ALL_ROLES)
 
     }catch(error){
-      Sentry.captureException(error)
-      Sentry.captureMessage("there was an error while fetching roles")
+      if(isProd){
+
+        Sentry.captureException(error)
+        Sentry.captureMessage("there was an error while fetching roles")
+      }
 
     }
   }
@@ -77,7 +81,8 @@ export default function UserList() {
         throw new Error("Invalid data format");
       }
     } catch (error) {
-      Sentry.captureException(error)
+
+      if (isProd)Sentry.captureException(error)
       
     }finally{
       setloading(false)
@@ -143,8 +148,11 @@ export default function UserList() {
     setShowEditModal(false);
     // Optional: Show success toast/alert
   } catch (error) {
-    Sentry.captureMessage("Error updating user")
-    Sentry.captureException(error)
+    if (isProd){
+
+      Sentry.captureMessage("Error updating user")
+      Sentry.captureException(error)
+    }
     
     // Optional: Show error toast/alert
   }

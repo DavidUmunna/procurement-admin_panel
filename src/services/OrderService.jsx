@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react"
 import axios from "axios";
 import { getCookie } from "../components/Helpers";
+import { isProd } from "../components/env";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 const orders="orders"
@@ -23,8 +24,11 @@ export const getOrders = async (page , limit ) => {
     //console.log("response",response)
     return response.data;
   } catch (error) {
-     Sentry.captureMessage("Error fetching orders")
+    if(isProd){
+
+      Sentry.captureMessage("Error fetching orders")
       Sentry.captureException(error)
+    }
 
     return [];
   }
@@ -51,8 +55,11 @@ export const getOrders = async (page , limit ) => {
 
     return { orders: orderResponse?.data, file: fileResponse };
   } catch (error) {
-    Sentry.captureMessage("Error fetching orders")
-    Sentry.captureException(error)
+    if(isProd){
+
+      Sentry.captureMessage("Error fetching orders")
+      Sentry.captureException(error)
+    }
 
     return {};
   }
@@ -99,9 +106,11 @@ export const createOrder = async ({ formData, orderData }) => {
       order: orderResponse,
     };
   } catch (error) {
-    console.error("Error creating order:", error);
-    Sentry.captureMessage("Error creating order");
-    Sentry.captureException(error);
+    if(isProd){
+
+      Sentry.captureMessage("Error creating order");
+      Sentry.captureException(error);
+    }
     return {
       file: null,
       order: null,
@@ -132,7 +141,7 @@ export const downloadFile = async (fileId,filename,onProgress) => {
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {
-    Sentry.captureException(err)
+    if (isProd)Sentry.captureException(err)
     
   }
 };
@@ -143,8 +152,11 @@ export const deleteOrder = async (orderId) => {
     await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{"x-csrf-token":csrf_token, "ngrok-skip-browser-warning": "true"},
       withCredentials:true});
   } catch (error) {
-     Sentry.captureMessage("Error deleting  orders")
-          Sentry.captureException(error)
+    if(isProd){
+
+      Sentry.captureMessage("Error deleting  orders")
+      Sentry.captureException(error)
+    }
     
   }
 };

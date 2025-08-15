@@ -11,6 +11,7 @@ import PaginationControls from '../../components/Paginationcontrols';
 import Categoryform from './Category_form';
 import CategorySelect from "./Category_select"
 import LoadingModal from "./Loading_modal"
+import { isProd } from '../../components/env';
 const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
  
   const { user } = useUser();
@@ -160,7 +161,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       }, ...Activities]);
       
     } catch (err) {
-      Sentry.captureException(err);
+      if(isProd)Sentry.captureException(err);
       // Revert to original quantity in UI if update fails
       setEditingQuantities({
         ...editingQuantities,
@@ -204,7 +205,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       onInventoryChange()
       
     } catch (err) {
-      Sentry.captureException(err);
+      if(isProd)Sentry.captureException(err);
       // Revert to original quantity in UI if update fails
       setEditingQuantities(prev => ({
         ...prev,
@@ -248,7 +249,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
       onInventoryChange()
       
     } catch (err) {
-      Sentry.captureException(err)
+      if(isProd)Sentry.captureException(err)
       // Revert to original quantity in UI if update fails
       setEditingQuantities(prev => ({
         ...prev,
@@ -284,7 +285,7 @@ const InventoryManagement = ({ setAuth , onInventoryChange,  }) => {
 
 
     }catch(error){
-      Sentry.captureException(error)
+      if(isProd)Sentry.captureException(error)
      
       setEditingQuantities(prev => ({
         ...prev,

@@ -9,7 +9,7 @@ const Sidebar=forwardRef(({ isOpen, onClose },ref) =>{
   const {user}=useUser()
   const sidebar = [
     //{ name: "Inventory", to: "/#", icon: Boxes,visibleTo: ["procurement_officer","human_resources","internal_auditor","admin","global_admin"]  },
-    { name: "Assets Management", to: "/admin/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","human_resources","global_admin","Accounts", ] },
+    { name: "Assets Management", to: "/admin/assetsmanagement", icon: Briefcase,visibleTo: ["procurement_officer","human_resources","global_admin","Accounts","Financial_manager" ] },
     { name: "Add Vendor", to: "/admin/addsupplier", icon: UserPlus,visibleTo:["procurement_officer",'global_admin'] },
     { name: "Vendor", to: "/admin/supplierlist", icon: Truck,visibleTo:["procurement_officer",'global_admin',"internal_auditor"] },
     { name:"Inventory management" ,to:"/admin/inventorymanagement", icon:PlusSquare, visibleTo: ["procurement_officer","admin","human_resources","global_admin","Environmental_lab_manager","lab_supervisor","QHSE Coordinator"] },

@@ -1,7 +1,8 @@
 import * as Sentry from "@sentry/react"
 import axios from "axios";
 import { getCookie } from "../components/Helpers";
-
+import { toast } from "react-toastify";
+import { isProd } from "../components/env";
 
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api`
@@ -19,8 +20,11 @@ export const get_users=async ()=>{
         return response.data;
 
     }catch (error){
-      Sentry.captureMessage("Error fetching users")
-      Sentry.captureException(error)
+      if(isProd){
+
+        Sentry.captureMessage("Error fetching users")
+        Sentry.captureException(error)
+      }
         
         return [];
     }
@@ -35,7 +39,7 @@ export const sendResetLink=async(email)=>{
       
       return response
     }else{
-      Sentry.captureMessage("user does not exist")
+      if (isProd)Sentry.captureMessage("user does not exist")
       
       
     }
@@ -50,14 +54,23 @@ export const sendResetLink=async(email)=>{
 
 export const createUser = async (userData) => {
     try {
-      const token=localStorage.getItem("sessionId")
+      
      
       const response = await axios.post(`${API_URL}/${route}`,userData,{headers:{"x-csrf-token":csrf_token},withCredentials:true});
-     
+      toast.success(response.data.message)
+    
       return response.data;
     } catch (error) {
-       Sentry.captureMessage("Error Creating users")
-      Sentry.captureException(error)
+      
+       if (error.response){
+      
+          toast.error(error.response.data.message)
+        }
+      if(isProd){
+
+        Sentry.captureMessage("Error Creating users")
+        Sentry.captureException(error)
+      }
       
     }
   };
@@ -68,8 +81,11 @@ export const createUser = async (userData) => {
       const response = await axios.put(`${API_URL}/${route}/reset-password`, { token,newPassword });
       return response.data;
     } catch (error) {
-      Sentry.captureMessage("Error updating password users")
-      Sentry.captureException(error)
+      if(isProd){
+
+        Sentry.captureMessage("Error updating password users")
+        Sentry.captureException(error)
+      }
 
       throw error; // Rethrow error for proper handling in calling function
     }
@@ -83,8 +99,11 @@ export const updateUser= async (userId, payload) => {
      
       return response.data;
     } catch (error) {
-      Sentry.captureMessage("Error updatng user")
-      Sentry.captureException(error)
+      if(isProd){
+
+        Sentry.captureMessage("Error updatng user")
+        Sentry.captureException(error)
+      }
 
     }
   };
@@ -93,8 +112,11 @@ export const deleteUser = async (userId) => {
     try {
       await axios.delete(`${API_URL}/${route}/${userId}`,{headers:{"x-csrf-token":csrf_token},withCredentials:true});
     } catch (error) {
-       Sentry.captureMessage("Error Deleting user")
-       Sentry.captureException(error)
+      if(isProd){
+
+        Sentry.captureMessage("Error Deleting user")
+        Sentry.captureException(error)
+      }
       
     }
   };

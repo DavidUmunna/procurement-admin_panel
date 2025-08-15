@@ -6,6 +6,7 @@ import { CommentInput } from './CommentInput';
 import { ModalFooter } from './Footer';
 import * as Sentry from "@sentry/react"
 import axios from 'axios';
+import { isProd } from '../../components/env';
 export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
   const [comments, setComments] = useState('');
   const [selectedRequests, setSelectedRequests] = useState([]);
@@ -65,9 +66,11 @@ export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
             } else if (error.response?.status === 401 || error.response?.status === 403) {
               window.location.href = '/adminlogin'; 
             } else {
-              
-              Sentry.captureMessage("an error occurred while submitting review")
-              Sentry.captureException(error)
+              if(isProd){
+
+                Sentry.captureMessage("an error occurred while submitting review")
+                Sentry.captureException(error)
+              }
             }
   }
 };

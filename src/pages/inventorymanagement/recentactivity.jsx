@@ -4,6 +4,7 @@ import React,{useState,useEffect} from "react"
 import PaginationControls from "../../components/Paginationcontrols";
 import axios from "axios";
 import { useUser } from "../../components/usercontext";
+import { isProd } from '../../components/env';
 
 // RecentActivity Component
 const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
@@ -45,7 +46,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
          
           onRefreshComplete?.()
         } catch (error) {
-          Sentry.captureException(error);
+          if (isProd)Sentry.captureException(error);
         } finally {
           setIsLoading(false);
         }
@@ -67,7 +68,7 @@ const RecentActivity = ({ refreshFlag, onRefreshComplete }) => {
 
 
         }catch(error){
-          Sentry.captureException(error)
+          if (isProd)Sentry.captureException(error)
 
         }
       }

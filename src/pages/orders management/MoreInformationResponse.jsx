@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import {X} from "lucide-react"
 import { useUser } from "../../components/usercontext";
+import { isProd } from "../../components/env";
 const MoreInformationResponse = ({
   responseText,
   setResponseText,
@@ -48,7 +49,7 @@ const MoreInformationResponse = ({
       }
       
       setError("Failed to load admin names");
-      Sentry.captureException(error);
+      if (isProd)Sentry.captureException(error);
       console.error("Error fetching approval names:", error);
     } finally {
       setIsFetching(false);
@@ -71,7 +72,7 @@ const MoreInformationResponse = ({
         message: "Failed to fetch Responses",
         type: "error"
       });
-      Sentry.captureException(error);
+      if (isProd)Sentry.captureException(error);
     } finally {
       setIsFetching(false);
     }
@@ -147,7 +148,7 @@ const MoreInformationResponse = ({
         message: "Failed to submit response",
         type: "error"
       });
-      Sentry.captureException(error);
+      if(isProd)Sentry.captureException(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -176,7 +177,7 @@ const MoreInformationResponse = ({
         message: "Error in deletion",
         type: "error"
       });
-      Sentry.captureException(error);
+      if(isProd)Sentry.captureException(error);
     }
   };
 

@@ -19,7 +19,6 @@ const Searchbar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showmodal,setshowmodal]=useState(false)
   const [loading,setLoading]=useState(false)
-
   const export_departments=["accounts_dep","Administration","IT"]
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);

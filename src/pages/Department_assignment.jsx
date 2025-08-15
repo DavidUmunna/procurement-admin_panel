@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useUser } from '../components/usercontext';
 import { fetch_RBAC_department } from '../services/rbac_service';
 import * as Sentry from "@sentry/react"
+import { isProd } from '../components/env';
 
 const DepartmentManagement = (setAuth) => {
   // State
@@ -46,7 +47,8 @@ const DepartmentManagement = (setAuth) => {
       set_ADMIN_ROLES(data.ADMIN_ROLES_DEPARTMENT)
 
     }catch(error){
-      Sentry.captureException(error)
+      
+      if(isProd)Sentry.captureException(error)
 
     }
   }
@@ -269,7 +271,7 @@ const refreshDepartments = () => {
       setDepartments(prev => prev.filter(d => d._id !== modal.data._id));
       closeModal();
     } catch (err) {
-      Sentry.captureException(err)}
+      if(isProd)Sentry.captureException(err)}
   };
 
   // User Operations

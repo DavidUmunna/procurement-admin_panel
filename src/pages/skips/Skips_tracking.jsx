@@ -250,7 +250,7 @@ const SkipsManagement = () => {
     try {
       setIsLoading(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('sessionId');
+
       const res = await axios.post(`${API_URL}/skiptrack/create`, {
         ...formData,
         DateMobilized: formData.DateMobilized
@@ -331,7 +331,7 @@ const SkipsManagement = () => {
     try {
       setLoading(true)
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('sessionId');
+
       await axios.delete(`${API_URL}/skiptrack/${id}`, {
       withCredentials:true
       });

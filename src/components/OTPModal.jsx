@@ -18,7 +18,7 @@ export default function OTPModal({ onClose, onSubmit, statusOption,orderId}) {
     setLoading(true);
 
     try {
-      const response=await onSubmit(orderId,statusOption,otp);
+      await onSubmit(orderId,statusOption,otp);
      
       onClose();
     } catch (err) {

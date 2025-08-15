@@ -12,6 +12,7 @@ import { FiChevronUp, FiChevronDown } from 'react-icons/fi';
 import RequestBarChart from './RequestsAnalytics/RequestBarchart';
 import SchedulingButton from '../SchedulingComponents/SchedulingButton';
 import { ScheduleList } from '../SchedulingComponents/ScheduleList';
+import { isProd } from '../../components/env';
 const UserDetails = ({ 
   user, 
   request_amount, 
@@ -49,7 +50,7 @@ const UserDetails = ({
         } else if (error.response?.status === 401 || error.response?.status === 403) {
           window.location.href = '/adminlogin'; 
         } else {
-          Sentry.captureException(error);
+          if (isProd)Sentry.captureException(error);
         }
       }
     };

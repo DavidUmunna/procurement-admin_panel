@@ -2,12 +2,13 @@
 import * as Sentry from "@sentry/react"
 import React,{ useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiChevronDown, FiChevronUp,  FiSearch } from 'react-icons/fi';
-import { useUser } from '../components/usercontext';
-import Assetsanalysis from "../components/Assetsanalysis";
+import { useUser } from '../../components/usercontext';
+import Assetsanalysis from "./Assetsanalysis";
 import AssetsConditionChart from './Asssetvisuals';
 import axios from 'axios';
-import PaginationControls from '../components/Paginationcontrols';
-
+import PaginationControls from '../../components/Paginationcontrols';
+import { isProd } from "../../components/env";
+import AssetExportModal from "./AssetExport";
 
 const AssetManagement = ({setAuth}) => {
   const { user } = useUser();
@@ -41,7 +42,7 @@ const AssetManagement = ({setAuth}) => {
   const [sortConfig, setSortConfig] = useState({ key: 'lastUpdated', direction: 'desc' });
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
-
+  const [showmodal,setshowmodal]=useState(false)
   const [ADMIN_ROLES_ASSET_MANAGEMENT,set_ADMIN_ROLES_ASSET_MANAGEMENT]=useState([])
   const [Error,setError]=useState("")
 
@@ -89,8 +90,11 @@ const AssetManagement = ({setAuth}) => {
           setAuth(false);
           window.location.href = '/adminlogin'; 
         } else {
-          Sentry.captureMessage('Failed to fetch data:');
-          Sentry.captureException(err)
+          if(isProd){
+
+            Sentry.captureMessage('Failed to fetch data:');
+            Sentry.captureException(err)
+          }
         }
       } finally {
         setLoading(false);
@@ -111,7 +115,10 @@ const AssetManagement = ({setAuth}) => {
     
       set_ADMIN_ROLES_ASSET_MANAGEMENT(rbacRes.data.data.ADMIN_ROLES_ASSET_MANAGEMENT)
     }catch(error){
-      Sentry.captureException(error)
+      if (isProd){
+
+        Sentry.captureException(error)
+      }
 
     }finally{
       setLoading(false)
@@ -137,7 +144,9 @@ const AssetManagement = ({setAuth}) => {
   const filteredItems = AssetItems
     .filter(item => 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))||
+      (item.condition.toLowerCase().includes(searchTerm.toLowerCase()))||
+      (item.location.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(item => 
       selectedCategory === 'All' || item.category === selectedCategory
@@ -214,7 +223,7 @@ const AssetManagement = ({setAuth}) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem("sessionId");
       const res = await axios.put(`${API_URL}/assets/${editingItem._id}`, formData, {
-        headers: { "x-session-id":token ,"ngrok-skip-browser-warning": "true"}
+
       });
       
       setAssetItems(AssetItems.map(item => 
@@ -231,9 +240,9 @@ const AssetManagement = ({setAuth}) => {
   const deleteItem = async (id) => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
-      const token = localStorage.getItem('sessionId');
+
       await axios.delete(`${API_URL}/assets/${id}`, {
-        headers: { "x-session-id":token,"ngrok-skip-browser-warning": "true" }
+
       });
       setAssetItems(AssetItems.filter(item => item._id !== id));
     } catch (err) {
@@ -317,18 +326,26 @@ const AssetManagement = ({setAuth}) => {
               )}
             </select>
         </div>
-        
+        <div className="flex flex-wrap justify-between">
+
+        <button
+                 onClick={() => setshowmodal(!showmodal)}
+                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105 mr-2 m-1"
+                 >
+                   Excel Export 
+        </button>
         <button
           onClick={() => {
             setEditingItem(null);
             resetForm();
             setShowForm(true);
           }}
-          className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105"
-        >
+          className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105 m-1"
+          >
           <FiPlus className="mr-2" />
           Add Asset Item
         </button>
+        </div>
       </div>
 
       {/* Form Modal */}
@@ -510,10 +527,11 @@ const AssetManagement = ({setAuth}) => {
                 <thead className="bg-gray-50">
                   <tr>
                     {/* Table headers */}
-                    <th onClick={() => requestSort('name')}>Item Name</th>
+                    <th onClick={() => requestSort('name')}>Asset Name/Type</th>
                     <th onClick={() => requestSort('category')}>Category</th>
                     <th onClick={() => requestSort('quantity')}>Quantity</th>
                     <th onClick={() => requestSort('condition')}>Condition</th>
+                    <th onClick={() => requestSort('value')}>Value</th>
                     <th onClick={() => requestSort('lastUpdated')}>Last Updated</th>
                     <th>Actions</th>
                   </tr>
@@ -548,6 +566,11 @@ const AssetManagement = ({setAuth}) => {
                             {item.condition}
                           </span>
                         </td>
+                        <td className="px-6 py-4">
+                          <span className={`condition-badge ${item.condition}`}>
+                            {item.value}
+                          </span>
+                        </td>
                         <td className="px-6 py-4">{item.lastUpdated.split("T")[0]}</td>
                         <td className="px-6 py-4 text-right">
                           <button onClick={() => setupEdit(item)}>
@@ -567,6 +590,10 @@ const AssetManagement = ({setAuth}) => {
                          <div>
                            <h4 className="font-medium">SKU:</h4>
                            <p>{item.sku || 'Not specified'}</p>
+                         </div>
+                         <div>
+                           <h4 className="font-medium">Location:</h4>
+                           <p>{item?.location || 'Not specified'}</p>
                          </div>
                          <div>
                            <h4 className="font-medium">Description:</h4>
@@ -615,6 +642,12 @@ const AssetManagement = ({setAuth}) => {
           </div>
         </div>)}
         {Error}
+        {showmodal && (
+           <AssetExportModal 
+             onClose={() => setshowmodal(false)} 
+             setLoading={setLoading}
+           />
+         )}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useUser } from '../components/usercontext';
 import {  FiUsers } from 'react-icons/fi';
 import * as Sentry from "@sentry/react"
+import { isProd } from '../components/env';
 const UserTasks = () => {
   const { user } = useUser();
   const [tasks, setTasks] = useState([]);
@@ -20,8 +21,11 @@ const UserTasks = () => {
       });
       setTasks(res.data.data);
     } catch (err) {
-      Sentry.captureMessage('Failed to fetch tasks:')
-      Sentry.captureException(err)
+      if(isProd){
+
+        Sentry.captureMessage('Failed to fetch tasks:')
+        Sentry.captureException(err)
+      }
 
     } finally {
       setLoading(false);

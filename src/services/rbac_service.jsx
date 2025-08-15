@@ -1,6 +1,6 @@
 import axios from "axios"
 import * as Sentry from "@sentry/react"
-import { getCookie } from "../components/Helpers";
+import { isProd } from "../components/env";
 
 
 axios.interceptors.response.use(
@@ -40,7 +40,7 @@ export const fetch_RBAC_ALL=async()=>{
                                 window.location.href = '/adminlogin'; 
                               }else{
                                 
-                                Sentry.captureException(error);
+                                if (isProd)Sentry.captureException(error);
                                
                               }
        
@@ -70,7 +70,7 @@ export const fetch_RBAC=async()=>{
                                 window.location.href = '/adminlogin'; 
                               }else{
                                 
-                                Sentry.captureException(error);
+                                if(isProd)Sentry.captureException(error);
                                
                               }
        
@@ -102,7 +102,7 @@ export const fetch_RBAC_DASH=async()=>{
         window.location.href = '/adminlogin'; 
       }else{
         
-        Sentry.captureException(error);
+        if(isProd)Sentry.captureException(error);
        
       }
   }
@@ -132,7 +132,7 @@ export const fetch_RBAC_ordermanagement=async()=>{
       window.location.href = '/adminlogin'; 
     }else{
       
-      Sentry.captureException(error);
+      if(isProd)Sentry.captureException(error);
      
     }
   }
@@ -161,7 +161,7 @@ export const fetch_RBAC_department=async()=>{
       window.location.href = '/adminlogin'; 
     }else{
       
-      Sentry.captureException(error);
+      if (isProd)Sentry.captureException(error);
      
     }
   }

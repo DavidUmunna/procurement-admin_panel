@@ -10,6 +10,7 @@ import { get_user_orders } from '../../services/OrderService';
 import { fetch_RBAC_DASH } from '../../services/rbac_service';
 import UserDetailsSkeleton from '../../skeletons/UserDetails_skeleton';
 import { motion } from 'framer-motion';
+import { isProd } from '../../components/env';
 
 
 
@@ -47,7 +48,7 @@ export const Dashboard=()=>{
                 window.location.href = '/adminlogin'; 
               }else{
                 
-                Sentry.captureException(error);
+                if(isProd)Sentry.captureException(error);
                
               }
       }
