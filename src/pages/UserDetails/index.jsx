@@ -10,7 +10,6 @@ import { calculateStats } from "./userDetails.utils";
 import { BarChart2 ,FileText,Timer} from 'lucide-react';
 import { FiChevronUp, FiChevronDown } from 'react-icons/fi';
 import RequestBarChart from './RequestsAnalytics/RequestBarchart';
-import SchedulingButton from '../SchedulingComponents/SchedulingButton';
 import { ScheduleList } from '../SchedulingComponents/ScheduleList';
 import { isProd } from '../../components/env';
 const UserDetails = ({ 

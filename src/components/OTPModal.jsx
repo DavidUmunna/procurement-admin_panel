@@ -37,10 +37,10 @@ export default function OTPModal({ onClose, onSubmit, statusOption,orderId}) {
     className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6"
     onClick={(e) => e.stopPropagation()} // stops clicks inside from closing modal
   >
-    <h2 className="text-xl font-bold text-gray-800 mb-4">Enter OTP Code</h2>
+    <h2 className="text-xl font-bold text-gray-800 mb-4">Enter 6 digit Passcode</h2>
     <p className="text-gray-500 text-sm mb-4">
-      A one-time code has been sent to your registered email.  
-      Please enter it below to confirm approval.
+      A Passcode tht lasts for 5 minutes has been sent to your registered email.  
+      Please enter it below to confirm approval. You will be able to use it in for subsequent approvals
     </p>
     
     <form onSubmit={handleSubmit} className="space-y-4">

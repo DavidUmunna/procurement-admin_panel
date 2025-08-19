@@ -7,6 +7,7 @@ import { ModalFooter } from './Footer';
 import * as Sentry from "@sentry/react"
 import axios from 'axios';
 import { isProd } from '../../components/env';
+import DetailsDisplay from './DetailsDisplay';
 export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
   const [comments, setComments] = useState('');
   const [selectedRequests, setSelectedRequests] = useState([]);
@@ -79,10 +80,9 @@ export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
   const totalAmount = schedule?.totalAmount
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[70vh] flex flex-col m-10 mt-16 sm:m-10 lg:m-20 lg:mb-28 overflow-y-auto">
         <ScheduleHeader schedule={schedule} onClose={onClose} />
-        
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1  p-3">
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <p>Loading schedule details...</p>
@@ -96,6 +96,11 @@ export const MDReviewModal = ({ scheduleId, isOpen, onClose, onComplete }) => {
                 onToggleRequest={handleToggleRequest}
                 totalAmount={totalAmount}
               />
+              {schedule.paymentDetails&&(
+                <DetailsDisplay 
+                Schedule={schedule}
+                />
+              )}
               {schedule.AccountsComment && (
                 <div className="bg-blue-50 p-4 border-t">
                   <p className="text-sm font-medium text-gray-700">Information From Accounts:</p>

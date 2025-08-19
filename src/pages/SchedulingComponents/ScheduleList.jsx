@@ -31,15 +31,26 @@ export const ScheduleList = () => {
       {isLoading ? (
         <p>Loading schedules...</p>
       ) : (
-        <div className="space-y-4 overflow-y-auto max-h-56">
-          {schedules?.map(schedule => (
-            <ScheduleCard 
-              key={schedule._id}
-              schedule={schedule}
-              onReviewClick={() => handleOpenModal(schedule._id)}
-            />
-          ))}
-        </div>
+        <div
+        className="
+          space-y-4 
+          overflow-y-auto 
+          max-h-56 
+          sm:max-h-72 
+          md:max-h-96 
+          lg:max-h-[32rem] 
+          w-full
+        "
+      >
+        {schedules?.map(schedule => (
+          <ScheduleCard
+            key={schedule._id}
+            schedule={schedule}
+            onReviewClick={() => handleOpenModal(schedule._id)}
+          />
+        ))}
+      </div>
+
       )}
 
       <MDReviewModal

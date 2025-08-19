@@ -8,9 +8,11 @@ import {
   downloadFile,
   
 } from "../../services/OrderService";
+import SignatureModal from "../../components/SignatureModal";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText } from "lucide-react";
-import { FaFilePdf,FaInfoCircle, FaFile, FaTrash, FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment, FaMoneyBillWave } from "react-icons/fa";
+import { FaFilePdf,FaInfoCircle, FaFile, FaTrash, 
+  FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment,FaTimesCircle, FaMoneyBillWave, FaSignature } from "react-icons/fa";
 import { FiDownload,  } from "react-icons/fi";
 import { useUser } from "../../components/usercontext";
 import Searchbar from "./searchbar";
@@ -51,6 +53,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [total, setTotal] = useState(0);
   const [StatusState,setStatusState]=useState("")
   const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [isOpen,setIsOpen]=useState(false)
+  const [signature, setSignature] = useState(null);
   const getOverallStatus = (approvals, Department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
@@ -276,6 +280,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         otp,
         adminName: user.name,
         comment: orderComment,
+        SignatureData:signature,
         orderId,
       },orderId);
     } else if (newStatus === "Rejected") {
@@ -291,6 +296,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     } else if (newStatus === "More Information") {
       setvalidate(true);
       await updateOrderStatus_Specific("MoreInfo", {
+        otp,
         adminName: user.name,
         comment: orderComment,
         orderId,
@@ -465,6 +471,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         bgColor = "bg-amber-100";       
         textColor = "text-amber-800";   
         icon = <FaInfoCircle className="mr-1" />;  
+        break;
+      case "Remove Action":  
+        bgColor = "bg-gray-100";       
+        textColor = "text-gray-500";   
+        icon = <FaTimesCircle className="mr-1" />;  
         break;
       case "Awaiting Funding":
         bgColor = "bg-purple-100";       
@@ -795,16 +806,19 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                             }`}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              if(statusOption==="Approved" || statusOption==="Rejected"){
-                                                setOtpModalOpen(!otpModalOpen)
-  
-                                                setStatusState(statusOption)
-                                                handleApproveClick(order._id,statusOption)
-                                                
-                                              }else{
+                                              
 
-                                                handleStatusChange(order._id, statusOption);
-                                              }
+                                                /*if(user.role!=="human_resources"){
+                                                  setOtpModalOpen(!otpModalOpen)
+                                                  
+                                                  setStatusState(statusOption)
+                                                  handleApproveClick(order._id,statusOption)
+                                                  
+                                                }*/
+                                                 
+                                                  handleStatusChange(order._id, statusOption);
+                                                
+                                              
                                             }}
                                           >
                                             <span className="mr-5">
@@ -851,6 +865,13 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                         <FaTrash className="mr-2" />
                                         Delete
                                       </button>)}
+                                      <button 
+                                        onClick={() => setIsOpen(true)} 
+                                        className="flex items-center px-4 py-2 w-full text-sm text-blue-600 hover:bg-blue-50 "
+                                      >
+                                        <FaSignature className="mr-2"/>
+                                        <span>Add Signature</span>
+                                      </button>
                                        <button
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         onClick={() => setOpenCommentOrderId(prev => prev === order._id ? null : order._id)}
@@ -960,6 +981,11 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
            requestId={selectedRequest?._id}
            requestTitle={selectedRequest?.Title}
           />
+           <SignatureModal 
+           isOpen={isOpen} 
+           onClose={() => setIsOpen(false)} 
+           onSave={(sig) => setSignature(sig)} 
+         />
           {isLoading && total > 0 && (
             <DownloadStatus
               downloadedBytes={downloaded}

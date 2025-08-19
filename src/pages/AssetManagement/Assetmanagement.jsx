@@ -6,6 +6,7 @@ import { useUser } from '../../components/usercontext';
 import Assetsanalysis from "./Assetsanalysis";
 import AssetsConditionChart from './Asssetvisuals';
 import axios from 'axios';
+import {toast} from "react-toastify"
 import PaginationControls from '../../components/Paginationcontrols';
 import { isProd } from "../../components/env";
 import AssetExportModal from "./AssetExport";
@@ -223,7 +224,7 @@ const AssetManagement = ({setAuth}) => {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
       const token = localStorage.getItem("sessionId");
       const res = await axios.put(`${API_URL}/assets/${editingItem._id}`, formData, {
-
+       withCredentials:true
       });
       
       setAssetItems(AssetItems.map(item => 
@@ -245,8 +246,11 @@ const AssetManagement = ({setAuth}) => {
 
       });
       setAssetItems(AssetItems.filter(item => item._id !== id));
-    } catch (err) {
-      console.error('Delete failed:', err.response?.data || err.message);
+    } catch (error) {
+     if(error.response){
+      toast.error(error.response.data.message)
+      }
+      Sentry.captureException(error)
     }
   };
 

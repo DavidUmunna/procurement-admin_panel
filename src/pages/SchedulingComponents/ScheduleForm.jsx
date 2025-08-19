@@ -1,14 +1,44 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { toast } from 'react-toastify';
-
+import PaymentDetailsTable from './PaymentDetailsTable';
+import axios from 'axios';
 export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
+  const [filteredDetails,setFilteredDetails]=useState({
+    Beneficiary:'',
+    AccountNumber:0,
+    Bank:''
+  })
+
   const [formData, setFormData] = useState({
     name: initialData.name || '',
     requests: initialData.requests || [],
     AccountsComment:initialData.AccountsComment||""
   });
+  
 
+  const [PaymentItem,setPaymentItem]=useState([])
+  
+  const fetchData=async()=>{
+    try{
+      const API_URL=`${process.env.REACT_APP_API_URL}/api`
+      const response=await axios.get(`${API_URL}/paymentdetails/${initialData._id}`,{withCredentials:true})
+    
+      if (response){
+        toast.success(response.data.message)
+        setPaymentItem(response.data.data)
+      }
+
+    }catch(error){
+      
+      error.response? toast.error(error.response.data.message):
+      toast.error("there was an error while fetching data")
+    }
+  }
+
+  useEffect(()=>{
+     fetchData()
+  },[])
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
@@ -27,6 +57,16 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
   };
 
   return (
+    <div>
+
+        <PaymentDetailsTable
+      FormData={filteredDetails}
+      setFormData={setFilteredDetails}
+      initialData={initialData}
+      PaymentItem={PaymentItem}
+      setPaymentItem={setPaymentItem}
+       className="m-1"/>
+
     <form onSubmit={handleSubmit}>
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -40,16 +80,19 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
           required
         />
       </div>
-<div className="mb-6">
+      <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Information For MD
         </label>
         <textarea
           type="text"
           value={formData.AccountsComment}
-          onChange={(e) => setFormData({...formData, AccountsComment: e.target.value})}
+          onChange={(e) => {
+           
+           
+            setFormData({...formData, AccountsComment: e.target.value})}}
           className="w-full h-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          required
+          
         />
       </div>
       <div className="border rounded-lg overflow-hidden mb-6">
@@ -87,6 +130,8 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
           ))}
         </ul>
       </div>
+    
+   
 
       <div className="flex justify-end">
         <button
@@ -106,6 +151,7 @@ export const ScheduleForm = ({ initialData, onSubmit, isSubmitting }) => {
         </div>
 
       </div>
-    </form>
+     </form>
+    </div>
   );
 };

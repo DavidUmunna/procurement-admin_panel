@@ -1,11 +1,13 @@
 import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
-import {useState} from "react"
+import {useState,useEffect} from "react"
 import * as Sentry from "@sentry/react"
-import { FiTrash, FiUpload } from 'react-icons/fi';
+import { FiTrash, FiDownload } from 'react-icons/fi';
 import axios from 'axios';
 import PaginationControls from '../../../components/Paginationcontrols';
 import ScheduleSearchBar from './ScheduleSearchBar';
+import DetailsDisplay from '../../MDreview/DetailsDisplay';
+import { isProd } from '../../../components/env';
 const statusColors = {
   "Submitted to MD": "bg-yellow-100 text-yellow-800",
   "Reviewed by MD": "bg-blue-100 text-blue-800",
@@ -39,6 +41,11 @@ const SubmittedSchedules = ({ refreshKey }) => {
       onSuccess: (data) => setFilteredSchedules(data.schedules)
     }
   );
+  useEffect(() => {
+  if (data?.schedules) {
+    setFilteredSchedules(data.schedules);
+  }
+}, [data?.schedules]);
   const handleDelete=async(scheduleId)=>{
     try{
       const response=await axios.delete(`${API}/api/scheduling/disbursement-schedules/${scheduleId}`,{withCredentials:true})
@@ -87,8 +94,11 @@ const SubmittedSchedules = ({ refreshKey }) => {
 
 
     }catch(error){
-      Sentry.captureException(error)
-      toast.error(error.message)
+      if(isProd){
+
+        Sentry.captureException(error)
+        toast.error(error.message)
+      }
       if(error.response?.status===401||error.response?.status===403){        
         window.location.href = '/adminlogin'; 
       }
@@ -139,7 +149,7 @@ const SubmittedSchedules = ({ refreshKey }) => {
                 className='ml-3'
                 onClick={()=>handlexport(schedule._id)}
                 >
-                  <FiUpload />
+                  <FiDownload />
                 </button>
                 </div>
               </div>
@@ -186,6 +196,9 @@ const SubmittedSchedules = ({ refreshKey }) => {
                   <p className="text-sm font-medium text-gray-700">MD Comments:</p>
                   <p className="text-sm text-gray-600 mt-1 break-words ">{schedule.mdComments}</p>
                 </div>
+              )}
+              {schedule.paymentDetails &&(
+                <DetailsDisplay Schedule={schedule}/>
               )}
             </div>
           ))}

@@ -8,24 +8,30 @@ Sentry.init({
   environment: "production",
 
   beforeSend(event, hint) {
-    const error = hint.originalException;
+  const error = hint.originalException;
 
-    // Ignore specific error messages
-    if (error && error.message) {
-      const ignoredMessages = [
-        "Network Error",
-        "Request failed with status code 401"
-      ];
-      if (ignoredMessages.some(msg => error.message.includes(msg))) {
-        return null; // Drop from Sentry (not counted toward quota)
-      }
+  // Ignore specific error messages or error types
+  if (error) {
+    const ignoredMessages = [
+      "Network Error",
+      "Request failed with status code 401",
+      "Module not found",
+    ];
+    
+    if (
+      (error.message && ignoredMessages.some(msg => error.message.includes(msg))) ||
+      error.name === "ReferenceError" // <-- catch ReferenceErrors properly
+    ) {
+      return null; // Drop from Sentry
     }
-    // Ignore errors from specific URLs
-    if (event.request && event.request.url && event.request.url.includes("/api/access")) {
-      return null;
-    }
-
-    return event; // All other errors will be sent
   }
-});
+
+  // Ignore errors from specific URLs
+  if (event.request?.url?.includes("/api/access")) {
+    return null;
+  }
+
+  return event; // All other errors will be sent
+}
+})
 

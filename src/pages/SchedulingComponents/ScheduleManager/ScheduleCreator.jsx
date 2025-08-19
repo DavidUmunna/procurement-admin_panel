@@ -88,8 +88,8 @@ const Requests = (approvedRequests || []).concat(RequestsAwaitingFunding || []);
           <div className="p-4 text-center">Loading...</div>
         ) : (
           <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-            {Requests?.map(request => (
-              <li key={request._id} className="p-4 hover:bg-gray-50">
+            {Requests?.map((request,index) => (
+              <li key={`${request.orderNumber}-${index}`} className="p-4 hover:bg-gray-50">
                 <label className="flex items-center space-x-3">
                   <input
                     type="checkbox"
