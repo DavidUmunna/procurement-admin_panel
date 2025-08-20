@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/react"
 import axios from "axios";
-import { getCookie } from "../components/Helpers";
 import { toast } from "react-toastify";
 import { isProd } from "../components/env";
 
@@ -9,8 +8,6 @@ const API_URL = `${process.env.REACT_APP_API_URL}/api`
 
 const route="users"
 
-
-const csrf_token=getCookie("XSRF-TOKEN")
 
 
 export const get_users=async ()=>{
@@ -56,7 +53,7 @@ export const createUser = async (userData) => {
     try {
       
      
-      const response = await axios.post(`${API_URL}/${route}`,userData,{headers:{"x-csrf-token":csrf_token},withCredentials:true});
+      const response = await axios.post(`${API_URL}/${route}`,userData,{withCredentials:true});
       toast.success(response.data.message)
     
       return response.data;
@@ -95,7 +92,7 @@ export const createUser = async (userData) => {
 export const updateUser= async (userId, payload) => {
     try {
     
-      const response = await axios.put(`${API_URL}/${route}/${userId}/updateuser`,  payload,{headers:{"x-csrf-token":csrf_token},withCredentials:true} );
+      const response = await axios.put(`${API_URL}/${route}/${userId}/updateuser`,  payload,{withCredentials:true} );
      
       return response.data;
     } catch (error) {
@@ -110,7 +107,7 @@ export const updateUser= async (userId, payload) => {
 
 export const deleteUser = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/${route}/${userId}`,{headers:{"x-csrf-token":csrf_token},withCredentials:true});
+      await axios.delete(`${API_URL}/${route}/${userId}`,{withCredentials:true});
     } catch (error) {
       if(isProd){
 

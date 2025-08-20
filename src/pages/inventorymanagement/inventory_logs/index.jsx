@@ -11,7 +11,6 @@ import PrintReport from './PrintReport';
 import CategoryForm from '../Category_form';
 import CategorySelect from '../Category_select';
 import ExcelExport from './Excelexport';
-import { getCookie } from '../../../components/Helpers';
 import { isProd } from '../../../components/env';
 const InventoryLogs = () => {
   // Form state
@@ -104,7 +103,7 @@ const InventoryLogs = () => {
   }, []);
 
 
-  const csrf_token=getCookie("XSRF-TOKEN")
+
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -113,7 +112,7 @@ const InventoryLogs = () => {
         const API_URL = `${process.env.REACT_APP_API_URL}/api`;
         const response=await axios.post(`${API_URL}/inventorylogs/create`,
             {...formData},
-        {headers:{"x-csrf-token":csrf_token},withCredentials:true})
+        {withCredentials:true})
 
         setLogs([response.data.data,...logs])
         fetchData()
@@ -147,7 +146,7 @@ const InventoryLogs = () => {
        
             const API_URL = `${process.env.REACT_APP_API_URL}/api`;
             await axios.delete(`${API_URL}/inventorylogs/${itemId}`,{
-                    headers:{"x-csrf-token":csrf_token},withCredentials:true
+            withCredentials:true
             })
 
             setLogs(prevItem=>prevItem.filter(item=>item._id!==itemId))
@@ -200,7 +199,7 @@ const InventoryLogs = () => {
         setLoading(true)
         const API_URL = `${process.env.REACT_APP_API_URL}/api`
   
-        const res = await axios.put(`${API_URL}/inventorylogs/${editingItem._id}`, formData, {headers:{"x-csrf-token":csrf_token},
+        const res = await axios.put(`${API_URL}/inventorylogs/${editingItem._id}`, formData, {
           withCredentials:true
         });
         

@@ -20,15 +20,8 @@ const ScheduleCreator = ({ onSuccess }) => {
   );
 
 
-  const { data:RequestsAwaitingFunding,isLoading: isLoadingFunding  } = useQuery(
-    'RequestsAwaitingFunding',
-    () => axios.get(`${API}/api/scheduling/purchase-orders?status=Awaiting Funding`).then(res => res.data),
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 15 * 60 * 1000, // 15 minutes
-    }
-  );
-const Requests = (approvedRequests || []).concat(RequestsAwaitingFunding || []);
+
+const Requests = (approvedRequests || [])
 
   const createSchedule = useMutation(
     (scheduleData) => axios.post(`${API}/api/scheduling/disbursement-schedules`, scheduleData,{withCredentials:true}),
@@ -84,7 +77,7 @@ const Requests = (approvedRequests || []).concat(RequestsAwaitingFunding || []);
         <div className="bg-gray-50 p-4 border-b">
           <h3 className="font-medium">Approved Purchase Orders</h3>
         </div>
-        {(isLoadingApproved && isLoadingFunding) ? (
+        {(isLoadingApproved) ? (
           <div className="p-4 text-center">Loading...</div>
         ) : (
           <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto">

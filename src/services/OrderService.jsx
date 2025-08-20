@@ -1,12 +1,9 @@
 import * as Sentry from "@sentry/react"
 import axios from "axios";
-import { getCookie } from "../components/Helpers";
 import { isProd } from "../components/env";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api`; //  backend URL
 const orders="orders"
-
-const csrf_token=getCookie("XSRF-TOKEN")
 
 
 
@@ -78,7 +75,7 @@ export const createOrder = async ({ formData, orderData }) => {
         headers: {
           "Content-Type": "multipart/form-data",
           "ngrok-skip-browser-warning": "true",
-          "x-csrf-token":csrf_token,
+          
       },
       withCredentials:true}
     );
@@ -95,7 +92,7 @@ export const createOrder = async ({ formData, orderData }) => {
     //  STEP 3: Always send order
     const orderResponse = await axios.post(`${API_URL}/orders`, orderData, {
       headers: {
-        "x-csrf-token":csrf_token,
+       
         "ngrok-skip-browser-warning": "true",
       },
       withCredentials:true
@@ -123,8 +120,8 @@ export const createOrder = async ({ formData, orderData }) => {
 
 export const updateOrderStatus = async (orderId, status) => {
   try {
-    const token_csrf = getCookie('XSRF-TOKEN');
-    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status },{headers:{ "x-csrf-token": token_csrf,"ngrok-skip-browser-warning": "true"},
+    
+    const response = await axios.put(`${API_URL}/${orders}/${orderId}`, { status },{headers:{"ngrok-skip-browser-warning": "true"},
       withCredentials:true});
     return response.data;
   } catch (error) {
@@ -149,8 +146,8 @@ export const downloadFile = async (fileId,filename,onProgress) => {
 export const deleteOrder = async (orderId) => {
   try {
     //const token_csrf = getCookie('XSRF-TOKEN');
-    await axios.delete(`${API_URL}/${orders}/${orderId}`,{headers:{"x-csrf-token":csrf_token, "ngrok-skip-browser-warning": "true"},
-      withCredentials:true});
+    await axios.delete(`${API_URL}/${orders}/${orderId}`,
+      {withCredentials:true});
   } catch (error) {
     if(isProd){
 

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react"
-import React, {  useState,useEffect } from "react";
+import  {  useState,useEffect } from "react";
 
 import {
 
@@ -22,7 +22,7 @@ import ExportMemoModal from "./ExportMemoModal";
 import MoreInformationResponse from "./MoreInformationResponse";
 import SkipsToast from "../skips/skipsToast";
 import DownloadStatus from "../../components/Downloadstatus";
-import OTPModal from "../../components/OTPModal";
+import ReviewVerification from "../../components/ReviewVerification";
 import { toast } from "react-toastify";
 import { isProd } from "../../components/env";
 
@@ -37,7 +37,6 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  //const [error, setError] = useState(null);
   const [commentsByOrder, setCommentsByOrder] = useState({});
   const [ResponseByOrder, setResponseByOrder] = useState({});
   const [openCommentOrderId, setOpenCommentOrderId] = useState(null);
@@ -46,7 +45,6 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [ExportOpen, setIsExportOpen] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState(null)
   const [OpenResponseOrderId,setOpenResponseOrderId]=useState(null)
-  const [validate,setvalidate]=useState(false)
   const [responseText, setResponseText] = useState("");
   const [responses, setResponses] = useState([]);
   const [downloaded, setDownloaded] = useState(0);
@@ -228,8 +226,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     }
   };
   
-  const handleStatusChange = async (orderId, newStatus,otp="") => {
+  const handleStatusChange = async (orderId, newStatus) => {
   try {
+    console.log("newStatuses",newStatus)
     setIsLoading(true);
 
     
@@ -275,9 +274,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     // Then send specific approve/reject requests
     
     if (newStatus === "Approved") {
-      setvalidate(false);
+    
       await updateOrderStatus_Specific("approve", {
-        otp,
+
         adminName: user.name,
         comment: orderComment,
         SignatureData:signature,
@@ -285,24 +284,24 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       },orderId);
     } else if (newStatus === "Rejected") {
       await updateOrderStatus_Specific("reject", {
-        otp,
+        
         adminName: user.name,
         comment: orderComment,
         orderId,
       },orderId);
     } else if (newStatus === "Completed") {
-      setvalidate(false);
+    
       await updateOrderStatus_Specific("completed", { orderId },orderId);
     } else if (newStatus === "More Information") {
-      setvalidate(true);
+     
       await updateOrderStatus_Specific("MoreInfo", {
-        otp,
+        
         adminName: user.name,
         comment: orderComment,
         orderId,
       },orderId);
     } else if(newStatus==="Awaiting Funding") {
-      setvalidate(true);
+      
       await updateOrderStatus_Specific("funding",{
         adminName:user.name,
         comment:orderComment,
@@ -375,26 +374,6 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   };
    
 
-  const handleApproveClick = async (orderId,statusOption) => {
-    try{
-      const API_URL = `${process.env.REACT_APP_API_URL}/api`
-
-      const response=await axios.post(`${API_URL}/otp/${orderId}/send-otp`,{orderId},{withCredentials:true});
-
-      
-      //setOtpModalOpen(true);
-    }catch(error){
-        if (error.response?.status===401|| error.response?.status===403){
-          setError("Session expired. Please log in again.");
-          //localStorage.removeItem('sessionId');
-          
-          window.location.href = '/adminlogin';}
-          else{
-            if (isProd)Sentry.captureException(error)
-
-          }
-    }
-  };
   
   const toggleOrderDetails = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
@@ -537,6 +516,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
             <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-sm">
               <p><span className="font-semibold">Admin:</span> {a.admin}</p>
               <p><span className="font-semibold">Status:</span> {a.status}</p>
+              <p><span className="font-semibold">Time Approved:</span> {a.timestamp.split('T')[0]}</p>
               {a.comment && (
                 <p><span className="font-semibold">Comment:</span> {a.comment}</p>
               )}
@@ -808,15 +788,14 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                               e.stopPropagation();
                                               
 
-                                                /*if(user.role!=="human_resources"){
-                                                  setOtpModalOpen(!otpModalOpen)
-                                                  
+                                            if(statusOption==="Approved"){
+                                                  setOtpModalOpen(true)
                                                   setStatusState(statusOption)
-                                                  handleApproveClick(order._id,statusOption)
-                                                  
-                                                }*/
+                                            }else{
+
+                                              handleStatusChange(order._id, statusOption);
+                                            }
                                                  
-                                                  handleStatusChange(order._id, statusOption);
                                                 
                                               
                                             }}
@@ -843,11 +822,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
                                             </span>
                                             {statusOption}
-                                               {otpModalOpen&&(
-
-                                             <OTPModal
+                                            
+                                            {otpModalOpen&&(
+                                             <ReviewVerification
                                              onClose={() => setOtpModalOpen(false)}
                                              statusOption={StatusState}
+                                             order={order}
                                              orderId={order._id}
                                              onSubmit={handleStatusChange}
                                                />

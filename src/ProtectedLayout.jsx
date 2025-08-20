@@ -1,3 +1,4 @@
+import React from "react";
 import { Navigate, Route, Routes} from "react-router-dom";
 import CreateOrder from "./pages/CreateOrder";
 import "./index.css";
@@ -5,19 +6,21 @@ import Users from "./pages/User_list";
 import { Dashboard } from "./pages/Dash/Dashboard";
 import AddSupplier from "./pages/Suppliers/add_suppliers";
 import SupplierList from "./pages/Suppliers/supplierList";
-import DepartmentAssignment from "./pages/Department_assignment";
-import AssetsManagement from "./pages/AssetManagement/Assetmanagement";
-import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import UserTasks from "./pages/Usertask";
-import InventoryManagement from "./pages/inventorymanagement/ParentComp";
-import SkipsManagement from "./pages/skips/parent";
+import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
-import Monitoring from "./pages/Monitoring"
 import AppLayout from "./components/AppLayout"
-import Addusers from "./pages/add_users"
-import ScheduleManager from "./pages/SchedulingComponents/ScheduleManager";
-import  DraftSchedules  from './pages/SchedulingComponents/ScheduleManager/DraftSchedules';
-import  ScheduleEditor  from './pages/SchedulingComponents/ScheduleEditor';
+
+// lazy loaded components
+const  DepartmentAssignment= React.lazy(()=>import("./pages/Department_assignment")) 
+const  AssetsManagement=React.lazy(()=>import("./pages/AssetManagement/Assetmanagement"))
+const InventoryManagement =React.lazy(()=>import("./pages/inventorymanagement/ParentComp")) ;
+const SkipsManagement=React.lazy(()=>import("./pages/skips/parent"))
+const Monitoring =React.lazy(()=>import("./pages/Monitoring"))
+const Addusers=React.lazy(()=>import("./pages/add_users")) 
+const ScheduleManager =React.lazy(()=>import("./pages/SchedulingComponents/ScheduleManager"))
+const DraftSchedules =React.lazy(()=>import('./pages/SchedulingComponents/ScheduleManager/DraftSchedules')) ;
+const ScheduleEditor =React.lazy(()=>import('./pages/SchedulingComponents/ScheduleEditor'))
 const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
     return (
         

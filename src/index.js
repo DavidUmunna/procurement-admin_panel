@@ -12,7 +12,7 @@ import { UserProvider } from "./components/usercontext";
 import { ErrorBoundary } from 'react-error-boundary';
 import Fallback from "./components/errorboundary";
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

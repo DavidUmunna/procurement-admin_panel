@@ -91,7 +91,7 @@ const AssetExportModal = ({ onClose, setLoading }) => {
       setDownloadProgress(0);
 
       const API_URL = `${process.env.REACT_APP_API_URL}/api`;
-      const token = localStorage.getItem("sessionId");
+
 
       const response = await axios.post(
         `${API_URL}/assets/export`,
@@ -101,7 +101,6 @@ const AssetExportModal = ({ onClose, setLoading }) => {
           endDate: formData.endDate.toISOString(),
         },
         {
-          headers: { "x-session-id": token },
           responseType: "blob",
           onDownloadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
@@ -198,11 +197,7 @@ const AssetExportModal = ({ onClose, setLoading }) => {
     },
   };
 
-  const formatCategory = (category) => {
-    return category
-      .replace(/_/g, " ")
-      .replace(/(^|\s)\S/g, (l) => l.toUpperCase());
-  };
+ 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center min-h-screen z-50 p-4">

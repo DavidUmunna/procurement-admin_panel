@@ -15,7 +15,6 @@ const UserTasks = () => {
     try {
       const API_URL = `${process.env.REACT_APP_API_URL}/api`
 
-      const token = localStorage.getItem('sessionId');
       const res = await axios.get(`${API_URL}/tasks/${user.userId}`, {
          withCredentials:true
       });

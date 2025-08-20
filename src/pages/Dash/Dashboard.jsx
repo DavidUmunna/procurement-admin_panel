@@ -5,8 +5,6 @@ import React, { useState } from 'react';
 import { useUser } from "../../components/usercontext";
 import { useEffect } from "react";
 import axios from "axios"
-import CostDashboard from "./CostDashboard";
-import { get_user_orders } from '../../services/OrderService';
 import { fetch_RBAC_DASH } from '../../services/rbac_service';
 import UserDetailsSkeleton from '../../skeletons/UserDetails_skeleton';
 import { motion } from 'framer-motion';

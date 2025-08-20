@@ -9,7 +9,6 @@ import CompletedOrdersList from './Completed';
 import axios from 'axios';
 import PaginationControls from "../../components/Paginationcontrols";
 import { fetch_RBAC_ordermanagement } from '../../services/rbac_service';
-import { getCookie } from "../../components/Helpers";
 import { isProd } from "../../components/env";
 
 const OrdersDashboard = ({setAuth}) => {

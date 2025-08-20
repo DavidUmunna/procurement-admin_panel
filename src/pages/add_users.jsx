@@ -4,7 +4,6 @@ import { Eye, EyeOff } from "react-feather";
 import { motion,AnimatePresence } from "framer-motion";
 import { fetch_RBAC_ALL } from "../services/rbac_service";
 import * as Sentry from "@sentry/react"
-import {toast } from "react-toastify"
 import { isProd } from "../components/env";
 //import Navbar from "../components/navBar"
 
