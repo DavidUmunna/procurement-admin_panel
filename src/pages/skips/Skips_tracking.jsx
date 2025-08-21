@@ -64,8 +64,7 @@ const SkipsManagement = () => {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
   const [Error, setError] = useState("");
-  let isotherunit;
-  let isothercat;
+
   // Format date to YYYY-MM-DD
   const formatDate = (date) => {
     if (!date) return "";
@@ -165,9 +164,7 @@ const SkipsManagement = () => {
     const formatted = category
       .replace(/_/g, ' ') // Replace underscores with spaces
       .replace(/(^|\s)\S/g, l => l.toUpperCase()); // Capitalize first letters
-    if(category==="Others"){
-    isothercat=formData.WasteStream==="Others"
-    }
+ 
     // Special case for "PVT" to keep it uppercase
     return category === 'PVT' ? 'PVT' : formatted;
   };
@@ -216,9 +213,7 @@ const SkipsManagement = () => {
  
   // Handle the two nested quantity fields
   if (name === 'value' || name === 'unit') {
-    if (name==="other"){
-      return isotherunit=true
-    }
+   
     setFormData(prev => ({
       ...prev,
       Quantity: {
@@ -779,16 +774,8 @@ const SkipsManagement = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-                  {isothercat?(
-                    <input
-                    type="text"
-                    name="WasteStream"
-                    value={formData.WasteStream}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  ):(<select
+
+                  <select
                     name="WasteStream"
                     value={formData.WasteStream}
                     onChange={handleInputChange}
@@ -805,7 +792,7 @@ const SkipsManagement = () => {
                     ) : (
                       <option disabled>No categories available</option>
                     )}
-                  </select>)}
+                  </select>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -822,19 +809,7 @@ const SkipsManagement = () => {
                         
                         className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                       />
-                      {isotherunit?(
-                        <input
-                          type="text"
-                          name="QuantityUnit"
-                          value={formData.Quantity.unit}
-                          onChange={
-                            handleInputChange
-                          }
-                          required
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        
-                      ):(<select
+                      <select
                         name="QuantityUnit"
                         value={formData.Quantity.unit}
                         onChange={
@@ -850,7 +825,7 @@ const SkipsManagement = () => {
                         <option value="units">Units</option>
                         <option value="other">Other</option>
                         {/* Add more units as needed */}
-                      </select>)}
+                      </select>
                     </div>
                   </div>
 
