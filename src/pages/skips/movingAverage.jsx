@@ -214,7 +214,7 @@ const MovingAverageChart = () => {
       <div className="flex flex-col  justify-between items-start xl:items-center mb-4 lg:mb-6 gap-4">
         <h2 className="text-lg lg:text-xl xl:text-2xl font-bold text-gray-800">Skip Trends Analysis</h2>
         
-        <div className="flex flex-col  gap-3 w-full xl:w-auto">
+        <div className="flex  flex-wrap p-3  gap-3 w-full xl:w-auto">
           {/* Date range picker */}
           <div className="relative w-full lg:w-56 xl:w-64">
             <DatePicker

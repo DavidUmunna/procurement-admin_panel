@@ -387,8 +387,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     setDropdownOpen(dropdownOpen === orderId ? null : orderId);
   };
  
-   const handleFileDownload = async (fileId,filename, event) => {
-    event.stopPropagation();
+   const handleFileDownload = async (fileId,filename) => {
+ 
     try {
       setError("");
       setDownloaded(0);

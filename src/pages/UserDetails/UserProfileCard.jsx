@@ -1,8 +1,8 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+
 import { EnterpriseCard } from './EnterpriseCard';
-import { colorPalette, typography, spacing } from './enterpriseUI.constants';
-import { FiMail, FiCalendar, FiInfo } from 'react-icons/fi';
+import { colorPalette, typography} from './enterpriseUI.constants';
+import { FiMail, FiCalendar } from 'react-icons/fi';
 import { FaSitemap } from 'react-icons/fa';
 import { formatDate, getInitials } from './userDetails.utils';
 import userImg from "../../components/assets/user.png"

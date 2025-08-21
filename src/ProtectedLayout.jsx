@@ -9,6 +9,7 @@ import SupplierList from "./pages/Suppliers/supplierList";
 import UserTasks from "./pages/Usertask";
 import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
+import ScheduleEditor from './pages/SchedulingComponents/ScheduleEditor'
 import AppLayout from "./components/AppLayout"
 
 // lazy loaded components
@@ -20,7 +21,6 @@ const Monitoring =React.lazy(()=>import("./pages/Monitoring"))
 const Addusers=React.lazy(()=>import("./pages/add_users")) 
 const ScheduleManager =React.lazy(()=>import("./pages/SchedulingComponents/ScheduleManager"))
 const DraftSchedules =React.lazy(()=>import('./pages/SchedulingComponents/ScheduleManager/DraftSchedules')) ;
-const ScheduleEditor =React.lazy(()=>import('./pages/SchedulingComponents/ScheduleEditor'))
 const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
     return (
         
