@@ -239,7 +239,7 @@ const MovingAverageChart = () => {
             <option value={14}>14-Day Moving Avg</option>
             <option value={30}>30-Day Moving Avg</option>
           </select>
-          {console.log("date field",DateField)}
+      
           <select
           value={DateField}
           
