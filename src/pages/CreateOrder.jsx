@@ -133,8 +133,11 @@ const CreateOrder = () => {
   };
 
   const removeProduct = (index) => {
-    const updatedProducts = products.filter((_, i) => i !== index);
-    setProducts(updatedProducts);
+    if(products.length>1){
+
+      const updatedProducts = products.filter((_, i) => i !== index);
+      setProducts(updatedProducts);
+    }
   };
   if(showInfo){
     setTimeout(()=>setShowInfo(false),2500)
@@ -311,7 +314,7 @@ const CreateOrder = () => {
               required
             ></textarea>
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Item Entry</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Item Entry(At Least One Required)</h3>
             <AnimatePresence>
               {products.map((item, index) => (
                 <motion.div
@@ -326,7 +329,7 @@ const CreateOrder = () => {
                   <label>Item Name(Request Name)</label>
                   <input
                     type="text"
-                    placeholder="Product Name"
+                    placeholder="Requested Item"
                     value={item.name}
                     onChange={(e) => handleProductChange(index, "name", e.target.value)}
                     required
