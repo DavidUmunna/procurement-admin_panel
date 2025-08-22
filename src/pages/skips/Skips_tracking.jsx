@@ -2,7 +2,7 @@
 
 import * as Sentry from '@sentry/react';
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiSearch, FiCalendar } from 'react-icons/fi';
+import { FiPlus,FiSearch, FiCalendar } from 'react-icons/fi';
 import { useUser } from '../../components/usercontext';
 import axios from 'axios';
 import PaginationControls from '../../components/Paginationcontrols';
@@ -10,7 +10,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ExcelExport from './excelexport';
 import SkipsToast from './skipsToast';
-import { input } from '@testing-library/user-event/dist/cjs/event/input.js';
+import AddSkip from './AddSkip';
+import SkipsTable from './SkipsTable';
+import SkipSummaryCard from './SkipSummaryCard';
 
 
 const SkipsManagement = () => {
@@ -251,13 +253,16 @@ const SkipsManagement = () => {
       const res = await axios.post(`${API_URL}/skiptrack/create`, {
         ...formData,
         DateMobilized: formData.DateMobilized
-      ? formData.DateMobilized.toISOString()
+      ? formData.DateMobilized.toISOString().split("T")[0]
+      : null,
+        DateReceivedOnLocation: formData.DateReceivedOnLocation
+      ? formData.DateReceivedOnLocation.toISOString().split("T")[0]
       : null,
         DemobilizationOfFilledSkips: formData.DemobilizationOfFilledSkips
           ? formData.DemobilizationOfFilledSkips.toISOString()
           : null,
         DateFilled: formData.DateFilled
-      ? formData.DateFilled.toISOString()
+      ? formData.DateFilled.toISOString().split("T")[0]
       : null,
         addedBy: user.userId
       }, {
@@ -555,176 +560,18 @@ const SkipsManagement = () => {
 
       {/* Skip Summary Cards */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500">Total Items</h3>
-            <p className="text-2xl font-bold text-gray-800">{stats.totalItems || 0}</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500">Total Quantity(tonnes)</h3>
-            <p className="text-2xl font-bold text-gray-800">{stats.totalQuantity || 0}</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500">Categories</h3>
-            <p className="text-2xl font-bold text-gray-800">{stats.totalCategories || 0}</p>
-          </div>
-          
-          
-        </div>
+        <SkipSummaryCard
+        stats={stats}
+        />
       )}
 
-      {/* Skip Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-      <thead className="bg-gray-50">
-        <tr>
-          {/* Define fixed widths for each column via w- classes */}
-          <th className="w-1/12 px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
-          <th
-            onClick={() => requestSort('skip_id')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Skip ID</th>
-          <th
-            onClick={() => requestSort('WasteStream')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Category</th>
-          <th
-            onClick={() => requestSort('Quantity.value')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Quantity</th>
-          <th
-            onClick={() => requestSort('DeliveryWaybillNo')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Delivery Waybill No</th>
-          <th
-            onClick={() => requestSort('DateMobilized')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Date Mobilized</th>
-          <th
-            onClick={() => requestSort('DateReceivedOnLocation')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Date Received On Location</th>
-          <th
-            onClick={() => requestSort('SkipsTruckRegNo')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Skips Truck Reg No</th>
-          <th
-            onClick={() => requestSort('SkipsTruckDriver')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Skips Truck Driver Name</th>
-          <th
-            onClick={() => requestSort('WasteSource')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Waste Source</th>
-          <th
-            onClick={() => requestSort('DispatchManifestNo')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Dispatch Manifest No</th>
-          <th
-            onClick={() => requestSort('WasteTruckRegNo')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Waste Truck Reg No</th>
-          <th
-            onClick={() => requestSort('WasteTruckDriverName')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Waste Driver Name</th>
-          
-          <th
-            onClick={() => requestSort('DemobilizationOfFilledSkips')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Demobilization</th>
-          <th
-            onClick={() => requestSort('DateFilled')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Date Filled</th>
-          <th
-            onClick={() => requestSort('lastUpdated')}
-            className="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
-          >Last Updated</th>
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {filteredItems.length === 0 ? (
-          <tr>
-            <td colSpan="12" className="px-4 py-4 text-center text-gray-500">No skip items found</td>
-          </tr>
-        ) :
-
-          (
-            filteredItems.map((item) => (
-              <React.Fragment key={item._id}>
-            <tr className="hover:bg-gray-50">
-            <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-            <button onClick={() => setupEdit(item)} className="text-blue-600 hover:text-blue-900">
-                    <FiEdit2 />
-                  </button>
-                  <button onClick={() => deleteItem(item._id)} className="text-red-600 hover:text-red-900">
-                    <FiTrash2 />
-                  </button>
-                  </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    
-                    <div className="ml-2 text-sm font-medium text-gray-900">{item.skip_id}</div>
-                  </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                  {formatCategory(item.WasteStream)}
-                  </span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.Quantity?.value} {item.Quantity?.unit}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DeliveryWaybillNo}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DateMobilized?.split('T')[0]}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.DateReceivedOnLocation?.split('T')[0]}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.SkipsTruckRegNo}
-                </td>
-                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                 {item.SkipsTruckDriver}
-                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.WasteSource}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item.DispatchManifestNo}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item.WasteTruckRegNo}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item.WasteTruckDriverName}
-                </td>
-                
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item.DemobilizationOfFilledSkips?.split('T')[0]}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item.DateFilled?.split('T')[0]}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {item.lastUpdated?.split('T')[0]}
-                </td>
-                
-                </tr>
-                </React.Fragment>
-              )
-            
-            )
-          )}
-      </tbody>
-    </table>
-        </div>
-      </div>
+      <SkipsTable
+      requestSort={requestSort}
+      filteredItems={filteredItems}
+      formatCategory={formatCategory}
+      setupEdit={setupEdit}
+      deleteItem={deleteItem}
+      />
 
       {/* Pagination */}
       <div className="mt-4">
@@ -741,259 +588,20 @@ const SkipsManagement = () => {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
-                {editingItem ? 'Edit Skip Item' : 'Add New Skip Item'}
-              </h2>
-              <button
-                onClick={() => {
-                  setShowForm(false);
-                  setEditingItem(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <FiX size={24} />
-              </button>
-            </div>
-            
-            <form onSubmit={editingItem ? handleUpdate : handleSubmit}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Skip ID*</label>
-                  <input
-                    type="text"
-                    name="skip_id"
-                    value={formData.skip_id}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-
-                  <select
-                    name="WasteStream"
-                    value={formData.WasteStream}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
-                  >
-                    <option value="">Select a category</option>
-                    {(Array.isArray(categories) && categories.length) > 0 ? (
-                      categories.map((category,index) => (
-                        <option key={category._id || index} value={category}>
-                          {formatCategory(category)}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No categories available</option>
-                    )}
-                  </select>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        name="QuantityValue"
-                        min="1"
-                        step={"any"}
-                        
-                        value={formData?.Quantity?.value?? 0}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            Quantity: { ...formData.Quantity, value: e.target.value }
-                          })
-                        }
-                        
-                        className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      <select
-                        name="QuantityUnit"
-                        value={formData.Quantity.unit}
-                        onChange={(e)=>{
-                          setFormData({
-                            ...formData,                            
-                            Quantity:{...formData.Quantity,unit:e.target.value}
-                          }
-                          )
-                        }
-                                                
-                        }
-                        
-                        className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">Unit </option>
-                        <option value="kg">kg</option>
-                        <option value="liters">liters</option>
-                        <option value="tonne">tonnes</option>
-                        <option value="units">Units</option>
-                        <option value="other">Other</option>
-                        {/* Add more units as needed */}
-                      </select>
-                    </div>
-                  </div>
-
-                
-               
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">DeliveryWaybillNo</label>
-                  <input
-                    type="number"
-                    name="DeliveryWaybillNo"
-                    value={formData.DeliveryWaybillNo}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Mobilized</label>
-                  <DatePicker
-                    selected={formData.DateMobilized}
-                    onChange={(date) => handleDateChange("DateMobilized", date)}
-                    className='border-4'
-                  />
-                </div>
-                  <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Recieved On Location</label>
-                  <DatePicker
-                    selected={formData.DateReceivedOnLocation}
-                    onChange={(date) => handleDateChange("DateReceivedOnLocation", date)}
-                    className='border-4'
-                  />
-                </div>
-                 <div>
-
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SkipsTruckRegNo</label>
-                  <input
-                    type="text"
-                    name="SkipsTruckRegNo"
-                    value={formData.SkipsTruckRegNo}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SkipsDriverName</label>
-                  <input
-                    type="text"
-                    name="SkipsTruckDriver"
-                    value={formData.SkipsTruckDriver}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">WasteSource*</label>
-                  <input
-                    type="text"
-                    name="WasteSource"
-                    value={formData.WasteSource}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">DispatchManifestNo</label>
-                  <input
-                    type="text"
-                    name="DispatchManifestNo"
-                    value={formData.DispatchManifestNo}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">WasteTruckRegNo</label>
-                  <input
-                    type="text"
-                    name="WasteTruckRegNo"
-                    value={formData.WasteTruckRegNo}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">WasteDriverName</label>
-                  <input
-                    type="text"
-                    name="WasteTruckDriverName"
-                    value={formData.WasteTruckDriverName}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              
-                
-                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Demobilization Of Filled Skips</label>
-                  <DatePicker
-                    selected={formData.DemobilizationOfFilledSkips}
-                    onChange={(date) => handleDateChange("DemobilizationOfFilledSkips", date)}
-                    className='mt-5 border-4'
-                    />
-                </div>
-                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Filled</label>
-                  <DatePicker
-                    selected={formData.DateFilled}
-                    onChange={(date) => handleDateChange("DateFilled", date)}
-                    className='mt-5 border-4'
-                  />
-                </div>
-                
-               
-              </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingItem(null);
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                disabled={IsLoading}
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                >
-                  
-                {IsLoading ? (
-                  <>
-                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                      Saving...
-                </>):(<>
-                <FiSave className="mr-2" />
-                  {editingItem ? 'Update Item' : 'Save Item'}
-                </>
-                  )}
-              </button>
-              </div>
-              </div>
-            </form>
-           
-          </div>
-        </div>
+        <AddSkip
+        setShowForm={setShowForm}
+        handleSubmit={handleSubmit}
+        handleUpdate={handleUpdate}
+        editingItem={editingItem}
+        setEditingItem={setEditingItem}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        handleDateChange={handleDateChange}
+        categories={categories}
+        IsLoading={IsLoading}
+        setFormData={setFormData}
+        formatCategory={formatCategory}
+        />
       )}
       {openmodal && (<ExcelExport setopenmodal={setopenmodal} categories={categories} setIsLoading={setIsLoading} IsLoading={IsLoading} />)}
 
