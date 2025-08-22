@@ -305,12 +305,12 @@ const CreateOrder = () => {
               </label>
             </div>
 
-            <label className="block mb-2">Remarks/Message</label>
+            <label className="block mb-2">Remarks/Message(Include Payment Details of third Party If Applicable)</label>
             <textarea
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               className="w-full p-2 border rounded mb-4"
-              placeholder="Describe your request..."
+              placeholder="(If Third party Involved, Include Payment Details)Describe your request..."
               required
             ></textarea>
 
