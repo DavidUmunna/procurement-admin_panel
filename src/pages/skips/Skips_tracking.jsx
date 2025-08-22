@@ -803,6 +803,7 @@ const SkipsManagement = () => {
                         type="number"
                         name="QuantityValue"
                         min="1"
+                        step={"any"}
                         
                         value={formData?.Quantity?.value?? 0}
                         onChange={(e) =>
