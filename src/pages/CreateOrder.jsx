@@ -311,7 +311,7 @@ const CreateOrder = () => {
               required
             ></textarea>
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Request</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Item Entry</h3>
             <AnimatePresence>
               {products.map((item, index) => (
                 <motion.div
@@ -321,6 +321,9 @@ const CreateOrder = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                 >
+                  <div>
+
+                  <label>Item Name(Request Name)</label>
                   <input
                     type="text"
                     placeholder="Product Name"
@@ -328,7 +331,10 @@ const CreateOrder = () => {
                     onChange={(e) => handleProductChange(index, "name", e.target.value)}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                    />
+                  </div>
+                  <div>
+                  <label>Quantity</label>
                   <input
                     type="number"
                     placeholder="Quantity"
@@ -336,7 +342,10 @@ const CreateOrder = () => {
                     onChange={(e) => handleProductChange(index, "quantity", e.target.value)}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                    />
+                  </div>
+                  <div>
+                  <label>Unit Price(Not Total)</label>
                   <input
                     type="number"
                     placeholder="Price"
@@ -344,7 +353,8 @@ const CreateOrder = () => {
                     onChange={(e) => handleProductChange(index, "price", e.target.value)}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                    />
+                  </div>
                   <motion.button
                     type="button"
                     onClick={() => removeProduct(index)}
