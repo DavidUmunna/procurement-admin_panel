@@ -805,15 +805,26 @@ const SkipsManagement = () => {
                         min="1"
                         
                         value={formData?.Quantity?.value?? 0}
-                        onChange={handleInputChange}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            Quantity: { ...formData.Quantity, value: e.target.value }
+                          })
+                        }
                         
                         className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                       />
                       <select
                         name="QuantityUnit"
                         value={formData.Quantity.unit}
-                        onChange={
-                          handleInputChange                        
+                        onChange={(e)=>{
+                          setFormData({
+                            ...formData,                            
+                            Quantity:{...formData.Quantity,unit:e.target.value}
+                          }
+                          )
+                        }
+                                                
                         }
                         
                         className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
