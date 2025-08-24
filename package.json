@@ -19,7 +19,7 @@
     "chart.js": "^4.4.9",
     "cypress": "^14.3.2",
     "date-fns": "^4.1.0",
-    "electron": "^37.2.0",
+    "electron": "^37.2.6",
     "framer-motion": "^12.5.0",
     "html-entities": "^2.6.0",
     "jest": "^27.5.1",
