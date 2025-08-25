@@ -101,7 +101,10 @@ const Requests = (approvedRequests || [])
                       <strong>Department:</strong>{request.staff?.Department}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className=" flex justify-end text-right">
+                    <p className="text-sm font-medium mr-6 text-gray-500">
+                      {request.createdAt.split('T')[0]}
+                    </p>
                     <p className="text-sm font-medium">
                       ₦{request.products.reduce((sum, p) => sum + (p.price * p.quantity), 0).toLocaleString()}
                     </p>
