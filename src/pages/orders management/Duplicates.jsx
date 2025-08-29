@@ -213,7 +213,7 @@ const Duplicates = ({ orders, onOrderSelect }) => {
                               <ul className="text-sm text-gray-600">
                                 {order.products?.map((product, idx) => (
                                   <li key={idx}>
-                                    • {product.name} (Qty: {product.quantity}, ${product.price})
+                                    • {product.name} (Qty: {product.quantity}, ₦{product.price})
                                   </li>
                                 ))}
                               </ul>
