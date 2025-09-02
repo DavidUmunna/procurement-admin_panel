@@ -41,16 +41,16 @@ export const getOrders = async (page , limit ) => {
                 page,
                 limit,
               },headers:{"x-session-id":token},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
-      requests.push(axios.get(`${API_URL}/fileupload/${userId}`, { responseType: "blob" },{headers:{"x-session-id":token},withCredentials:true,"ngrok-skip-browser-warning": "true"}));
+     
     }
     
     const results = await Promise.allSettled(requests);
    
 
     const orderResponse = results[0].status === "fulfilled" ? results[0].value : null;
-    const fileResponse = results[1].status === "fulfilled" ? results[1].value : null;
+    
 
-    return { orders: orderResponse?.data, file: fileResponse };
+    return { orders: orderResponse?.data };
   } catch (error) {
     if(isProd){
 
@@ -76,12 +76,11 @@ export const createOrder = async ({ formData, orderData }) => {
           "Content-Type": "multipart/form-data",
           "ngrok-skip-browser-warning": "true",
           
-      },
-      withCredentials:true}
+      },withCredentials:true}
     );
 
       // Extract file IDs from response
-      uploadedFileIds = fileResponse?.data?.files?._id;
+      uploadedFileIds = fileResponse?.data?.files?._id; //the file Id is gotten and attatched tot he oerderdata for use as fileRef
     }
 
     // STEP 2: Attach file IDs if available
@@ -138,7 +137,7 @@ export const downloadFile = async (fileId,filename,onProgress) => {
       headers:{ "ngrok-skip-browser-warning": "true"}});
     return response_2.data;
   } catch (err) {
-    if (isProd)Sentry.captureException(err)
+    if (isProd) Sentry.captureException(err)
     
   }
 };

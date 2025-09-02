@@ -67,11 +67,12 @@ const DepartmentManagement = (setAuth) => {
           axios.get(`${API_URL}/tasks`, {withCredentials:true }),
           axios.get(`${API_URL}/department/stats`, { withCredentials:true })
         ]);
+        console.log(statsRes)
        
         setDepartments(deptRes.status === 'fulfilled' ? deptRes.value.data.data : []);
         setUsers(usersRes.status === 'fulfilled' ? usersRes.value.data.data : []);
         setTasks(tasksRes.status === 'fulfilled' ? tasksRes.value.data.data : []);
-        setStats(statsRes.status === 'fulfilled' ? statsRes.value.data : {});
+        setStats(statsRes.status === 'fulfilled' ? statsRes.value.data.data: {});
       } catch (err) {
         if (err.response?.status===401|| err.response?.status===403){
         setError("Session expired. Please log in again.");
@@ -365,32 +366,37 @@ const refreshDepartments = () => {
   }
 
   // Components
+  {console.log(stats)}
   const StatsPanel = ({ department }) => (
     <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
       <h3 className="font-bold text-lg mb-3 flex items-center">
         <FiBarChart2 className="mr-2" /> Department Statistics
       </h3>
-      <div className="grid grid-cols-2 gap-4">
+      {
+        stats.map((stat)=>(
+          
+          <div className="grid grid-cols-2 gap-4" key={stat._id}>
         <StatCard 
           title="Total Members" 
-          value={department.users.length} 
+          value={stat?.memberCount} 
           trend="↗︎ 2 this month" 
-        />
+          />
         <StatCard 
           title="Active Tasks" 
-          value={stats[department._id]?.activeTasks || 0} 
-          trend={`${stats[department._id]?.taskCompletion || 0}% completed`} 
+          value={stat?.activeTasks || 0} 
+          trend={`${stat?.taskCompletion || 0}% completed`} 
         />
         <StatCard 
           title="Avg. Task Time" 
-          value={stats[department._id]?.avgTaskTime || 'N/A'} 
+          value={Math.ceil(stat?.avgTaskTimeHours) || 'N/A'} 
           trend="Last month: 3.2 days" 
-        />
+          />
         <StatCard 
           title="Head Since" 
           value={new Date(department.createdAt.split("T")[0]).toLocaleDateString() || 'N/A'} 
-        />
+          />
       </div>
+        ))}
     </div>
   );
 
@@ -488,7 +494,7 @@ const refreshDepartments = () => {
   if (loading) return <div className="text-center py-8">Loading departments...</div>;
 
   return (
-    <div className="max-w-full sm:max-w-md md:max-w-full lg:max-w-4xl xl:max-w-6xl mx-auto p-6 mt-10"
+    <div className="max-w-full sm:max-w-md md:max-w-full lg:max-w-4xl xl:max-w-6xl mx-auto p-6 mt-10 mb-15"
       >
             {/* Header and Search */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 flex-wrap mt-4 md:items-center">

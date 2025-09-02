@@ -51,7 +51,8 @@ const UserTasks = () => {
       await axios.patch(
         `${API_URL}/tasks/${taskId}`,
         { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" } },
+        { headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning":"true" },
+      withCredentials:true },
         
       );
       fetchTasks();

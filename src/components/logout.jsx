@@ -17,7 +17,7 @@ export default function SignOut({ setAuth }) {
                 
             
                 const API = `${process.env.REACT_APP_API_URL}/api`
-                const response=await axios.post(`${API}/admin-user/logout`,{userId:user.userId},{withCredentials:true})
+                const response=await axios.post(`${API}/admin-user/logout`,{userId:user?.userId},{withCredentials:true})
                 if (response.success===true){
 
 
