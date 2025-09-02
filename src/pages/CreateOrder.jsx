@@ -88,7 +88,7 @@ const CreateOrder = () => {
       setIsSubmitting(true);
       const requestupload = await createOrder({ formData: formData, orderData: payload });
      
-      if (requestupload.order.data.success===true){
+      if (requestupload.order?.data?.success===true){
 
       
         
@@ -348,7 +348,7 @@ const CreateOrder = () => {
                     />
                   </div>
                   <div>
-                  <label>Unit Price(Not Total)</label>
+                  <label>Unit Price(Or Total)</label>
                   <input
                     type="number"
                     placeholder="Price"

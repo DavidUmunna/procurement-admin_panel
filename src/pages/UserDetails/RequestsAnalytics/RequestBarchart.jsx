@@ -158,13 +158,13 @@ const RequestBarChart = ({DepartmentalAccess=[],GeneralAccess=[]}) => {
   return (
   <div className="w-full bg-white shadow-lg p-5 rounded-2xl max-h-screen flex flex-col">
   {/* Filters */}
-  <div className="mb-5 flex flex-col sm:flex-row sm:flex-wrap gap-3">
-    <div className="w-full sm:w-auto">
+  <div className="mb-5 flex flex-col  md:w-full sm:flex-wrap gap-3">
+    <div className="w-full sm:w-full md:w-full">
       <label className="block mb-1 font-medium">View Mode:</label>
       <select
         value={viewMode}
         onChange={(e) => setViewMode(e.target.value)}
-        className="p-2 border border-gray-300 rounded w-full sm:w-40"
+        className="p-2 border border-gray-300 rounded w-full sm:w-full"
       >
         <option value="daily">Daily</option>
         <option value="monthly">Monthly</option>
@@ -172,12 +172,12 @@ const RequestBarChart = ({DepartmentalAccess=[],GeneralAccess=[]}) => {
       </select>
     </div>
 
-    <div className="w-full sm:w-auto">
+    <div className="w-full sm:w-full  md:w-full">
       <label className="block mb-1 font-medium">Display Metric:</label>
       <select
         value={displayMetric}
         onChange={(e) => setDisplayMetric(e.target.value)}
-        className="p-2 border border-gray-300 rounded w-full sm:w-40"
+        className="p-2 border border-gray-300 rounded w-full sm:w-full"
       >
         <option value="count">Order Count</option>
         <option value="value">Total Value</option>
