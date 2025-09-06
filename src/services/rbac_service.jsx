@@ -113,7 +113,7 @@ export const fetch_RBAC_ordermanagement=async()=>{
 
      const token = localStorage.getItem('sessionId');
           const API_URL = `${process.env.REACT_APP_API_URL}/api`
-          const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_GENERAL:true,GENERAL_ACCESS_ORDERS:true,DEPARTMENTAL_ACCESS:true,APPROVALS_LIST:true},{headers: {
+          const rbacRes=await axios.post(`${API_URL}/roles&departments`,{ADMIN_ROLES_GENERAL:true,GENERAL_ACCESS_ORDERS:true,DEPARTMENTAL_ACCESS:true,APPROVALS_LIST:true,EDITING_ROLES:true},{headers: {
                 Authorization: `Bearer ${token}`,
             
                 "ngrok-skip-browser-warning": "true",

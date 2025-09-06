@@ -21,6 +21,7 @@ const buttonVariants = {
 
 const CreateOrder = () => {
   const { user } = useUser();
+  const [targetDepartment,setTargetDepartment]=useState("")
   const [supplier, setSupplier] = useState("Halden");
   const [products, setProducts] = useState([{ name: "", quantity: 1, price: 0 }]);
   const [urgency, setUrgency] = useState("");
@@ -34,7 +35,6 @@ const CreateOrder = () => {
   const [staff,setStaff]=useState("")
   const [role,setrole]=useState("")
   const [IsTarget,setIsTarget]=useState(false)
-  const [targetDepartment,setTargetDepartment]=useState("")
   const [showInfo, setShowInfo] = useState(false);
   useEffect(() => {
     if (user) {
@@ -53,9 +53,13 @@ const CreateOrder = () => {
   };
   
   const handleInputChange=(e)=>{
-    setIsTarget(e.target.checked)
+    const checked=e.target.checked
+    setIsTarget(checked)
+    if(!checked){
+      setTargetDepartment("")
+    }
   }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -72,12 +76,12 @@ const CreateOrder = () => {
       role,
 
     };
-
     formData.append("email", email);
     formData.append("userId",user.userId)
     if (IsTarget){
       payload.targetDepartment=targetDepartment
-    };
+    }
+   
 
     files.forEach((file) => {
       formData.append("files", file);
@@ -90,8 +94,6 @@ const CreateOrder = () => {
      
       if (requestupload.order?.data?.success===true){
 
-      
-        
         // Reset form
         setSupplier("Halden");
         setProducts([{ name: "", quantity: 1, price: 0 }]);
@@ -122,6 +124,8 @@ const CreateOrder = () => {
     }
   };
 
+   
+
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...products];
     updatedProducts[index][field] = value;
@@ -129,11 +133,12 @@ const CreateOrder = () => {
   };
 
   const addProduct = () => {
-    setProducts([...products, { name: "", quantity: 1, price: 0 }]);
+     setProducts([...products, { name: "", quantity: 1, price: 0 }]);
+  
   };
 
   const removeProduct = (index) => {
-    if(products.length>1){
+    if(products.length>1 ){
 
       const updatedProducts = products.filter((_, i) => i !== index);
       setProducts(updatedProducts);
@@ -314,6 +319,9 @@ const CreateOrder = () => {
               required
             ></textarea>
 
+            {targetDepartment!=="Procurement_department"&&
+            (<div>
+
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Item Entry(At Least One Required)</h3>
             <AnimatePresence>
               {products.map((item, index) => (
@@ -363,7 +371,7 @@ const CreateOrder = () => {
                     onClick={() => removeProduct(index)}
                     className="px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                     whileHover={{ scale: 1.1 }}
-                  >
+                    >
                     Remove
                   </motion.button>
                 </motion.div>
@@ -375,9 +383,11 @@ const CreateOrder = () => {
               className="p-2 y-4 w-full bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
               variants={buttonVariants}
               whileHover="hover"
-            >
+              >
               Add Product
             </motion.button>
+              </div>
+            )}
             <motion.button 
               type="submit" 
               className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex justify-center items-center gap-2 mb-24"

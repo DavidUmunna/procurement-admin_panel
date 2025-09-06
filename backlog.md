@@ -1,4 +1,4 @@
-## 🧾 Request Lifecycle (Staff + Accounts)
+## 🧾 Request Lifecycle (Staff + Accounts)(Completed)
 
 | ID | Title | Description | Priority |
 |----|-------|-------------|----------|
@@ -8,7 +8,7 @@
 
 ---
 
-## 🗓 Schedule Creation (Accounts)
+## 🗓 Schedule Creation (Accounts)(Completed)
 
 | ID | Title | Description | Priority |
 |----|-------|-------------|----------|
@@ -19,7 +19,7 @@
 
 ---
 
-## 🧑‍💼 MD Review Workflow
+## 🧑‍💼 MD Review Workflow(Completed)
 
 | ID | Title | Description | Priority |
 |----|-------|-------------|----------|
@@ -34,7 +34,7 @@
 
 | ID | Title | Description | Priority |
 |----|-------|-------------|----------|
-| `FD-001` | Accounts See "On Hold" Requests | On-hold requests can be reviewed and added to future schedules | Medium |
+| `FD-001` | Accounts See "Awaiting funding" Requests | On-hold requests can be reviewed and added to future schedules | Medium |
 | `FD-002` | Mark Funded Requests | After MD approval, Accounts can mark requests as `Funded` and attach payment details | Medium |
 | `FD-003` | View Funding History | View/search historical schedules and requests with filters and status tracking | Low |
 
@@ -48,4 +48,12 @@
 | `NT-002` | Notify Accounts When MD Returns a Schedule | Triggered when MD sends revised schedule | Low |
 
 ---
+
+
+## Edit Existing Request Modal 
+| ER-001 | staff makes a request to procurement department (completed)
+| ER-002 | procurement officer goes to request history to view existing requests(completed)
+ |ER-003| Requests sent to procurement department glow light blue 
+ |ER-004| procuremnt officer can edit the request by clicking a modal named "Edit" (completed)
+ |ER-005| after editing is done, the submit button is clicked and the request is edited (completed)
 

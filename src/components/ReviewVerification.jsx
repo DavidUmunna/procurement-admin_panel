@@ -1,7 +1,7 @@
 // components/OTPModal.jsx
 import { useState } from "react";
 
-export default function OTPModal({ onClose, onSubmit, order,statusOption,orderId}) {
+export default function ReviewVerification({ onClose, onSubmit, order,statusOption,orderId}) {
  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,7 +38,7 @@ export default function OTPModal({ onClose, onSubmit, order,statusOption,orderId
   >
     <h2 className="text-xl font-bold text-gray-800 mb-4">Review Option Verification</h2>
     <p className="text-gray-500 text-sm mb-4">
-       Confirm Review Verification for : <strong>{order.Title}</strong>
+       Confirm Review Action <strong>({statusOption})</strong> for : <strong>{order.Title}</strong>
     </p>
     
    

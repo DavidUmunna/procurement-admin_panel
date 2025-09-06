@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FileText } from "lucide-react";
 import { FaFilePdf,FaInfoCircle, FaFile, FaTrash, 
   FaEllipsisV, FaCheck, FaTimes, FaClock, FaComment,FaTimesCircle, FaMoneyBillWave, FaSignature } from "react-icons/fa";
-import { FiDownload,  } from "react-icons/fi";
+import { FiDownload,FiEdit2  } from "react-icons/fi";
 import { useUser } from "../../components/usercontext";
 import Searchbar from "./searchbar";
 import axios from "axios";
@@ -25,10 +25,10 @@ import DownloadStatus from "../../components/Downloadstatus";
 import ReviewVerification from "../../components/ReviewVerification";
 import { toast } from "react-toastify";
 import { isProd } from "../../components/env";
+import EditOrderModal from "./EditOrderModal";
 
 
-
-const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest}) => {
+const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -50,9 +50,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [downloaded, setDownloaded] = useState(0);
   const [total, setTotal] = useState(0);
   const [StatusState,setStatusState]=useState("")
-  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [RVModalOpen, setRVModalOpen] = useState(false);
   const [isOpen,setIsOpen]=useState(false)
   const [signature, setSignature] = useState(null);
+  const [EditingModalId,setEditingModalId]=useState(false)
   const getOverallStatus = (approvals, Department) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
@@ -498,6 +499,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
           <p className="text-gray-600"><span className="font-medium">Request Number:</span> {order.orderNumber || "N/A"}</p>
           {order.supplier!=="Halden"&&(<p className="text-gray-600"><span className="font-medium">Supplier:</span> {order.supplier || "N/A"}</p>)}
           <p className="text-gray-600"><span className="font-medium">Requested By:</span> {order.staff?.name}</p>
+          <p><span className="font-semibold">EditedBy:</span> {order?.EditedBy?.name || "N/A" }</p>
           <p className="text-gray-600"><span className="font-medium">Employee Email:</span> {order.staff?.email}</p>
           <p className="text-gray-600"><span className="font-medium">Employee Department:</span> {order.staff?.Department}</p>
         </div>
@@ -516,6 +518,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
             <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-sm">
               <p><span className="font-semibold">Admin:</span> {a.admin}</p>
               <p><span className="font-semibold">Status:</span> {a.status}</p>
+    
               <p><span className="font-semibold">Time Approved:</span> {a.timestamp.split('T')[0]} ({a.timestamp.split('T')[1].split(".")[0]})</p>
               {a.comment && (
                 <p><span className="font-semibold">Comment:</span> {a.comment}</p>
@@ -604,12 +607,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       </div>
       <div className="flex ">
 
-        {(user.role==="accounts" || user.role==="Financial_manager")&&(<button 
+        {(accRoles?.includes(user.Department))&&(<button 
           onClick={() => {
             setSelectedRequest(prev => prev === order ? null : order)
             setIsExportOpen(true)
           }}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-md rounded p-1 ml-1"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-md rounded-lg p-1 ml-1"
           >
           <FileText className="h-4 w-4" />
           Export Memo
@@ -620,7 +623,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
           <button
       
           onClick={()=> setOpenResponseOrderId(prev=>prev===order._id? null:order._id)}
-        className="relative px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ml-3"
+       className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-md rounded-lg  ml-1 p-3"
        >
           Response
        
@@ -631,6 +634,23 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
            )}
         </button>
           )
+        }
+      
+
+        {(EditingRoles?.includes(user.role)&&(
+
+          <div>
+            <button onClick={()=>{
+              setEditingModalId(order._id)
+            }}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-md rounded-lg  ml-1 p-3"
+            >
+              <FiEdit2  className="h-4 w-4" />
+              Edit
+            </button>
+          </div>
+            ))
+
         }
       </div>
       {order.remarks && (
@@ -786,19 +806,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                             }`}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              
-
-                                            if(statusOption==="Approved"){
-                                                  setOtpModalOpen(true)
-                                                  setStatusState(statusOption)
-                                            }else{
-
-                                              handleStatusChange(order._id, statusOption);
-                                            }
-                                                 
-                                                
-                                              
-                                            }}
+                          
+                                              setRVModalOpen(true)
+                                              setStatusState(statusOption)
+                                           }}
                                           >
                                             <span className="mr-5">
                                               {statusOption === "Approved" && (
@@ -823,9 +834,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                             </span>
                                             {statusOption}
                                             
-                                            {otpModalOpen&&(
+                                            {RVModalOpen&&(
                                              <ReviewVerification
-                                             onClose={() => setOtpModalOpen(false)}
+                                             onClose={() => setRVModalOpen(false)}
                                              statusOption={StatusState}
                                              order={order}
                                              orderId={order._id}
@@ -914,6 +925,21 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                             </div>
                                 )
                               }
+                        {EditingModalId===order._id &&(
+                          <EditOrderModal Order={order}
+                          setEditingModalId={setEditingModalId}
+                          setOrders={setOrders}
+                          Onclose={(e)=>{
+
+                            e.preventDefault()
+                            setEditingModalId(null)
+                          }
+                          }
+                          />
+
+                        )
+
+                        }
 
                         </div>
                       </div>
