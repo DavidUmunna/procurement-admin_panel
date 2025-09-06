@@ -228,7 +228,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   
   const handleStatusChange = async (orderId, newStatus) => {
   try {
-    console.log("newStatuses",newStatus)
+    
     setIsLoading(true);
 
     
@@ -516,7 +516,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
             <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-sm">
               <p><span className="font-semibold">Admin:</span> {a.admin}</p>
               <p><span className="font-semibold">Status:</span> {a.status}</p>
-              <p><span className="font-semibold">Time Approved:</span> {a.timestamp.split('T')[0]} ({a.timestamp.split('T')[1].split(".")[0]})</p>
+              <p><span className="font-semibold">Time Reviewed:</span> {a.timestamp.split('T')[0]} ({a.timestamp.split('T')[1].split(".")[0]})</p>
               {a.comment && (
                 <p><span className="font-semibold">Comment:</span> {a.comment}</p>
               )}

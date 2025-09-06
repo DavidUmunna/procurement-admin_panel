@@ -67,7 +67,7 @@ const DepartmentManagement = (setAuth) => {
           axios.get(`${API_URL}/tasks`, {withCredentials:true }),
           axios.get(`${API_URL}/department/stats`, { withCredentials:true })
         ]);
-        console.log(statsRes)
+       
        
         setDepartments(deptRes.status === 'fulfilled' ? deptRes.value.data.data : []);
         setUsers(usersRes.status === 'fulfilled' ? usersRes.value.data.data : []);
@@ -332,7 +332,7 @@ const refreshDepartments = () => {
   const visibleDepartments = filteredDepartments.filter(dept => {
     const isGlobalAccess = ADMIN_ROLES.includes(user.role);
     const isDepartmentHead = String(dept.headOfDepartment.user._id) === String(user.userId);
-    //console.log(dept.headOfDepartment?.user?._id)
+   
     return isGlobalAccess || isDepartmentHead;
   })
   // Task Operations
@@ -351,7 +351,7 @@ const refreshDepartments = () => {
       }, { 
         withCredentials: true 
       });
-      //console.log(response)
+     
       //setTasks(prev => [...prev, response.data.data]);
       fetchTasks()
       closeModal();
@@ -366,7 +366,7 @@ const refreshDepartments = () => {
   }
 
   // Components
-  {console.log(stats)}
+
   const StatsPanel = ({ department }) => (
     <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
       <h3 className="font-bold text-lg mb-3 flex items-center">
