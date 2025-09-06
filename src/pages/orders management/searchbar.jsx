@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
 import Orderexport from "./Orderexport";
+import { FaFileExport } from 'react-icons/fa';
 import { useUser } from '../../components/usercontext';
 const Searchbar = () => {
   const dispatch = useDispatch();
@@ -64,10 +65,10 @@ const Searchbar = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="bg-white shadow-md rounded-xl p-4 sm:p-6 space-y-4 mt-4"
+        className="bg-white shadow-md rounded-xl p-2 sm:p-6 space-y-4 mt-4"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <h2 className="text-lg font-semibold text-gray-700">Search Requests</h2>
+         
           {hasActiveFilters() && (
             <button
               onClick={handleClear}
@@ -109,9 +110,9 @@ const Searchbar = () => {
           </motion.button>
           {export_departments.includes(user.Department)&&<button
                  onClick={() => setshowmodal(!showmodal)}
-                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 "
+                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex justify-between items-center"
                  >
-                   Excel Export 
+                  <FaFileExport className='mr-2'/>   Export 
           </button>
                 }
 
@@ -129,6 +130,8 @@ const Searchbar = () => {
                 <option value="Pending">Pending</option>
                 <option value="Approved">Approved</option>
                 <option value="Rejected">Rejected</option>
+                <option value="More Information">More Information</option>
+                <option value="Completed">Completed</option>
               </select>
             )}
 

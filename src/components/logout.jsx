@@ -3,18 +3,19 @@ import { useEffect, useState } from "react";
 import { useUser } from "./usercontext";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 import { isProd } from "./env";
 import * as Sentry from "@sentry/react"
 export default function SignOut({ setAuth }) {
     const { user,setUser } = useUser();
     const [error,setError]=useState(null)
-
+    //const [IsLoading, setIsLoading]=useState(false)
     useEffect(() => {
         setAuth(false);
         const logout_backend=async()=>{
             try{
                
-                
+               
             
                 const API = `${process.env.REACT_APP_API_URL}/api`
                 const response=await axios.post(`${API}/admin-user/logout`,{userId:user?.userId},{withCredentials:true})
@@ -67,11 +68,12 @@ export default function SignOut({ setAuth }) {
       transition={{ duration: 0.8 }}
     >
       <motion.h2
-        className="text-lg font-semibold text-gray-800"
+        className="text-lg font-semibold text-gray-800 flex justify-center items-center"
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
+        <Loader2 className="animate-spin h-5 w-5 mr-2" />
         Signing out...
       </motion.h2>
     </motion.div>
