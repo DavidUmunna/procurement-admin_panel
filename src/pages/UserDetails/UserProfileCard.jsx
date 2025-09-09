@@ -3,7 +3,7 @@ import React from 'react';
 import { EnterpriseCard } from './EnterpriseCard';
 import { colorPalette, typography} from './enterpriseUI.constants';
 import { FiMail, FiCalendar } from 'react-icons/fi';
-import { FaSitemap } from 'react-icons/fa';
+import { FaSitemap,FaUser } from 'react-icons/fa';
 import { formatDate, getInitials } from './userDetails.utils';
 import userImg from "../../components/assets/user.png"
 const ProfileBadge = ({ role }) => (
@@ -69,6 +69,13 @@ export const UserProfileCard = ({ user }) => (
         {user?.Department && (
           <div className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
             <FaSitemap className="text-gray-500 text-xl flex-shrink-0" />
+            <span className="text-gray-700 text-lg">{user.Department}</span>
+          </div>
+        )}
+
+        {user?.Availability &&(
+          <div className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+            <FaUser className="text-gray-500 text-xl flex-shrink-0" />
             <span className="text-gray-700 text-lg">{user.Department}</span>
           </div>
         )}
