@@ -28,7 +28,7 @@ import { isProd } from "../../components/env";
 import EditOrderModal from "./EditOrderModal";
 
 
-const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles}) => {
+const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles,Managers}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -54,22 +54,31 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [isOpen,setIsOpen]=useState(false)
   const [signature, setSignature] = useState(null);
   const [EditingModalId,setEditingModalId]=useState(false)
-  const getOverallStatus = (approvals, Department) => {
+  const getOverallStatus = (approvals, Department,role) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
     if (approvals.some(a => a.status === "Completed")) return "Completed";
     const approvalCount = approvals.filter(a => a.status === "Approved").length;
     
     let REQUIRED_APPROVALS;
-    
+   
     switch (Department) {
       case "waste_management_dep":
-        REQUIRED_APPROVALS = 5;
+        if(role==="Waste Management Manager"){
+
+        REQUIRED_APPROVALS=3}else{
+
+          REQUIRED_APPROVALS = 5;
+        }        
         break;
       case "Environmental_lab_dep":
-        REQUIRED_APPROVALS = 4;
+        if (role==="Environmental_lab_manager"){
+
+          REQUIRED_APPROVALS = 4;
+        }else{
+          REQUIRED_APPROVALS=3}
         break;
-        default:
+      default:
           REQUIRED_APPROVALS = 3;
         }
 
@@ -84,26 +93,33 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     return "Pending";
   };
   
-  const getStatusExplanation = (approvals,Department) => {
-    const status = getOverallStatus(approvals,Department);
+  const getStatusExplanation = (approvals,Department,role) => {
+    const status = getOverallStatus(approvals,Department,role);
    
     const approvalsCount = Array.isArray(approvals)?approvals?.filter(a => a.status === "Approved").length : 0;
 
     
     let REQUIRED_APPROVALS;
-
-    switch(Department){
+ 
+     switch (Department) {
       case "waste_management_dep":
-        REQUIRED_APPROVALS=5;
-        break
-      case  "Environmental_lab_dep":
-        REQUIRED_APPROVALS=4;
+        if(role==="Waste Management Manager"){
+
+        REQUIRED_APPROVALS=3}else{
+
+          REQUIRED_APPROVALS = 5;
+        }        
+        break;
+      case "Environmental_lab_dep":
+        if (role==="Environmental_lab_manager"){
+
+          REQUIRED_APPROVALS = 4;
+        }else{
+          REQUIRED_APPROVALS=3}
         break;
       default:
-        REQUIRED_APPROVALS=3;
-
-        
-    }
+          REQUIRED_APPROVALS = 3;
+        }
 
     
     switch(status) {
@@ -230,6 +246,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const handleStatusChange = async (orderId, newStatus) => {
   try {
     
+  
     setIsLoading(true);
 
     
@@ -425,7 +442,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
 
   const getStatusBadge = (order) => {
     let bgColor, textColor, icon;
-    const status = order.status==="Completed"?order.status:order.status==="More Information"?order.status:getOverallStatus(order.Approvals,order.staff?.Department);
+    const status = order.status==="Completed"?order.status:order.status==="More Information"?order.status:getOverallStatus(order.Approvals,order.staff?.Department,order.staff?.role);
     switch (status) {
       case "Approved":
         bgColor = "bg-green-100";
@@ -487,10 +504,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       
       <div className="p-3 bg-gray-50 rounded-lg">
           <p className="font-semibold text-gray-700">
-            Current Status: <span className="ml-2">{order.status==="Completed"?order.status:getOverallStatus(order.Approvals,order.staff?.Department)}</span>
+            Current Status: <span className="ml-2">{order.status==="Completed"?order.status:getOverallStatus(order.Approvals,order.staff?.Department,order.staff?.role)}</span>
           </p>
           <p className="text-sm text-gray-500 mt-1">
-            {getStatusExplanation(order.Approvals,order?.staff?.Department)}
+            {getStatusExplanation(order.Approvals,order?.staff?.Department,order.staff?.role)}
           </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
