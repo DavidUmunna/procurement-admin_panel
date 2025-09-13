@@ -18,7 +18,7 @@ const  AssetsManagement=React.lazy(()=>import("./pages/AssetManagement/Assetmana
 const InventoryManagement =React.lazy(()=>import("./pages/inventorymanagement/ParentComp")) ;
 const SkipsManagement=React.lazy(()=>import("./pages/skips/parent"))
 const Monitoring =React.lazy(()=>import("./pages/Monitoring"))
-const Addusers=React.lazy(()=>import("./pages/add_users")) 
+
 const ScheduleManager =React.lazy(()=>import("./pages/SchedulingComponents/ScheduleManager"))
 const DraftSchedules =React.lazy(()=>import('./pages/SchedulingComponents/ScheduleManager/DraftSchedules')) ;
 const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
@@ -78,18 +78,7 @@ const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
                             )
                         }
                       />
-                      <Route
-                        path="addusers"
-                        element={
-                          isauthenticated ? (
-                           
-                              <Addusers />
-                            
-                          ) : (
-                            <Navigate to="/adminlogin" />
-                          )
-                        }
-                      />
+                     
                       <Route
                         path="addsupplier"
                         element={
