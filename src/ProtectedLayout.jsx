@@ -11,7 +11,7 @@ import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
 import ScheduleEditor from './pages/SchedulingComponents/ScheduleEditor'
 import AppLayout from "./components/AppLayout"
-import AssetManagement from "./pages/AssetManagement/Assetmanagement";
+import AssetsManagement from "./pages/AssetManagement/Assetmanagement";
 // lazy loaded components
 const  DepartmentAssignment= React.lazy(()=>import("./pages/Department_assignment")) 
 
