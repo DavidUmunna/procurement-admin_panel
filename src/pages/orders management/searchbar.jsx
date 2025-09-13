@@ -110,7 +110,7 @@ const Searchbar = () => {
           </motion.button>
           {export_departments.includes(user.Department)&&<button
                  onClick={() => setshowmodal(!showmodal)}
-                 className="h-11 w-full sm:w-auto px-4 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex justify-between items-center"
+                 className="h-11 w-full justify-center sm:w-auto px-4 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex items-center"
                  >
                   <FaFileExport className='mr-2'/>   Export 
           </button>
