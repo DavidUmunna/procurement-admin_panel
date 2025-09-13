@@ -11,14 +11,13 @@ import OrdersDashboard from "./pages/orders management/Ordersmanagement";
 import InventoryLogs from "./pages/inventorymanagement/inventory_logs/index";
 import ScheduleEditor from './pages/SchedulingComponents/ScheduleEditor'
 import AppLayout from "./components/AppLayout"
-import AssetsManagement from "./pages/AssetManagement/Assetmanagement";
+
 // lazy loaded components
 const  DepartmentAssignment= React.lazy(()=>import("./pages/Department_assignment")) 
-
 const InventoryManagement =React.lazy(()=>import("./pages/inventorymanagement/ParentComp")) ;
 const SkipsManagement=React.lazy(()=>import("./pages/skips/parent"))
 const Monitoring =React.lazy(()=>import("./pages/Monitoring"))
-
+const  AssetsManagement=React.lazy(()=>import("./pages/AssetManagement/Assetmanagement"))
 const ScheduleManager =React.lazy(()=>import("./pages/SchedulingComponents/ScheduleManager"))
 const DraftSchedules =React.lazy(()=>import('./pages/SchedulingComponents/ScheduleManager/DraftSchedules')) ;
 const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
