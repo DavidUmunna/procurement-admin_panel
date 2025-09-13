@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import AdminImg from "../components/assets/haldenlogo_1 copy.png"
+import AdminImg from "../components/assets/haldenlogo_copy.png"
 import { useUser } from "../components/usercontext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";

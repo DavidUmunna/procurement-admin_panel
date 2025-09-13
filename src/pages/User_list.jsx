@@ -44,6 +44,7 @@ export default function UserList() {
     canApprove: false,
     role: "",
     password: "",
+    WorkStatus:"",
     email:""
   });
   const [showEditModal, setShowEditModal] = useState(false);
@@ -107,16 +108,17 @@ export default function UserList() {
     setUsers(users.filter((user) => user._id !== userId));
   };
 
-  const handleEdit = (user) => {
+  const handleEdit = (editeduser) => {
 
-    setEditingUser(user);
+    setEditingUser(editeduser);
     setEditForm({
-      name: user.name,
-      Department: user.Department,
-      canApprove: user.canApprove || false,
-      role: user.role,
-      password: "",
-      email:user.email // Leave blank for security
+      name: editeduser.name||"",
+      Department: editeduser.Department||'',
+      canApprove: editeduser.canApprove || false,
+      role: editeduser.role||"",
+      password:editeduser.password||'',
+      WorkStatus:editeduser.role||'',
+      email:editeduser.email ||""   // Leave blank for security
     });
     setShowEditModal(true);
   };
@@ -259,6 +261,22 @@ export default function UserList() {
                     ))}
                   </select>
                 </div>
+
+                <div>
+                  <label>Work Status</label>
+                  <select
+                  name="WorkStatus"
+                  value={editForm.WorkStatus}
+                  onChange={handleInputChange}
+                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
+                  >
+                    <option value="">Select Work Status</option>
+                    <option value="On-Site">On-Site</option>
+                    <option value="On-Leave">On-Leave</option>
+
+                  </select>
+                </div>
                 
                 <div className="flex items-center">
                   <input
@@ -393,18 +411,28 @@ export default function UserList() {
                             <span className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded-full">
                               {person.role}
                             </span>
+                            
                           )}
+                          {(person.WorkStatus)&&
+                            <span className={`text-xs px-2 py-1  rounded-full
+                              ${person.WorkStatus==="On-Site"?" bg-green-100 ": "bg-red-100" }`
+                            }>
+                              {person?.WorkStatus}
+                            </span>
+                          }
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-end sm:justify-normal gap-3">
+                     
                       <motion.button
                         onClick={() => handleEdit(person)}
                         className="px-3 py-1 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100 transition font-medium flex items-center gap-1"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
+
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>

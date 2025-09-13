@@ -105,10 +105,10 @@ const CreateOrder = () => {
         setrole("")
         setTargetDepartment("")
       }else{
-        setError("the file/order was not sent please reach out to IT")
-
+        setError("the file/Request was not sent please Refresh Page")
+        
       }
-      //alert("Order Created!");
+    
     } catch (error) {
       console.error("Error creating order:", error);
       setError(" It seems there was an error processing your Request")

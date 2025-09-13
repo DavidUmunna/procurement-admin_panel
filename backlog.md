@@ -51,8 +51,8 @@
 
 
 ## Edit Existing Request Modal 
-| ER-001 | staff makes a request to procurement department (completed)
-| ER-002 | procurement officer goes to request history to view existing requests(completed)
+ | ER-001 | staff makes a request to procurement department (completed)
+ | ER-002 | procurement officer goes to request history to view existing requests(completed)
  |ER-003| Requests sent to procurement department glow light blue 
  |ER-004| procuremnt officer can edit the request by clicking a modal named "Edit" (completed)
  |ER-005| after editing is done, the submit button is clicked and the request is edited (completed)

@@ -74,9 +74,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       case "Environmental_lab_dep":
         if (role==="Environmental_lab_manager"){
 
-          REQUIRED_APPROVALS = 4;
+          REQUIRED_APPROVALS = 3;
         }else{
-          REQUIRED_APPROVALS=3}
+          REQUIRED_APPROVALS=4}
         break;
       default:
           REQUIRED_APPROVALS = 3;
@@ -113,9 +113,9 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
       case "Environmental_lab_dep":
         if (role==="Environmental_lab_manager"){
 
-          REQUIRED_APPROVALS = 4;
+          REQUIRED_APPROVALS = 3;
         }else{
-          REQUIRED_APPROVALS=3}
+          REQUIRED_APPROVALS=4}
         break;
       default:
           REQUIRED_APPROVALS = 3;

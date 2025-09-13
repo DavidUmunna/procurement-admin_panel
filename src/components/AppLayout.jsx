@@ -3,6 +3,7 @@ import Navbar from "./navBar";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { useEffect,useState } from "react";
+import Footer from "./Footer/footer";
 
 function AppLayout() {
   const location = useLocation();
@@ -30,11 +31,12 @@ function AppLayout() {
             ease: "easeInOut",
             type: "tween" 
           }}
-          className="absolute inset-0"
+          className="relative "
         >
           <Outlet />
         </motion.div>)}
       </main>
+      <Footer/>
     </div>
   );
 }
