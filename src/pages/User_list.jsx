@@ -179,7 +179,7 @@ export default function UserList() {
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
   }
-  console.log("open add user",openAdduser)
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10 mb-11">
@@ -348,7 +348,7 @@ export default function UserList() {
             </div>
             <div className="flex  justify-between ">
 
-            <button className="p-3 bg-gray-700 text-white rounded-lg mx-3"
+            <button className="p-3 bg-gray-700 text-white rounded-lg mx-3 font-bold"
             onClick={()=>setOpenAdduser(true)}
             >
                 Add User

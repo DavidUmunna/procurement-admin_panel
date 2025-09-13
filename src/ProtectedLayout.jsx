@@ -4,7 +4,6 @@ import CreateOrder from "./pages/CreateOrder";
 import "./index.css";
 import Users from "./pages/User_list";
 import { Dashboard } from "./pages/Dash/Dashboard";
-import AddSupplier from "./pages/Suppliers/add_suppliers";
 import SupplierList from "./pages/Suppliers/supplierList";
 import UserTasks from "./pages/Usertask";
 import OrdersDashboard from "./pages/orders management/Ordersmanagement";
@@ -78,18 +77,7 @@ const ProtectedLayout=({isauthenticated,setisauthenticated})=>{
                         }
                       />
                      
-                      <Route
-                        path="addsupplier"
-                        element={
-                          isauthenticated ? (
-                           
-                              <AddSupplier />
-                            
-                          ) : (
-                            <Navigate to="/adminlogin" />
-                          )
-                        }
-                      />
+                    
                       <Route
                         path="schedules"
                         element={

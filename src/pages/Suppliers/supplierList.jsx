@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import AddSupplierModal from "./AddSupplierModal";
+
 
 export default function SupplierList() {
   const [suppliers, setSuppliers] = useState([]);
   const [expandedSupplierId, setExpandedSupplierId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openAddSupplierModal,setOpenAddSupplierModal]=useState(false)
   //const [requests, setRequests] = useState({}); // supplierId -> [requests]
 
   useEffect(() => {
@@ -36,8 +39,21 @@ export default function SupplierList() {
   if (loading) return <p className="text-center mt-10">Loading suppliers...</p>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4">
-      <h2 className="text-2xl font-bold mb-6">Suppliers</h2>
+    <div className="max-w-4xl mx-auto mt-20 p-4 ">
+      {openAddSupplierModal&&(
+        <AddSupplierModal 
+        onClose={()=>setOpenAddSupplierModal(false)}
+        />
+      )}
+      <div className="flex justify-between items-center align-middle mb-6">
+
+      <h2 className="text-2xl font-bold">Suppliers</h2>
+      <button
+      onClick={()=>setOpenAddSupplierModal(true)}
+       className="bg-gray-700 p-3 text-white rounded-lg font-bold">
+        Add Supplier
+      </button>
+      </div>
 
       {suppliers.length === 0 ? (
         <p>No suppliers found.</p>
