@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react"
 import { useEffect, useState } from "react";
 import { get_users, deleteUser, updateUser } from "../services/userService";
 import { motion, AnimatePresence } from "framer-motion";
-
+import AddUserModal from "./AddUserModal";
 import {Users} from "lucide-react"
 import { fetch_RBAC_ALL } from "../services/rbac_service";
 import { isProd } from "../components/env";
@@ -47,6 +47,7 @@ export default function UserList() {
     WorkStatus:"",
     email:""
   });
+  const [openAdduser,setOpenAdduser]=useState(false)
   const [showEditModal, setShowEditModal] = useState(false);
   const fetch_all=async()=>{
     try{
@@ -178,6 +179,7 @@ export default function UserList() {
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
   }
+  console.log("open add user",openAdduser)
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 mt-10 mb-11">
@@ -273,6 +275,7 @@ export default function UserList() {
                   >
                     <option value="">Select Work Status</option>
                     <option value="On-Site">On-Site</option>
+                    <option value="Remote">Remote</option>
                     <option value="On-Leave">On-Leave</option>
 
                   </select>
@@ -323,6 +326,12 @@ export default function UserList() {
           </motion.div>
         </div>
       )}
+      {openAdduser&&(
+          <AddUserModal
+          onClose={()=>setOpenAdduser(false)}        
+          />
+        )
+        }
 
       {/* Main User List */}
       <motion.div
@@ -337,12 +346,19 @@ export default function UserList() {
               <Users className="h-6 w-6 text-gray-800" />
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">User Management</h2>
             </div>
-            
+            <div className="flex  justify-between ">
+
+            <button className="p-3 bg-gray-700 text-white rounded-lg mx-3"
+            onClick={()=>setOpenAdduser(true)}
+            >
+                Add User
+            </button>
             <div className="flex flex-wrap gap-2">
+              
               <select 
                 onChange={(e) => setFilter(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
+                >
                 <option value="All">Select Department</option>
                 <option value="waste_management_dep">Waste Management</option>
                 <option value="PVT">PVT</option>
@@ -353,6 +369,7 @@ export default function UserList() {
                 <option value="Administration">Administration</option>
            
               </select>
+            </div>
             </div>
           </div>
         </div>
@@ -456,6 +473,7 @@ export default function UserList() {
             </AnimatePresence>
           </motion.ul>
         )}
+        
       </motion.div>
     </div>
   );
