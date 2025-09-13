@@ -1,8 +1,8 @@
 import axios from "axios"
 import { Loader2 } from "lucide-react"
-import React, { useState } from "react"
+import  { useState } from "react"
 import { toast } from "react-toastify"
-import { FiX,FiPlus } from "react-icons/fi"
+import { FiX } from "react-icons/fi"
 import { FaPlus } from "react-icons/fa"
 
 
