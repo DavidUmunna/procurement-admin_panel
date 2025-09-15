@@ -3,8 +3,8 @@ import { Loader2 } from "lucide-react"
 import  { useState } from "react"
 import { toast } from "react-toastify"
 import { FiX } from "react-icons/fi"
-import { FaPlus } from "react-icons/fa"
-
+import { FaPlus, FaTrash } from "react-icons/fa"
+import { motion } from "framer-motion"
 
 
 const EditOrderModal=({Order, Onclose,setOrders,setEditingModalId})=>{
@@ -44,6 +44,15 @@ const EditOrderModal=({Order, Onclose,setOrders,setEditingModalId})=>{
             {...prev,[name]:value}
         ))
 
+    }
+    const handleRemoveProduct=(index)=>{{
+
+      setformdata((prev)=>(
+        {...prev,
+          products:prev.products.filter((_,i)=>i!==index)
+        }
+        ))
+    }
     }
     const handleAddProduct = () => {
      setformdata((prev) => ({
@@ -196,6 +205,15 @@ const EditOrderModal=({Order, Onclose,setOrders,setEditingModalId})=>{
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                           </div>
+                         
+                          <motion.button 
+                          type="button"
+                          onClick={()=>handleRemoveProduct(index)}
+                          className="p-2 py-2 bg-red-600 m-2 rounded-lg text-white hover:-translate-y-1 hover:scale-105 transition-transform duration-200 hover;bg-red-700"
+                          whileHover={{scale:1.05}}
+                          >
+                             <FaTrash/>
+                          </motion.button>
                     </div>
                     
                     ))}
