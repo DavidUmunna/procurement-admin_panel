@@ -1,13 +1,15 @@
 import { useQuery, useQueryClient, useMutation } from 'react-query';
+import { useEffect,useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { data, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as Sentry from "@sentry/react"
+import { FaTrash } from 'react-icons/fa';
 
 const DraftSchedules = ({ refreshKey, onEdit })=>{
   const queryClient = useQueryClient();
   const API = process.env.REACT_APP_API_URL;
-   
+  const [filteredSchedules, setFilteredSchedules]=useState([])
   const { 
   data: drafts, 
   isLoading, 
@@ -39,6 +41,7 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
   {
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2, // Retry failed requests twice
+    onSuccess:(data)=>setFilteredSchedules(data),
     onError: (error) => {
       // Log to error reporting service
       console.error('Draft schedules fetch error:', error);
@@ -47,6 +50,11 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
     }
   }
 );
+ useEffect(() => {
+  if (data) {
+    setFilteredSchedules(data);
+  }
+}, [data]);
 
   const submitToMD = useMutation(
     (scheduleId) => axios.patch(`${API}/api/scheduling/disbursement-schedules/${scheduleId}/submit`),
@@ -58,6 +66,19 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
       }
     }
   );
+   const handleDelete=async(scheduleId)=>{
+    try{
+      const response=await axios.delete(`${API}/api/scheduling/disbursement-schedules/${scheduleId}`,{withCredentials:true})
+      
+      setFilteredSchedules((prevSchedules) =>
+      prevSchedules.filter((schedule) => schedule._id !== scheduleId)
+      );
+      toast.success("deleted successfully")
+    }catch(error){
+      Sentry.captureException(error)
+      toast.error(error.message)
+    }
+  }
   
 
   const handleSubmit = (scheduleId) => {
@@ -83,7 +104,7 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {drafts?.map(schedule => (
+              {filteredSchedules?.map(schedule => (
                 <tr key={schedule._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {schedule.name || 'Untitled Schedule'}
@@ -106,10 +127,17 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
                     </Link>
                     <button
                       onClick={() => handleSubmit(schedule._id)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       Submit to MD
                     </button>
+
+                    <button
+                    onClick={()=>handleDelete(schedule._id)}
+                     className=' text-red-600 hover:text-red-400'>
+                      <FaTrash />
+                    </button>
+
                   </td>
                 </tr>
               ))}
