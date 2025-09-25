@@ -656,14 +656,13 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
         {(EditingRoles?.includes(user.role)&&(
 
           <div>
-            <button onClick={()=>{
-              setEditingModalId(order._id)
-            }}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-md rounded-lg  ml-1 p-3"
-            >
-              <FiEdit2  className="h-4 w-4" />
-              Edit
-            </button>
+           <button 
+             onClick={() => setEditingModalId(order._id)}
+             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2.5 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+           >
+             <FiEdit2 className="h-4 w-4" />
+             Edit
+           </button>
           </div>
             ))
 

@@ -41,7 +41,7 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
   {
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2, // Retry failed requests twice
-    onSuccess:(data)=>setFilteredSchedules(data),
+   
     onError: (error) => {
       // Log to error reporting service
       console.error('Draft schedules fetch error:', error);
@@ -52,7 +52,7 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
 );
  useEffect(() => {
   if (data) {
-    setFilteredSchedules(data);
+    setFilteredSchedules(data.data||[]);
   }
 }, [data]);
 
@@ -84,12 +84,13 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
   const handleSubmit = (scheduleId) => {
     submitToMD.mutate(scheduleId);
   };
+  
 
   return (
     <div>
       {isLoading ? (
         <div className="text-center py-4">Loading drafts...</div>
-      ) : drafts?.length === 0 ? (
+      ) : filteredSchedules?.length === 0 ? (
         <div className="text-center py-4 text-gray-500">No draft schedules found</div>
       ) : (
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
@@ -104,7 +105,7 @@ const DraftSchedules = ({ refreshKey, onEdit })=>{
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSchedules?.map(schedule => (
+              {Array.isArray(filteredSchedules)&&filteredSchedules?.map(schedule => (
                 <tr key={schedule._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {schedule.name || 'Untitled Schedule'}

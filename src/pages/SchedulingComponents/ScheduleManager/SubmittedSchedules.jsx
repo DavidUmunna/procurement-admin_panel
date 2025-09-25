@@ -32,8 +32,8 @@ const SubmittedSchedules = ({ refreshKey }) => {
       }
     }).then(res => ({
     
-      schedules: res.data.schedules,
-      pagination: res.data.Pagination
+      schedules: res.data.schedules||[],
+      pagination: res.data.Pagination||{}
     })),
     {
       staleTime: 3* 60 * 1000,
