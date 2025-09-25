@@ -26,9 +26,10 @@ import ReviewVerification from "../../components/ReviewVerification";
 import { toast } from "react-toastify";
 import { isProd } from "../../components/env";
 import EditOrderModal from "./EditOrderModal";
+import { DeleteConfirmationModal,DeleteButton } from "../../components/DeleteConfirmationModal";
 
 
-const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles,DeletionRoles}) => {
+const OrderList = ({orders,setOrders, selectedOrderId,setSelectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles,DeletionRoles}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -54,6 +55,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
   const [isOpen,setIsOpen]=useState(false)
   const [signature, setSignature] = useState(null);
   const [EditingModalId,setEditingModalId]=useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+ 
   const getOverallStatus = (approvals, Department,role) => {
     if (!approvals || approvals.length === 0) return "Pending";
     if (approvals.some(a => a.status === "Rejected")) return "Rejected";
@@ -391,6 +394,10 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
     }
   };
    
+  const handleDeleteClick=(orderId)=>{
+    setSelectedOrderId(orderId);
+    setDeleteModalOpen(true);
+  }
 
   
   const toggleOrderDetails = (orderId) => {
@@ -865,7 +872,8 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          handleDelete(order._id);
+                                          
+                                          handleDeleteClick(order._id);
                                         }}
                                       >
                                         <FaTrash className="mr-2" />
@@ -1007,6 +1015,12 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
            onClose={() => setIsOpen(false)} 
            onSave={(sig) => setSignature(sig)} 
          />
+          <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        orderId={selectedOrderId}
+        />
           {isLoading && total > 0 && (
             <DownloadStatus
               downloadedBytes={downloaded}

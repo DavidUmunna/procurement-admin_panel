@@ -242,6 +242,7 @@ return (
       <OrderList
         orders={orders}
         selectedOrderId={selectedOrderId}
+        setSelectedOrderId={setSelectedOrderId}
         setOrders={setOrders}
         error={error}
         setError={setError}
