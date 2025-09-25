@@ -31,7 +31,7 @@ const OrdersDashboard = ({setAuth}) => {
   const [ADMIN_ROLES_GENERAL,set_ADMIN_ROLES_GENERAL]=useState([])
   const [accRoles,set_ACC_ROLES]=useState([])
   const [EditingRoles,setEditingRoles]=useState([])
-
+  const [deletionRoles,setDeletionRoles]=useState([])
  
 
    const rbac_=async()=>{
@@ -44,6 +44,7 @@ const OrdersDashboard = ({setAuth}) => {
            set_ADMIN_ROLES_GENERAL(data.ADMIN_ROLES_GENERAL)
            set_ACC_ROLES(data.APPROVALS_LIST)
            setEditingRoles(data.EDITING_ROLES)
+           setDeletionRoles(data.DELETIONROLES)
           return data
       }catch(error){
         if(isProd)Sentry.captureException(error)
@@ -247,6 +248,7 @@ return (
         RefreshRequest={RefreshRequest}
         accRoles={accRoles}
         EditingRoles={EditingRoles}
+        DeletionRoles={deletionRoles}
       />
       <div>
         <PaginationControls

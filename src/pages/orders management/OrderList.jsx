@@ -28,7 +28,7 @@ import { isProd } from "../../components/env";
 import EditOrderModal from "./EditOrderModal";
 
 
-const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles,Managers}) => {
+const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshRequest,accRoles, EditingRoles,DeletionRoles}) => {
   const { keyword, status, dateRange, orderedby } = useSelector(
     (state) => state.search
   );
@@ -862,7 +862,7 @@ const OrderList = ({orders,setOrders, selectedOrderId ,error, setError ,RefreshR
                                              }
                                           </div>
                                         ))}
-                                      {user.role==="global_admin"&&(<button
+                                      {DeletionRoles.includes(user.role)&&(<button
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         onClick={(e) => {
                                           e.stopPropagation();
